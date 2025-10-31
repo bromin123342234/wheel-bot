@@ -68,6 +68,41 @@
             from { text-shadow: 0 0 20px rgba(255, 140, 66, 0.5); }
             to { text-shadow: 0 0 30px rgba(255, 140, 66, 0.8), 0 0 40px rgba(157, 78, 221, 0.6); }
         }
+
+        /* Окошко с ID пользователя */
+        .user-id-card {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 10px 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .user-id-title {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .user-id-value {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ff8c42;
+            word-break: break-all;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .user-id-value:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.02);
+        }
         
         .balance-card {
             background: linear-gradient(135deg, rgba(255, 140, 66, 0.15), rgba(157, 78, 221, 0.15));
@@ -598,21 +633,73 @@
             background: rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
         }
+
+        .user-id-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 14px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .user-id-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .copy-notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: bold;
+            z-index: 1001;
+            animation: slideDown 0.3s ease-out;
+            display: none;
+        }
+
+        @keyframes slideDown {
+            0% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
     </style>
 </head>
 <body>
     <div class="ghost">👻</div>
     <div class="ghost">👻</div>
     <div class="ghost">👻</div>
+
+    <!-- Уведомление о копировании -->
+    <div class="copy-notification" id="copyNotification">ID скопирован!</div>
     
-    <!-- Админ-панель -->
-    <div class="admin-panel">
+    <!-- Админ-панель (только для админа) -->
+    <div class="admin-panel" id="adminPanel" style="display: none;">
         <button class="admin-button" onclick="showAdminPanel()">⚙️ АДМИН</button>
     </div>
     
     <div class="container">
         <div class="header">
             <h1 class="title">🎃 HALLOWEEN WHEEL 🎃</h1>
+            
+            <!-- Окошко с ID пользователя -->
+            <div class="user-id-card">
+                <div class="user-id-title">ВАШ УНИКАЛЬНЫЙ ID</div>
+                <div class="user-id-value" id="userIdValue" onclick="copyUserId()">
+                    Загрузка...
+                </div>
+                <div style="font-size: 10px; opacity: 0.6; margin-top: 5px;">
+                    Нажмите чтобы скопировать ID для пополнения баланса
+                </div>
+            </div>
+            
             <div class="balance-card">
                 <div class="balance-title">ВАШ БАЛАНС</div>
                 <div class="balance-amount" id="balance">100</div>
@@ -684,17 +771,26 @@
     <!-- Админ-попап -->
     <div class="admin-popup" id="adminPopup">
         <div class="admin-title">⚙️ АДМИН ПАНЕЛЬ</div>
-        <input type="number" class="admin-input" id="adminStarsInput" placeholder="Количество звезд">
+        
+        <div style="margin-bottom: 20px;">
+            <div style="color: white; margin-bottom: 10px; font-size: 16px;">Ваш ID: <span id="currentUserId"></span></div>
+            <input type="text" class="user-id-input" id="targetUserId" placeholder="ID игрока для выдачи звезд">
+            <input type="number" class="admin-input" id="adminStarsInput" placeholder="Количество звезд">
+        </div>
+        
         <div class="admin-buttons">
-            <button class="admin-action-btn" onclick="adminAddStars()">➕ ДОБАВИТЬ</button>
-            <button class="admin-action-btn" onclick="adminSetStars()">⚡ УСТАНОВИТЬ</button>
-            <button class="admin-action-btn" onclick="adminResetBalance()">🔄 СБРОСИТЬ</button>
-            <button class="admin-action-btn" onclick="adminClearInventory()">🗑️ ОЧИСТИТЬ ИНВЕНТАРЬ</button>
+            <button class="admin-action-btn" onclick="adminAddStarsToUser()">🎁 ВЫДАТЬ ИГРОКУ</button>
+            <button class="admin-action-btn" onclick="adminAddStars()">➕ ДОБАВИТЬ СЕБЕ</button>
+            <button class="admin-action-btn" onclick="adminSetStars()">⚡ УСТАНОВИТЬ СЕБЕ</button>
+            <button class="admin-action-btn" onclick="adminResetBalance()">🔄 СБРОСИТЬ СЕБЯ</button>
         </div>
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
     <script>
+        // Конфигурация админа (ЗАМЕНИ НА СВОЙ ID)
+        const ADMIN_USER_ID = "admin_12345"; // Замени на свой уникальный ID
+        
         // Призы для колеса с картинками
         const prizes = [
             { name: "Мишка", type: "item", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
@@ -715,12 +811,77 @@
         const inventoryPopup = document.getElementById('inventoryPopup');
         const paymentPopup = document.getElementById('paymentPopup');
         const adminPopup = document.getElementById('adminPopup');
+        const adminPanel = document.getElementById('adminPanel');
         const adminStarsInput = document.getElementById('adminStarsInput');
+        const targetUserId = document.getElementById('targetUserId');
+        const currentUserIdElement = document.getElementById('currentUserId');
+        const userIdValue = document.getElementById('userIdValue');
+        const copyNotification = document.getElementById('copyNotification');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
 
         let isSpinning = false;
+        let currentUserId = '';
         let userInventory = [];
+        let userBalance = 100;
+
+        // Генерация уникального ID пользователя
+        function generateUserId() {
+            return 'user_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Копирование ID в буфер обмена
+        function copyUserId() {
+            navigator.clipboard.writeText(currentUserId).then(() => {
+                // Показываем уведомление
+                copyNotification.style.display = 'block';
+                setTimeout(() => {
+                    copyNotification.style.display = 'none';
+                }, 2000);
+            }).catch(err => {
+                console.error('Ошибка копирования: ', err);
+                alert('Не удалось скопировать ID');
+            });
+        }
+
+        // Сохранение данных в localStorage
+        function saveUserData() {
+            const userData = {
+                userId: currentUserId,
+                balance: userBalance,
+                inventory: userInventory
+            };
+            localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
+        }
+
+        // Загрузка данных из localStorage
+        function loadUserData() {
+            const savedData = localStorage.getItem('halloweenWheelData');
+            if (savedData) {
+                const userData = JSON.parse(savedData);
+                currentUserId = userData.userId;
+                userBalance = userData.balance;
+                userInventory = userData.inventory;
+            } else {
+                // Новый пользователь
+                currentUserId = generateUserId();
+                userBalance = 100;
+                userInventory = [];
+                saveUserData();
+            }
+            
+            // Обновляем отображение ID
+            userIdValue.textContent = currentUserId;
+            currentUserIdElement.textContent = currentUserId;
+            
+            // Показываем админ-панель только админу
+            if (currentUserId === ADMIN_USER_ID) {
+                adminPanel.style.display = 'block';
+            }
+            
+            updateBalance(userBalance);
+            updateInventoryBadge();
+        }
 
         // Создание колеса с сегментами
         function createWheel() {
@@ -763,14 +924,15 @@
         }
         
         function initUser() {
-            updateBalance(100);
+            loadUserData();
             createWheel();
-            updateInventoryBadge();
         }
         
         function updateBalance(newBalance) {
-            balanceElement.textContent = newBalance;
-            spinButton.disabled = newBalance < 50 || isSpinning;
+            userBalance = newBalance;
+            balanceElement.textContent = userBalance;
+            spinButton.disabled = userBalance < 50 || isSpinning;
+            saveUserData();
         }
         
         function showPaymentPopup() {
@@ -779,11 +941,9 @@
         }
         
         function addStars(amount, price) {
-            const currentBalance = parseInt(balanceElement.textContent);
-            updateBalance(currentBalance + amount);
+            updateBalance(userBalance + amount);
             
             // Здесь будет интеграция с платежной системой
-            // Показываем имитацию успешной оплаты
             setTimeout(() => {
                 closeAllPopups();
                 createConfetti();
@@ -816,15 +976,14 @@
                 flyingPrize.remove();
                 userInventory.push(prize);
                 updateInventoryBadge();
+                saveUserData(); // Сохраняем после добавления предмета
             }, 2000);
         }
         
         function spinWheel() {
             if (isSpinning) return;
             
-            const currentBalance = parseInt(balanceElement.textContent);
-            
-            if (currentBalance < 50) {
+            if (userBalance < 50) {
                 alert('❌ Недостаточно звезд\nДля вращения колеса нужно 50 звезд');
                 return;
             }
@@ -848,7 +1007,7 @@
                 
                 setTimeout(() => {
                     // Только списываем 50 звезд, не прибавляем выигрыш
-                    updateBalance(currentBalance - 50);
+                    updateBalance(userBalance - 50);
                     
                     createConfetti();
                     
@@ -858,7 +1017,7 @@
                     }, 1000);
                     
                     isSpinning = false;
-                    spinButton.disabled = currentBalance - 50 < 50;
+                    spinButton.disabled = userBalance < 50;
                 }, 4000);
             }, 50);
         }
@@ -919,16 +1078,36 @@
         
         // АДМИН-ФУНКЦИИ
         function showAdminPanel() {
+            if (currentUserId !== ADMIN_USER_ID) return;
+            
             overlay.style.display = 'block';
             adminPopup.style.display = 'block';
             adminStarsInput.value = '';
+            targetUserId.value = '';
+        }
+        
+        function adminAddStarsToUser() {
+            if (currentUserId !== ADMIN_USER_ID) return;
+            
+            const userId = targetUserId.value.trim();
+            const amount = parseInt(adminStarsInput.value);
+            
+            if (userId && amount && amount > 0) {
+                // В реальном приложении здесь был бы запрос к серверу
+                alert(`✅ Игроку ${userId} выдано ${amount} звезд!`);
+                adminStarsInput.value = '';
+                targetUserId.value = '';
+            } else {
+                alert('❌ Введите корректный ID игрока и количество звезд');
+            }
         }
         
         function adminAddStars() {
+            if (currentUserId !== ADMIN_USER_ID) return;
+            
             const amount = parseInt(adminStarsInput.value);
             if (amount && amount > 0) {
-                const currentBalance = parseInt(balanceElement.textContent);
-                updateBalance(currentBalance + amount);
+                updateBalance(userBalance + amount);
                 createConfetti();
                 adminStarsInput.value = '';
                 alert(`✅ Добавлено ${amount} звезд!`);
@@ -938,6 +1117,8 @@
         }
         
         function adminSetStars() {
+            if (currentUserId !== ADMIN_USER_ID) return;
+            
             const amount = parseInt(adminStarsInput.value);
             if (amount && amount >= 0) {
                 updateBalance(amount);
@@ -950,15 +1131,11 @@
         }
         
         function adminResetBalance() {
+            if (currentUserId !== ADMIN_USER_ID) return;
+            
             updateBalance(100);
             createConfetti();
             alert('✅ Баланс сброшен до 100 звезд!');
-        }
-        
-        function adminClearInventory() {
-            userInventory = [];
-            updateInventoryBadge();
-            alert('✅ Инвентарь очищен!');
         }
         
         // Закрытие попапов по клику на оверлей
