@@ -238,30 +238,6 @@
             transform: none;
         }
         
-        .result-popup {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 25px;
-            padding: 25px;
-            margin: 20px 0;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
-            display: none;
-            animation: popIn 0.5s ease-out;
-        }
-        
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-           100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .prize-text {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            margin: 10px 0;
-        }
-        
         .flying-prize {
             position: fixed;
             width: 60px;
@@ -281,11 +257,11 @@
                 opacity: 0.9;
             }
             70% {
-                transform: translate(100px, 50px) scale(1.1) rotate(270deg);
+                transform: translate(-100px, 50px) scale(1.1) rotate(270deg);
                 opacity: 0.7;
             }
             100% {
-                transform: translate(150px, 200px) scale(0.5) rotate(360deg);
+                transform: translate(-150px, 200px) scale(0.5) rotate(360deg);
                 opacity: 0;
             }
         }
@@ -468,6 +444,71 @@
             opacity: 0.8;
             margin-top: 5px;
         }
+
+        /* Стили для попапа пополнения баланса */
+        .payment-popup {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: none;
+            animation: popIn 0.5s ease-out;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+           100% { transform: scale(1); opacity: 1; }
+        }
+
+        .payment-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .payment-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .payment-option {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 15px;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .payment-option:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
+        }
+
+        .payment-amount {
+            font-size: 18px;
+            color: #ff8c42;
+        }
+
+        .payment-price {
+            font-size: 14px;
+            opacity: 0.8;
+        }
     </style>
 </head>
 <body>
@@ -485,7 +526,7 @@
                     <span>★</span>
                     <span>ЗВЕЗД</span>
                 </div>
-                <button class="top-up-button" onclick="topUpBalance()">
+                <button class="top-up-button" onclick="showPaymentPopup()">
                     💰 ПОПОЛНИТЬ
                 </button>
             </div>
@@ -503,12 +544,6 @@
             <div class="cost-info">Одно вращение = 50 звезд</div>
         </div>
         
-        <div class="result-popup" id="resultPopup">
-            <div style="font-size: 18px; opacity: 0.9;">🎉 ВАШ ВЫИГРЫШ!</div>
-            <div class="prize-text" id="prizeText">25 ЗВЕЗД</div>
-            <div style="font-size: 14px; opacity: 0.8; margin-top: 10px;">Удачи в следующем вращении! 🍀</div>
-        </div>
-        
         <div class="navigation">
             <button class="nav-btn" onclick="showInventory()">
                 🎒<br>ИНВЕНТАРЬ
@@ -520,11 +555,36 @@
         </div>
     </div>
 
+    <!-- Оверлей и попапы -->
     <div class="overlay" id="overlay"></div>
+    
     <div class="inventory-popup" id="inventoryPopup">
         <div class="inventory-title">🎒 ВАШ ИНВЕНТАРЬ</div>
         <div class="inventory-items" id="inventoryItems"></div>
-        <button class="close-button" onclick="closeInventory()">ЗАКРЫТЬ</button>
+        <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
+    </div>
+
+    <div class="payment-popup" id="paymentPopup">
+        <div class="payment-title">💰 ПОПОЛНЕНИЕ БАЛАНСА</div>
+        <div class="payment-options">
+            <div class="payment-option" onclick="addStars(100, 99)">
+                <div class="payment-amount">100 звезд</div>
+                <div class="payment-price">99 рублей</div>
+            </div>
+            <div class="payment-option" onclick="addStars(500, 399)">
+                <div class="payment-amount">500 звезд</div>
+                <div class="payment-price">399 рублей</div>
+            </div>
+            <div class="payment-option" onclick="addStars(1000, 699)">
+                <div class="payment-amount">1000 звезд</div>
+                <div class="payment-price">699 рублей</div>
+            </div>
+            <div class="payment-option" onclick="addStars(2000, 1199)">
+                <div class="payment-amount">2000 звезд</div>
+                <div class="payment-price">1199 рублей</div>
+            </div>
+        </div>
+        <button class="close-button" onclick="closeAllPopups()">ОТМЕНА</button>
     </div>
 
     <script>
@@ -543,11 +603,10 @@
         // Элементы DOM
         const wheel = document.getElementById('wheel');
         const spinButton = document.getElementById('spinButton');
-        const resultPopup = document.getElementById('resultPopup');
-        const prizeText = document.getElementById('prizeText');
         const balanceElement = document.getElementById('balance');
         const inventoryBadge = document.getElementById('inventoryBadge');
         const inventoryPopup = document.getElementById('inventoryPopup');
+        const paymentPopup = document.getElementById('paymentPopup');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
 
@@ -605,11 +664,21 @@
             spinButton.disabled = newBalance < 50 || isSpinning;
         }
         
-        function topUpBalance() {
-            const amount = 500;
+        function showPaymentPopup() {
+            overlay.style.display = 'block';
+            paymentPopup.style.display = 'block';
+        }
+        
+        function addStars(amount, price) {
             const currentBalance = parseInt(balanceElement.textContent);
             updateBalance(currentBalance + amount);
-            alert(`✅ Ваш баланс пополнен на ${amount} звезд!`);
+            
+            // Здесь будет интеграция с платежной системой
+            // Показываем имитацию успешной оплаты
+            setTimeout(() => {
+                closeAllPopups();
+                createConfetti();
+            }, 500);
         }
         
         function createConfetti() {
@@ -638,7 +707,6 @@
                 flyingPrize.remove();
                 userInventory.push(prize);
                 updateInventoryBadge();
-                alert(`🎉 ${prize.name} был добавлен в ваш инвентарь`);
             }, 2000);
         }
         
@@ -654,7 +722,6 @@
             
             isSpinning = true;
             spinButton.disabled = true;
-            resultPopup.style.display = 'none';
             
             const prizeIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[prizeIndex];
@@ -671,9 +738,6 @@
                 wheel.style.transform = `rotate(${totalRotation}deg)`;
                 
                 setTimeout(() => {
-                    prizeText.textContent = `Вам выпал ${prize.name}!`;
-                    resultPopup.style.display = 'block';
-                    
                     // Только списываем 50 звезд, не прибавляем выигрыш
                     updateBalance(currentBalance - 50);
                     
@@ -733,17 +797,18 @@
             inventoryPopup.style.display = 'block';
         }
         
-        function closeInventory() {
+        function closeAllPopups() {
             overlay.style.display = 'none';
             inventoryPopup.style.display = 'none';
+            paymentPopup.style.display = 'none';
         }
         
         function showCases() {
             alert('🎁 Кейсы\nСпециальные хэллоуинские кейсы скоро появятся!');
         }
         
-        // Закрытие попапа по клику на оверлей
-        overlay.addEventListener('click', closeInventory);
+        // Закрытие попапов по клику на оверлей
+        overlay.addEventListener('click', closeAllPopups);
         
         // Запуск при загрузке страницы
         document.addEventListener('DOMContentLoaded', initUser);
