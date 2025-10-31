@@ -509,12 +509,106 @@
             font-size: 14px;
             opacity: 0.8;
         }
+
+        /* Стили для админ-панели */
+        .admin-panel {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+        }
+
+        .admin-button {
+            background: linear-gradient(135deg, #ff4444, #ff8c42);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .admin-button:hover {
+            transform: scale(1.05);
+        }
+
+        .admin-popup {
+            background: linear-gradient(135deg, rgba(255, 68, 68, 0.95), rgba(255, 140, 66, 0.95));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: none;
+            animation: popIn 0.5s ease-out;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .admin-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .admin-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .admin-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .admin-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .admin-action-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            padding: 12px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-action-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
     <div class="ghost">👻</div>
     <div class="ghost">👻</div>
     <div class="ghost">👻</div>
+    
+    <!-- Админ-панель -->
+    <div class="admin-panel">
+        <button class="admin-button" onclick="showAdminPanel()">⚙️ АДМИН</button>
+    </div>
     
     <div class="container">
         <div class="header">
@@ -587,6 +681,19 @@
         <button class="close-button" onclick="closeAllPopups()">ОТМЕНА</button>
     </div>
 
+    <!-- Админ-попап -->
+    <div class="admin-popup" id="adminPopup">
+        <div class="admin-title">⚙️ АДМИН ПАНЕЛЬ</div>
+        <input type="number" class="admin-input" id="adminStarsInput" placeholder="Количество звезд">
+        <div class="admin-buttons">
+            <button class="admin-action-btn" onclick="adminAddStars()">➕ ДОБАВИТЬ</button>
+            <button class="admin-action-btn" onclick="adminSetStars()">⚡ УСТАНОВИТЬ</button>
+            <button class="admin-action-btn" onclick="adminResetBalance()">🔄 СБРОСИТЬ</button>
+            <button class="admin-action-btn" onclick="adminClearInventory()">🗑️ ОЧИСТИТЬ ИНВЕНТАРЬ</button>
+        </div>
+        <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
+    </div>
+
     <script>
         // Призы для колеса с картинками
         const prizes = [
@@ -607,6 +714,8 @@
         const inventoryBadge = document.getElementById('inventoryBadge');
         const inventoryPopup = document.getElementById('inventoryPopup');
         const paymentPopup = document.getElementById('paymentPopup');
+        const adminPopup = document.getElementById('adminPopup');
+        const adminStarsInput = document.getElementById('adminStarsInput');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
 
@@ -801,10 +910,55 @@
             overlay.style.display = 'none';
             inventoryPopup.style.display = 'none';
             paymentPopup.style.display = 'none';
+            adminPopup.style.display = 'none';
         }
         
         function showCases() {
             alert('🎁 Кейсы\nСпециальные хэллоуинские кейсы скоро появятся!');
+        }
+        
+        // АДМИН-ФУНКЦИИ
+        function showAdminPanel() {
+            overlay.style.display = 'block';
+            adminPopup.style.display = 'block';
+            adminStarsInput.value = '';
+        }
+        
+        function adminAddStars() {
+            const amount = parseInt(adminStarsInput.value);
+            if (amount && amount > 0) {
+                const currentBalance = parseInt(balanceElement.textContent);
+                updateBalance(currentBalance + amount);
+                createConfetti();
+                adminStarsInput.value = '';
+                alert(`✅ Добавлено ${amount} звезд!`);
+            } else {
+                alert('❌ Введите корректное количество звезд');
+            }
+        }
+        
+        function adminSetStars() {
+            const amount = parseInt(adminStarsInput.value);
+            if (amount && amount >= 0) {
+                updateBalance(amount);
+                createConfetti();
+                adminStarsInput.value = '';
+                alert(`✅ Баланс установлен на ${amount} звезд!`);
+            } else {
+                alert('❌ Введите корректное количество звезд');
+            }
+        }
+        
+        function adminResetBalance() {
+            updateBalance(100);
+            createConfetti();
+            alert('✅ Баланс сброшен до 100 звезд!');
+        }
+        
+        function adminClearInventory() {
+            userInventory = [];
+            updateInventoryBadge();
+            alert('✅ Инвентарь очищен!');
         }
         
         // Закрытие попапов по клику на оверлей
