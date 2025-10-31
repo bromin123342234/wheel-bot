@@ -788,8 +788,8 @@
     </div>
 
     <script>
-        // Конфигурация админа (ЗАМЕНИ НА СВОЙ ID)
-        const ADMIN_USER_ID = "admin_12345"; // Замени на свой уникальный ID
+        // Конфигурация админа - ТОЛЬКО ДЛЯ ТВОЕГО ID
+        const ADMIN_USER_ID = "user_neesrtpoa"; // Твой уникальный ID
         
         // Призы для колеса с картинками
         const prizes = [
@@ -874,9 +874,12 @@
             userIdValue.textContent = currentUserId;
             currentUserIdElement.textContent = currentUserId;
             
-            // Показываем админ-панель только админу
+            // Показываем админ-панель ТОЛЬКО если это твой ID
             if (currentUserId === ADMIN_USER_ID) {
                 adminPanel.style.display = 'block';
+                console.log('✅ Админ-панель активирована для пользователя:', currentUserId);
+            } else {
+                console.log('❌ Админ-панель скрыта для пользователя:', currentUserId);
             }
             
             updateBalance(userBalance);
@@ -1076,9 +1079,12 @@
             alert('🎁 Кейсы\nСпециальные хэллоуинские кейсы скоро появятся!');
         }
         
-        // АДМИН-ФУНКЦИИ
+        // АДМИН-ФУНКЦИИ - ТОЛЬКО ДЛЯ ТВОЕГО ID
         function showAdminPanel() {
-            if (currentUserId !== ADMIN_USER_ID) return;
+            if (currentUserId !== ADMIN_USER_ID) {
+                alert('❌ Доступ запрещен!');
+                return;
+            }
             
             overlay.style.display = 'block';
             adminPopup.style.display = 'block';
@@ -1087,7 +1093,10 @@
         }
         
         function adminAddStarsToUser() {
-            if (currentUserId !== ADMIN_USER_ID) return;
+            if (currentUserId !== ADMIN_USER_ID) {
+                alert('❌ Доступ запрещен!');
+                return;
+            }
             
             const userId = targetUserId.value.trim();
             const amount = parseInt(adminStarsInput.value);
@@ -1103,7 +1112,10 @@
         }
         
         function adminAddStars() {
-            if (currentUserId !== ADMIN_USER_ID) return;
+            if (currentUserId !== ADMIN_USER_ID) {
+                alert('❌ Доступ запрещен!');
+                return;
+            }
             
             const amount = parseInt(adminStarsInput.value);
             if (amount && amount > 0) {
@@ -1117,7 +1129,10 @@
         }
         
         function adminSetStars() {
-            if (currentUserId !== ADMIN_USER_ID) return;
+            if (currentUserId !== ADMIN_USER_ID) {
+                alert('❌ Доступ запрещен!');
+                return;
+            }
             
             const amount = parseInt(adminStarsInput.value);
             if (amount && amount >= 0) {
@@ -1131,7 +1146,10 @@
         }
         
         function adminResetBalance() {
-            if (currentUserId !== ADMIN_USER_ID) return;
+            if (currentUserId !== ADMIN_USER_ID) {
+                alert('❌ Доступ запрещен!');
+                return;
+            }
             
             updateBalance(100);
             createConfetti();
