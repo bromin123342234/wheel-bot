@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎃 Halloween Wheel</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
         * {
             margin: 0;
@@ -20,22 +19,6 @@
             padding: 15px;
             position: relative;
             overflow-x: hidden;
-        }
-        
-        /* Хэллоуинские декорации */
-        body::before {
-            content: '';
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: 
-                radial-gradient(circle at 20% 80%, rgba(255, 140, 66, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(139, 0, 139, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(34, 139, 34, 0.05) 0%, transparent 50%);
-            pointer-events: none;
-            z-index: -1;
         }
         
         .ghost {
@@ -67,7 +50,6 @@
         
         .header {
             margin-bottom: 25px;
-            position: relative;
         }
         
         .title {
@@ -89,7 +71,6 @@
         
         .balance-card {
             background: linear-gradient(135deg, rgba(255, 140, 66, 0.15), rgba(157, 78, 221, 0.15));
-            backdrop-filter: blur(10px);
             border: 2px solid rgba(255, 140, 66, 0.3);
             border-radius: 20px;
             padding: 20px;
@@ -97,23 +78,6 @@
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
-        }
-        
-        .balance-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-            transform: rotate(45deg);
-            animation: shine 3s infinite;
-        }
-        
-        @keyframes shine {
-            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
-            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
         
         .balance-title {
@@ -170,7 +134,6 @@
             width: 280px;
             height: 280px;
             margin: 0 auto;
-            filter: drop-shadow(0 0 20px rgba(255, 140, 66, 0.3));
         }
         
         .wheel {
@@ -222,7 +185,6 @@
             height: 50px;
             object-fit: contain;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
-            background: transparent;
         }
 
         .segment-text {
@@ -246,7 +208,6 @@
             background: #ff8c42;
             clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
             z-index: 2;
-            filter: drop-shadow(0 0 10px rgba(255, 140, 66, 0.8));
         }
         
         .spin-button {
@@ -260,31 +221,15 @@
             cursor: pointer;
             margin: 25px 0;
             transition: all 0.3s ease;
-            box-shadow: 
-                0 8px 25px rgba(255, 140, 66, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-            position: relative;
-            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(255, 140, 66, 0.4);
         }
         
-        .spin-button::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s;
-        }
-        
-        .spin-button:hover::before {
-            left: 100%;
+        .spin-button:hover {
+            transform: scale(1.05);
         }
         
         .spin-button:active {
             transform: scale(0.95);
-            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.6);
         }
         
         .spin-button:disabled {
@@ -295,7 +240,6 @@
         
         .result-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             padding: 25px;
@@ -303,8 +247,6 @@
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
             display: none;
             animation: popIn 0.5s ease-out;
-            position: relative;
-            z-index: 10;
         }
         
         @keyframes popIn {
@@ -371,7 +313,6 @@
         
         .nav-btn {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
             color: #ff8c42;
             border: 2px solid rgba(255, 140, 66, 0.3);
             padding: 15px;
@@ -413,11 +354,9 @@
         
         .inventory-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            backdrop-filter: blur(15px);
             border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             padding: 25px;
-            margin: 20px 0;
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
             display: none;
             animation: slideInUp 0.5s ease-out;
@@ -532,7 +471,6 @@
     </style>
 </head>
 <body>
-    <!-- Хэллоуинские призраки на фоне -->
     <div class="ghost">👻</div>
     <div class="ghost">👻</div>
     <div class="ghost">👻</div>
@@ -556,9 +494,7 @@
         <div class="wheel-section">
             <div class="wheel-container">
                 <div class="wheel-pointer"></div>
-                <div class="wheel" id="wheel">
-                    <!-- Сегменты колеса будут созданы через JavaScript -->
-                </div>
+                <div class="wheel" id="wheel"></div>
             </div>
             
             <button class="spin-button" id="spinButton" onclick="spinWheel()">
@@ -584,35 +520,24 @@
         </div>
     </div>
 
-    <!-- Оверлей и попап инвентаря -->
     <div class="overlay" id="overlay"></div>
     <div class="inventory-popup" id="inventoryPopup">
         <div class="inventory-title">🎒 ВАШ ИНВЕНТАРЬ</div>
-        <div class="inventory-items" id="inventoryItems">
-            <!-- Сюда будут добавляться выигранные предметы -->
-        </div>
+        <div class="inventory-items" id="inventoryItems"></div>
         <button class="close-button" onclick="closeInventory()">ЗАКРЫТЬ</button>
     </div>
 
     <script>
-        let tg = window.Telegram.WebApp;
-        
-        // Инициализация Telegram Web App
-        tg.expand();
-        tg.enableClosingConfirmation();
-        tg.setHeaderColor('#2d0c35');
-        tg.setBackgroundColor('#0c0c0c');
-        
         // Призы для колеса с картинками
         const prizes = [
-            { name: "Мишка", value: 10, type: "item", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
-            { name: "Букет", value: 25, type: "item", image: "https://i.postimg.cc/Lqq5tbVv/removed-bg.png" },
-            { name: "Роза", value: 50, type: "item", image: "https://i.postimg.cc/wRBBwx8N/removed-bg.png" },
-            { name: "Сердечко", value: 75, type: "item", image: "https://i.postimg.cc/KvCrqyBH/removed-7.png" },
-            { name: "Кубок", value: 100, type: "item", image: "https://i.postimg.cc/mh4CQ7Pq/removed-bg.png" },
-            { name: "Подарок", value: 150, type: "item", image: "https://i.postimg.cc/xNq0KsMn/removed-bg.png" },
-            { name: "Мишка", value: 200, type: "item", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
-            { name: "Календарик", value: 300, type: "item", image: "https://i.postimg.cc/Hr0C7GRR/removed-bg.png" }
+            { name: "Мишка", type: "item", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
+            { name: "Букет", type: "item", image: "https://i.postimg.cc/Lqq5tbVv/removed-bg.png" },
+            { name: "Роза", type: "item", image: "https://i.postimg.cc/wRBBwx8N/removed-bg.png" },
+            { name: "Сердечко", type: "item", image: "https://i.postimg.cc/KvCrqyBH/removed-7.png" },
+            { name: "Кубок", type: "item", image: "https://i.postimg.cc/mh4CQ7Pq/removed-bg.png" },
+            { name: "Подарок", type: "item", image: "https://i.postimg.cc/xNq0KsMn/removed-bg.png" },
+            { name: "Мишка", type: "item", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
+            { name: "Календарик", type: "item", image: "https://i.postimg.cc/Hr0C7GRR/removed-bg.png" }
         ];
         
         // Элементы DOM
@@ -644,9 +569,7 @@
                 
                 const text = document.createElement('div');
                 text.className = 'segment-text';
-                
-                const shortNames = ["Мишка", "Букет", "Роза", "Сердце", "Кубок", "Подарок", "Мишка", "Календарь"];
-                text.textContent = shortNames[index];
+                text.textContent = prize.name;
                 content.appendChild(text);
                 
                 const img = document.createElement('img');
@@ -672,10 +595,6 @@
         }
         
         function initUser() {
-            const user = tg.initDataUnsafe?.user;
-            if (user) {
-                console.log('User:', user);
-            }
             updateBalance(100);
             createWheel();
             updateInventoryBadge();
@@ -687,30 +606,10 @@
         }
         
         function topUpBalance() {
-            tg.showPopup({
-                title: '💰 Пополнение баланса',
-                message: 'Сколько звезд вы хотите добавить?',
-                buttons: [
-                    { id: '100', type: 'default', text: '+100 звезд' },
-                    { id: '500', type: 'default', text: '+500 звезд' },
-                    { id: '1000', type: 'default', text: '+1000 звезд' },
-                    { type: 'cancel' }
-                ]
-            });
-            
-            tg.onEvent('popupClosed', (data) => {
-                if (data.button_id === '100' || data.button_id === '500' || data.button_id === '1000') {
-                    const amount = parseInt(data.button_id);
-                    const currentBalance = parseInt(balanceElement.textContent);
-                    updateBalance(currentBalance + amount);
-                    
-                    tg.showPopup({
-                        title: '✅ Успешно!',
-                        message: `Ваш баланс пополнен на ${amount} звезд!`,
-                        buttons: [{ type: 'ok' }]
-                    });
-                }
-            });
+            const amount = 500;
+            const currentBalance = parseInt(balanceElement.textContent);
+            updateBalance(currentBalance + amount);
+            alert(`✅ Ваш баланс пополнен на ${amount} звезд!`);
         }
         
         function createConfetti() {
@@ -735,18 +634,11 @@
             
             document.body.appendChild(flyingPrize);
             
-            // Добавляем приз в инвентарь после завершения анимации
             setTimeout(() => {
                 flyingPrize.remove();
                 userInventory.push(prize);
                 updateInventoryBadge();
-                
-                // Показываем сообщение о добавлении в инвентарь
-                tg.showPopup({
-                    title: '🎉 Предмет добавлен!',
-                    message: `${prize.name} был добавлен в ваш инвентарь`,
-                    buttons: [{ type: 'ok' }]
-                });
+                alert(`🎉 ${prize.name} был добавлен в ваш инвентарь`);
             }, 2000);
         }
         
@@ -756,11 +648,7 @@
             const currentBalance = parseInt(balanceElement.textContent);
             
             if (currentBalance < 50) {
-                tg.showPopup({
-                    title: '❌ Недостаточно звезд',
-                    message: 'Для вращения колеса нужно 50 звезд',
-                    buttons: [{ type: 'ok' }]
-                });
+                alert('❌ Недостаточно звезд\nДля вращения колеса нужно 50 звезд');
                 return;
             }
             
@@ -786,7 +674,7 @@
                     prizeText.textContent = `Вам выпал ${prize.name}!`;
                     resultPopup.style.display = 'block';
                     
-                    // ИЗМЕНЕНИЕ: убрал прибавление баланса, оставил только списание 50 звезд
+                    // Только списываем 50 звезд, не прибавляем выигрыш
                     updateBalance(currentBalance - 50);
                     
                     createConfetti();
@@ -795,10 +683,6 @@
                     setTimeout(() => {
                         createFlyingPrize(prize);
                     }, 1000);
-                    
-                    if (navigator.vibrate) {
-                        navigator.vibrate([100, 50, 100]);
-                    }
                     
                     isSpinning = false;
                     spinButton.disabled = currentBalance - 50 < 50;
@@ -816,7 +700,6 @@
         }
         
         function showInventory() {
-            // Обновляем содержимое инвентаря
             inventoryItems.innerHTML = '';
             
             if (userInventory.length === 0) {
@@ -846,7 +729,6 @@
                 });
             }
             
-            // Показываем попап с анимацией
             overlay.style.display = 'block';
             inventoryPopup.style.display = 'block';
         }
@@ -857,16 +739,13 @@
         }
         
         function showCases() {
-            tg.showPopup({
-                title: '🎁 Кейсы',
-                message: 'Специальные хэллоуинские кейсы скоро появятся!',
-                buttons: [{ type: 'ok' }]
-            });
+            alert('🎁 Кейсы\nСпециальные хэллоуинские кейсы скоро появятся!');
         }
         
         // Закрытие попапа по клику на оверлей
         overlay.addEventListener('click', closeInventory);
         
+        // Запуск при загрузке страницы
         document.addEventListener('DOMContentLoaded', initUser);
     </script>
 </body>
