@@ -6,7 +6,6 @@
     <title>🎃 Halloween Wheel</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Твои стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -177,7 +176,7 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
-            transition: transform 4s cubic-bezier(0.2, 0.8, 0.1, 0.9);
+            transition: transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97);
             border: 8px solid #2d0c35;
             box-shadow: 
                 inset 0 0 20px rgba(0, 0, 0, 0.5),
@@ -484,41 +483,98 @@
             margin-top: 5px;
         }
 
+        /* Новые стили для окна пополнения баланса */
         .payment-popup {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.98), rgba(255, 140, 66, 0.98));
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 25px;
-            padding: 25px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
             display: none;
-            animation: popIn 0.5s ease-out;
+            animation: bounceIn 0.6s ease-out;
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             z-index: 1000;
             width: 90%;
-            max-width: 350px;
+            max-width: 380px;
+            backdrop-filter: blur(10px);
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-           100% { transform: scale(1); opacity: 1; }
+        @keyframes bounceIn {
+            0% { 
+                transform: translate(-50%, -50%) scale(0.3);
+                opacity: 0;
+            }
+            50% { 
+                transform: translate(-50%, -50%) scale(1.05);
+                opacity: 0.8;
+            }
+            70% { 
+                transform: translate(-50%, -50%) scale(0.95);
+            }
+            100% { 
+                transform: translate(-50%, -50%) scale(1);
+                opacity: 1;
+            }
         }
 
         .payment-title {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: bold;
             color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .payment-instruction {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+            animation: pulseGlow 2s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+            100% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); }
+        }
+
+        .payment-text {
+            color: white;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .payment-username {
+            background: linear-gradient(45deg, #ff8c42, #ff6b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-            margin-bottom: 20px;
+        }
+
+        .payment-note {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 14px;
+            font-style: italic;
+            margin-top: 15px;
         }
 
         .payment-options {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin: 20px 0;
+            gap: 12px;
+            margin: 25px 0;
         }
 
         .payment-option {
@@ -586,6 +642,11 @@
             z-index: 1000;
             width: 90%;
             max-width: 350px;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+           100% { transform: scale(1); opacity: 1; }
         }
 
         .admin-title {
@@ -684,6 +745,31 @@
             font-size: 12px;
             z-index: 1000;
         }
+
+        .prize-notification {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 30px;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            z-index: 1002;
+            animation: prizePopup 0.8s ease-out;
+            display: none;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        @keyframes prizePopup {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -692,6 +778,7 @@
     <div class="ghost">👻</div>
 
     <div class="copy-notification" id="copyNotification">ID скопирован!</div>
+    <div class="prize-notification" id="prizeNotification"></div>
     
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <button class="admin-button" onclick="showAdminPanel()">⚙️ АДМИН</button>
@@ -755,8 +842,17 @@
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
+    <!-- Обновленное окно пополнения баланса -->
     <div class="payment-popup" id="paymentPopup">
         <div class="payment-title">💰 ПОПОЛНЕНИЕ БАЛАНСА</div>
+        
+        <div class="payment-instruction">
+            <div class="payment-text">Чтобы пополнить баланс, отправьте подарок на:</div>
+            <div class="payment-username">@NFT_c0llecti0n</div>
+            <div class="payment-text">После отправки подарка ваш баланс будет пополнен</div>
+            <div class="payment-note">Не забудьте указать ваш ID в комментарии к подарку!</div>
+        </div>
+
         <div class="payment-options">
             <div class="payment-option" onclick="addStars(100, 99)">
                 <div class="payment-amount">100 звезд</div>
@@ -775,7 +871,7 @@
                 <div class="payment-price">1199 рублей</div>
             </div>
         </div>
-        <button class="close-button" onclick="closeAllPopups()">ОТМЕНА</button>
+        <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
     <div class="admin-popup" id="adminPopup">
@@ -806,47 +902,55 @@
         // Конфигурация админа
         const ADMIN_USER_ID = "user_neesrtpoa";
         
-        // Призы для колеса с ТВОИМИ картинками
+        // Призы для колеса с ТВОИМИ картинками и сообщениями
         const prizes = [
             { 
                 name: "Подарок", 
                 type: "item", 
-                image: "https://i.ibb.co/q3xL5y2h/image.png"  // Первый зеленый
+                image: "https://i.ibb.co/q3xL5y2h/image.png",
+                message: "🎁 Вам выпал подарок!"
             },
             { 
-                name: "Фиолетовый", 
+                name: "Сердечко", 
                 type: "item", 
-                image: "https://i.ibb.co/5gkW5WjD/image.png"  // Второй зеленый (узкий)
+                image: "https://i.ibb.co/5gkW5WjD/image.png",
+                message: "💖 Вам выпало сердечко!"
             },
             { 
-                name: "Картинка", 
+                name: "Букет", 
                 type: "item", 
-                image: "https://i.ibb.co/N6CmQdcD/image.png"  // На одном из них
+                image: "https://i.ibb.co/N6CmQdcD/image.png",
+                message: "💐 Вам выпал букет!"
             },
             { 
-                name: "Другая", 
+                name: "Календарик", 
                 type: "item", 
-                image: "https://i.ibb.co/CprKQQW2/image.png"  // На другом
+                image: "https://i.ibb.co/CprKQQW2/image.png",
+                message: "📅 Вам выпал календарик!"
             },
             { 
-                name: "Оранжевый1", 
+                name: "Подарок", 
                 type: "item", 
-                image: "https://i.ibb.co/LD05XPNV/image.png"  // Первый оранжевый
+                image: "https://i.ibb.co/LD05XPNV/image.png",
+                message: "🎁 Вам выпал подарок!"
             },
             { 
-                name: "Оранжевый2", 
+                name: "Подарок", 
                 type: "item", 
-                image: "https://i.ibb.co/7dyYVq4T/image.png"  // Второй оранжевый
+                image: "https://i.ibb.co/7dyYVq4T/image.png",
+                message: "🎁 Вам выпал подарок!"
+            },
+            { 
+                name: "Подарок", 
+                type: "item", 
+                image: "https://i.ibb.co/Y4cQLGqG/image.png",
+                message: "🎁 Вам выпал подарок!"
             },
             { 
                 name: "Сюрприз", 
                 type: "item", 
-                image: "https://i.ibb.co/q3xL5y2h/image.png"  // Дублируем для 8 секторов
-            },
-            { 
-                name: "Приз", 
-                type: "item", 
-                image: "https://i.ibb.co/5gkW5WjD/image.png"  // Дублируем для 8 секторов
+                image: "https://i.ibb.co/q3xL5y2h/image.png",
+                message: "🎉 Вам выпал сюрприз!"
             }
         ];
         
@@ -873,6 +977,7 @@
         const currentUserIdElement = document.getElementById('currentUserId');
         const userIdValue = document.getElementById('userIdValue');
         const copyNotification = document.getElementById('copyNotification');
+        const prizeNotification = document.getElementById('prizeNotification');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
         const debugInfo = document.getElementById('debugInfo');
@@ -898,6 +1003,16 @@
             }).catch(err => {
                 console.error('Ошибка копирования:', err);
             });
+        }
+
+        // Показать уведомление о выигрыше
+        function showPrizeMessage(message) {
+            prizeNotification.textContent = message;
+            prizeNotification.style.display = 'block';
+            
+            setTimeout(() => {
+                prizeNotification.style.display = 'none';
+            }, 3000);
         }
 
         // СОХРАНЕНИЕ ДАННЫХ В SUPABASE
@@ -1214,13 +1329,16 @@
                 wheel.style.transform = 'rotate(0deg)';
                 
                 setTimeout(() => {
-                    wheel.style.transition = `transform 4s cubic-bezier(0.2, 0.8, 0.1, 0.9)`;
+                    wheel.style.transition = `transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97)`;
                     wheel.style.transform = `rotate(${totalRotation}deg)`;
                     
                     setTimeout(async () => {
                         updateBalance(userBalance - 50);
                         await logTransaction('spin', -50, `Выиграл: ${prize.name}`);
                         await addToInventory(prize);
+                        
+                        // Показываем сообщение о выигрыше
+                        showPrizeMessage(prize.message);
                         
                         createConfetti();
                         
@@ -1230,7 +1348,7 @@
                         
                         isSpinning = false;
                         if (spinButton) spinButton.disabled = userBalance < 50;
-                    }, 4000);
+                    }, 5000);
                 }, 50);
             }
         }
