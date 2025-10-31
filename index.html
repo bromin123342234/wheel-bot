@@ -483,7 +483,7 @@
             margin-top: 5px;
         }
 
-        /* Новые стили для окна пополнения баланса */
+        /* Обновленные стили для окна пополнения баланса */
         .payment-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.98), rgba(255, 140, 66, 0.98));
             border: 3px solid rgba(255, 255, 255, 0.3);
@@ -570,40 +570,8 @@
             margin-top: 15px;
         }
 
-        .payment-options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin: 25px 0;
-        }
-
-        .payment-option {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 15px;
-            color: white;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .payment-option:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: scale(1.05);
-        }
-
-        .payment-amount {
-            font-size: 18px;
-            color: #ff8c42;
-        }
-
-        .payment-price {
-            font-size: 14px;
-            opacity: 0.8;
-        }
-
+        /* Удалены стили для payment-options */
+        
         .admin-panel {
             position: fixed;
             top: 10px;
@@ -842,7 +810,7 @@
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
-    <!-- Обновленное окно пополнения баланса -->
+    <!-- Обновленное окно пополнения баланса БЕЗ КНОПОК -->
     <div class="payment-popup" id="paymentPopup">
         <div class="payment-title">💰 ПОПОЛНЕНИЕ БАЛАНСА</div>
         
@@ -853,24 +821,8 @@
             <div class="payment-note">Не забудьте указать ваш ID в комментарии к подарку!</div>
         </div>
 
-        <div class="payment-options">
-            <div class="payment-option" onclick="addStars(100, 99)">
-                <div class="payment-amount">100 звезд</div>
-                <div class="payment-price">99 рублей</div>
-            </div>
-            <div class="payment-option" onclick="addStars(500, 399)">
-                <div class="payment-amount">500 звезд</div>
-                <div class="payment-price">399 рублей</div>
-            </div>
-            <div class="payment-option" onclick="addStars(1000, 699)">
-                <div class="payment-amount">1000 звезд</div>
-                <div class="payment-price">699 рублей</div>
-            </div>
-            <div class="payment-option" onclick="addStars(2000, 1199)">
-                <div class="payment-amount">2000 звезд</div>
-                <div class="payment-price">1199 рублей</div>
-            </div>
-        </div>
+        <!-- УДАЛЕН БЛОК С КНОПКАМИ PAYMENT-OPTIONS -->
+        
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
@@ -1273,6 +1225,7 @@
             if (paymentPopup) paymentPopup.style.display = 'block';
         }
         
+        // Функция addStars больше не нужна для кнопок, но оставим для админ-панели
         function addStars(amount, price) {
             updateBalance(userBalance + amount);
             logTransaction('purchase', amount, `Покупка ${amount} звезд`);
