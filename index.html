@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎃 Halloween Wheel</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #0c0c0c, #1a1025, #2d0c35);
+            color: #ff8c42;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            padding: 15px;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Хэллоуинские декорации */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(255, 140, 66, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(139, 0, 139, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(34, 139, 34, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        .ghost {
+            position: fixed;
+            font-size: 24px;
+            opacity: 0.1;
+            animation: float 15s infinite linear;
+            z-index: -1;
+        }
+        
+        .ghost:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
+        .ghost:nth-child(2) { top: 60%; left: 80%; animation-delay: -5s; }
+        .ghost:nth-child(3) { top: 30%; left: 90%; animation-delay: -10s; }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            25% { transform: translateY(-20px) rotate(5deg); }
+            50% { transform: translateY(0px) rotate(0deg); }
+            75% { transform: translateY(20px) rotate(-5deg); }
+        }
+        
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .header {
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .title {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            background: linear-gradient(45deg, #ff8c42, #ff6b9d, #9d4edd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 140, 66, 0.5);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 20px rgba(255, 140, 66, 0.5); }
+            to { text-shadow: 0 0 30px rgba(255, 140, 66, 0.8), 0 0 40px rgba(157, 78, 221, 0.6); }
+        }
+        
+        .balance-card {
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.15), rgba(157, 78, 221, 0.15));
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 20px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+            100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+        }
+        
+        .balance-amount {
+            font-size: 36px;
+            font-weight: bold;
+            color: #ff8c42;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .wheel-section {
+            margin: 30px 0;
+            position: relative;
+        }
+        
+        .wheel-container {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            margin: 0 auto;
+            filter: drop-shadow(0 0 20px rgba(255, 140, 66, 0.3));
+        }
+        
+        .wheel {
+            width: 100%;
+            height: 100%;
+            background: conic-gradient(
+                from 0deg,
+                #ff8c42 0deg 45deg,
+                #9d4edd 45deg 90deg,
+                #228b22 90deg 135deg,
+                #ff8c42 135deg 180deg,
+                #9d4edd 180deg 225deg,
+                #228b22 225deg 270deg,
+                #ff8c42 270deg 315deg,
+                #9d4edd 315deg 360deg
+            );
+            border-radius: 50%;
+            position: relative;
+            transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+            border: 8px solid #2d0c35;
+            box-shadow: 
+                inset 0 0 20px rgba(0, 0, 0, 0.5),
+                0 0 30px rgba(255, 140, 66, 0.3);
+        }
+        
+        .wheel-pointer {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 40px;
+            background: #ff8c42;
+            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            z-index: 2;
+            filter: drop-shadow(0 0 10px rgba(255, 140, 66, 0.8));
+        }
+        
+        .spin-button {
+            background: linear-gradient(135deg, #ff8c42, #9d4edd);
+            color: white;
+            border: none;
+            padding: 18px 35px;
+            font-size: 20px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 25px 0;
+            transition: all 0.3s ease;
+            box-shadow: 
+                0 8px 25px rgba(255, 140, 66, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .spin-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .spin-button:hover::before {
+            left: 100%;
+        }
+        
+        .spin-button:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.6);
+        }
+        
+        .spin-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .result-popup {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: none;
+            animation: popIn 0.5s ease-out;
+        }
+        
+        @keyframes popIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .prize-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin: 10px 0;
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #ff8c42;
+            border-radius: 50%;
+            animation: confettiFall 3s ease-out forwards;
+        }
+        
+        @keyframes confettiFall {
+            0% { transform: translateY(-100px) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(500px) rotate(360deg); opacity: 0; }
+        }
+        
+        .navigation {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            color: #ff8c42;
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            padding: 15px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            font-weight: bold;
+        }
+        
+        .nav-btn:hover {
+            background: rgba(255, 140, 66, 0.2);
+            border-color: #ff8c42;
+            transform: translateY(-2px);
+        }
+        
+        .cost-info {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Хэллоуинские призраки на фоне -->
+    <div class="ghost">👻</div>
+    <div class="ghost">👻</div>
+    <div class="ghost">👻</div>
+    
+    <div class="container">
+        <div class="header">
+            <h1 class="title">🎃 HALLOWEEN WHEEL 🎃</h1>
+            <div class="balance-card">
+                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">ВАШ БАЛАНС</div>
+                <div class="balance-amount" id="balance">100</div>
+                <div style="font-size: 14px; opacity: 0.8; margin-top: 5px;">⭐ ЗВЕЗД</div>
+            </div>
+        </div>
+        
+        <div class="wheel-section">
+            <div class="wheel-container">
+                <div class="wheel-pointer"></div>
+                <div class="wheel" id="wheel">
+                    <!-- Колесо будет здесь -->
+                </div>
+            </div>
+            
+            <button class="spin-button" id="spinButton" onclick="spinWheel()">
+                🎡 КРУТИТЬ ЗА 50 ЗВЕЗД
+            </button>
+            <div class="cost-info">Одно вращение = 50 звезд</div>
+        </div>
+        
+        <div class="result-popup" id="resultPopup">
+            <div style="font-size: 18px; opacity: 0.9;">🎉 ВАШ ВЫИГРЫШ!</div>
+            <div class="prize-text" id="prizeText">25 ЗВЕЗД</div>
+            <div style="font-size: 14px; opacity: 0.8; margin-top: 10px;">Удачи в следующем вращении! 🍀</div>
+        </div>
+        
+        <div class="navigation">
+            <button class="nav-btn" onclick="showInventory()">
+                🎒<br>ИНВЕНТАРЬ
+            </button>
+            <button class="nav-btn" onclick="showCases()">
+                🎁<br>КЕЙСЫ
+            </button>
+        </div>
+    </div>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        
+        // Инициализация Telegram Web App
+        tg.expand();
+        tg.enableClosingConfirmation();
+        tg.setHeaderColor('#2d0c35');
+        tg.setBackgroundColor('#0c0c0c');
+        
+        // Призы для колеса
+        const prizes = [
+            "10 звезд", "25 звезд", "50 звезд", "🎭 Редкий скин",
+            "100 звезд", "5 звезд", "🎭 Хэллоуинская маска", "75 звезд"
+        ];
+        
+        // Элементы DOM
+        const wheel = document.getElementById('wheel');
+        const spinButton = document.getElementById('spinButton');
+        const resultPopup = document.getElementById('resultPopup');
+        const prizeText = document.getElementById('prizeText');
+        const balanceElement = document.getElementById('balance');
+        
+        function initUser() {
+            const user = tg.initDataUnsafe?.user;
+            if (user) {
+                console.log('User:', user);
+            }
+            updateBalance(100);
+        }
+        
+        function updateBalance(newBalance) {
+            balanceElement.textContent = newBalance;
+            spinButton.disabled = newBalance < 50;
+        }
+        
+        function createConfetti() {
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = ['#ff8c42', '#9d4edd', '#228b22'][Math.floor(Math.random() * 3)];
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                document.body.appendChild(confetti);
+                
+                setTimeout(() => confetti.remove(), 3000);
+            }
+        }
+        
+        function spinWheel() {
+            const currentBalance = parseInt(balanceElement.textContent);
+            
+            if (currentBalance < 50) {
+                tg.showPopup({
+                    title: '❌ Недостаточно звезд',
+                    message: 'Для вращения колеса нужно 50 звезд',
+                    buttons: [{ type: 'ok' }]
+                });
+                return;
+            }
+            
+            spinButton.disabled = true;
+            resultPopup.style.display = 'none';
+            
+            const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
+            const degrees = 1440 + Math.floor(Math.random() * 360);
+            
+            wheel.style.transform = `rotate(${degrees}deg)`;
+            
+            setTimeout(() => {
+                prizeText.textContent = randomPrize;
+                resultPopup.style.display = 'block';
+                
+                // Обновляем баланс
+                const prizeValue = getPrizeValue(randomPrize);
+                updateBalance(currentBalance - 50 + prizeValue);
+                
+                // Создаем конфетти
+                createConfetti();
+                
+                // Вибрация (если поддерживается)
+                if (navigator.vibrate) {
+                    navigator.vibrate([100, 50, 100]);
+                }
+                
+                spinButton.disabled = false;
+            }, 3000);
+        }
+        
+        function getPrizeValue(prize) {
+            if (prize.includes('10')) return 10;
+            if (prize.includes('25')) return 25;
+            if (prize.includes('50')) return 50;
+            if (prize.includes('100')) return 100;
+            if (prize.includes('5')) return 5;
+            if (prize.includes('75')) return 75;
+            return 0;
+        }
+        
+        function showInventory() {
+            tg.showPopup({
+                title: '🎒 Инвентарь',
+                message: 'Здесь будут отображаться ваши выигранные предметы',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+        
+        function showCases() {
+            tg.showPopup({
+                title: '🎁 Кейсы',
+                message: 'Специальные хэллоуинские кейсы скоро появятся!',
+                buttons: [{ type: 'ok' }]
+            });
+        }
+        
+        document.addEventListener('DOMContentLoaded', initUser);
+    </script>
+</body>
+</html>
