@@ -116,11 +116,29 @@
             100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
         }
         
+        .balance-title {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
         .balance-amount {
             font-size: 36px;
             font-weight: bold;
             color: #ff8c42;
             text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            margin: 10px 0;
+        }
+        
+        .balance-stars {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
         
         .wheel-section {
@@ -139,24 +157,66 @@
         .wheel {
             width: 100%;
             height: 100%;
-            background: conic-gradient(
-                from 0deg,
-                #ff8c42 0deg 45deg,
-                #9d4edd 45deg 90deg,
-                #228b22 90deg 135deg,
-                #ff8c42 135deg 180deg,
-                #9d4edd 180deg 225deg,
-                #228b22 225deg 270deg,
-                #ff8c42 270deg 315deg,
-                #9d4edd 315deg 360deg
-            );
             border-radius: 50%;
             position: relative;
-            transition: transform 3s cubic-bezier(0.2, 0.8, 0.3, 1);
+            transition: transform 4s cubic-bezier(0.2, 0.8, 0.1, 0.9);
             border: 8px solid #2d0c35;
             box-shadow: 
                 inset 0 0 20px rgba(0, 0, 0, 0.5),
                 0 0 30px rgba(255, 140, 66, 0.3);
+            overflow: hidden;
+            background: conic-gradient(
+                from 0deg,
+                #ff8c42 0deg 45deg,
+                #8a2be2 45deg 90deg,
+                #228b22 90deg 135deg,
+                #ff8c42 135deg 180deg,
+                #8a2be2 180deg 225deg,
+                #228b22 225deg 270deg,
+                #ff8c42 270deg 315deg,
+                #8a2be2 315deg 360deg
+            );
+        }
+
+        .wheel-segment {
+            position: absolute;
+            width: 50%;
+            height: 50%;
+            top: 0;
+            left: 50%;
+            transform-origin: 0% 100%;
+        }
+
+        .segment-content {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            /* Размещаем картинки точно в центре своих цветов */
+            top: 50%;
+            left: -40px;
+            transform: rotate(90deg);
+        }
+
+        .segment-image {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
+            background: transparent;
+        }
+
+        .segment-text {
+            color: white;
+            font-size: 10px;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px black;
+            text-align: center;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 3px 5px;
+            border-radius: 3px;
         }
         
         .wheel-pointer {
@@ -167,7 +227,7 @@
             width: 40px;
             height: 40px;
             background: #ff8c42;
-            clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+            clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
             z-index: 2;
             filter: drop-shadow(0 0 10px rgba(255, 140, 66, 0.8));
         }
@@ -230,7 +290,7 @@
         
         @keyframes popIn {
             0% { transform: scale(0.5); opacity: 0; }
-            100% { transform: scale(1); opacity: 1; }
+           100% { transform: scale(1); opacity: 1; }
         }
         
         .prize-text {
@@ -298,9 +358,12 @@
         <div class="header">
             <h1 class="title">🎃 HALLOWEEN WHEEL 🎃</h1>
             <div class="balance-card">
-                <div style="font-size: 14px; opacity: 0.8; margin-bottom: 5px;">ВАШ БАЛАНС</div>
+                <div class="balance-title">ВАШ БАЛАНС</div>
                 <div class="balance-amount" id="balance">100</div>
-                <div style="font-size: 14px; opacity: 0.8; margin-top: 5px;">⭐ ЗВЕЗД</div>
+                <div class="balance-stars">
+                    <span>★</span>
+                    <span>ЗВЕЗД</span>
+                </div>
             </div>
         </div>
         
@@ -308,7 +371,7 @@
             <div class="wheel-container">
                 <div class="wheel-pointer"></div>
                 <div class="wheel" id="wheel">
-                    <!-- Колесо будет здесь -->
+                    <!-- Сегменты колеса будут созданы через JavaScript -->
                 </div>
             </div>
             
@@ -343,10 +406,24 @@
         tg.setHeaderColor('#2d0c35');
         tg.setBackgroundColor('#0c0c0c');
         
-        // Призы для колеса
+        // Призы для колеса с картинками (в правильном порядке по сегментам)
         const prizes = [
-            "10 звезд", "25 звезд", "50 звезд", "🎭 Редкий скин",
-            "100 звезд", "5 звезд", "🎭 Хэллоуинская маска", "75 звезд"
+            // Оранжевый сегмент 1 (0°-45°) - МИШКА
+            { name: "Вам выпал мишка!", value: 10, type: "stars", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
+            // Фиолетовый сегмент 1 (45°-90°) - БУКЕТ
+            { name: "Вам выпал букет!", value: 25, type: "stars", image: "https://i.postimg.cc/Lqq5tbVv/removed-bg.png" },
+            // Зеленый сегмент 1 (90°-135°) - РОЗА
+            { name: "Вам выпала роза!", value: 50, type: "stars", image: "https://i.postimg.cc/wRBBwx8N/removed-bg.png" },
+            // Оранжевый сегмент 2 (135°-180°) - СЕРДЕЧКО
+            { name: "Вам выпало сердечко!", value: 75, type: "stars", image: "https://i.postimg.cc/KvCrqyBH/removed-7.png" },
+            // Фиолетовый сегмент 2 (180°-225°) - КУБОК
+            { name: "Вам выпал кубок!", value: 100, type: "stars", image: "https://i.postimg.cc/mh4CQ7Pq/removed-bg.png" },
+            // Зеленый сегмент 2 (225°-270°) - ПОДАРОК
+            { name: "Вам выпал подарок!", value: 150, type: "stars", image: "https://i.postimg.cc/xNq0KsMn/removed-bg.png" },
+            // Оранжевый сегмент 3 (270°-315°) - МИШКА
+            { name: "Вам выпал мишка!", value: 200, type: "stars", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
+            // Фиолетовый сегмент 3 (315°-360°) - КАЛЕНДАРИК
+            { name: "Вам выпал календарик!", value: 300, type: "stars", image: "https://i.postimg.cc/Hr0C7GRR/removed-bg.png" }
         ];
         
         // Элементы DOM
@@ -355,6 +432,56 @@
         const resultPopup = document.getElementById('resultPopup');
         const prizeText = document.getElementById('prizeText');
         const balanceElement = document.getElementById('balance');
+
+        let isSpinning = false;
+
+        // Создание колеса с сегментами
+        function createWheel() {
+            wheel.innerHTML = '';
+            const segmentAngle = 360 / prizes.length;
+            
+            prizes.forEach((prize, index) => {
+                const segment = document.createElement('div');
+                segment.className = 'wheel-segment';
+                segment.style.transform = `rotate(${index * segmentAngle}deg)`;
+                
+                // Контейнер для содержимого сегмента
+                const content = document.createElement('div');
+                content.className = 'segment-content';
+                
+                // Создаем текст приза (всегда показываем)
+                const text = document.createElement('div');
+                text.className = 'segment-text';
+                
+                // Создаем короткое название для отображения на колесе
+                const shortNames = ["Мишка", "Букет", "Роза", "Сердце", "Кубок", "Подарок", "Мишка", "Календарь"];
+                text.textContent = shortNames[index];
+                content.appendChild(text);
+                
+                // Пробуем загрузить картинку
+                const img = document.createElement('img');
+                img.src = prize.image;
+                img.alt = prize.name;
+                img.className = 'segment-image';
+                img.style.display = 'none'; // Сначала скрываем
+                
+                img.onload = function() {
+                    // Если картинка загрузилась, показываем её и скрываем текст
+                    img.style.display = 'block';
+                    text.style.display = 'none';
+                };
+                
+                img.onerror = function() {
+                    // Если картинка не загрузилась, оставляем текст
+                    img.style.display = 'none';
+                    text.style.display = 'block';
+                };
+                
+                content.appendChild(img);
+                segment.appendChild(content);
+                wheel.appendChild(segment);
+            });
+        }
         
         function initUser() {
             const user = tg.initDataUnsafe?.user;
@@ -362,11 +489,12 @@
                 console.log('User:', user);
             }
             updateBalance(100);
+            createWheel();
         }
         
         function updateBalance(newBalance) {
             balanceElement.textContent = newBalance;
-            spinButton.disabled = newBalance < 50;
+            spinButton.disabled = newBalance < 50 || isSpinning;
         }
         
         function createConfetti() {
@@ -383,6 +511,8 @@
         }
         
         function spinWheel() {
+            if (isSpinning) return;
+            
             const currentBalance = parseInt(balanceElement.textContent);
             
             if (currentBalance < 50) {
@@ -394,42 +524,50 @@
                 return;
             }
             
+            isSpinning = true;
             spinButton.disabled = true;
             resultPopup.style.display = 'none';
             
-            const randomPrize = prizes[Math.floor(Math.random() * prizes.length)];
-            const degrees = 1440 + Math.floor(Math.random() * 360);
+            // Случайный приз (0-7)
+            const prizeIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[prizeIndex];
             
-            wheel.style.transform = `rotate(${degrees}deg)`;
+            // Угол сегмента
+            const segmentAngle = 360 / prizes.length;
+            // Угол для остановки точно на середине цветного сегмента
+            const targetAngle = 360 - (prizeIndex * segmentAngle + segmentAngle / 2);
+            // Полные обороты + целевой угол
+            const totalRotation = 360 * 5 + targetAngle;
             
+            // Сбрасываем трансформацию перед каждым вращением
+            wheel.style.transition = 'none';
+            wheel.style.transform = 'rotate(0deg)';
+            
+            // Даем время для сброса
             setTimeout(() => {
-                prizeText.textContent = randomPrize;
-                resultPopup.style.display = 'block';
+                wheel.style.transition = `transform 4s cubic-bezier(0.2, 0.8, 0.1, 0.9)`;
+                wheel.style.transform = `rotate(${totalRotation}deg)`;
                 
-                // Обновляем баланс
-                const prizeValue = getPrizeValue(randomPrize);
-                updateBalance(currentBalance - 50 + prizeValue);
-                
-                // Создаем конфетти
-                createConfetti();
-                
-                // Вибрация (если поддерживается)
-                if (navigator.vibrate) {
-                    navigator.vibrate([100, 50, 100]);
-                }
-                
-                spinButton.disabled = false;
-            }, 3000);
-        }
-        
-        function getPrizeValue(prize) {
-            if (prize.includes('10')) return 10;
-            if (prize.includes('25')) return 25;
-            if (prize.includes('50')) return 50;
-            if (prize.includes('100')) return 100;
-            if (prize.includes('5')) return 5;
-            if (prize.includes('75')) return 75;
-            return 0;
+                setTimeout(() => {
+                    prizeText.textContent = prize.name;
+                    resultPopup.style.display = 'block';
+                    
+                    // Обновляем баланс
+                    const prizeValue = prize.type === "stars" ? prize.value : 0;
+                    updateBalance(currentBalance - 50 + prizeValue);
+                    
+                    // Создаем конфетти
+                    createConfetti();
+                    
+                    // Вибрация (если поддерживается)
+                    if (navigator.vibrate) {
+                        navigator.vibrate([100, 50, 100]);
+                    }
+                    
+                    isSpinning = false;
+                    spinButton.disabled = currentBalance - 50 + prizeValue < 50;
+                }, 4000);
+            }, 50);
         }
         
         function showInventory() {
