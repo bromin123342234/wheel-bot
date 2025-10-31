@@ -141,6 +141,25 @@
             gap: 5px;
         }
         
+        .top-up-button {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.4);
+        }
+        
+        .top-up-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.6);
+        }
+        
         .wheel-section {
             margin: 30px 0;
             position: relative;
@@ -194,15 +213,13 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            /* Размещаем картинки точно в центре своих цветов */
-            top: 50%;
-            left: -40px;
-            transform: rotate(90deg);
+            top: 15%;
+            left: -20px;
         }
 
         .segment-image {
-            width: 45px;
-            height: 45px;
+            width: 50px;
+            height: 50px;
             object-fit: contain;
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
             background: transparent;
@@ -286,6 +303,8 @@
             box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
             display: none;
             animation: popIn 0.5s ease-out;
+            position: relative;
+            z-index: 10;
         }
         
         @keyframes popIn {
@@ -299,6 +318,34 @@
             color: white;
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
             margin: 10px 0;
+        }
+        
+        .flying-prize {
+            position: fixed;
+            width: 60px;
+            height: 60px;
+            z-index: 100;
+            pointer-events: none;
+            animation: flyToInventory 2s ease-in-out forwards;
+        }
+        
+        @keyframes flyToInventory {
+            0% {
+                transform: translate(0, 0) scale(1) rotate(0deg);
+                opacity: 1;
+            }
+            30% {
+                transform: translate(0, -100px) scale(1.3) rotate(180deg);
+                opacity: 0.9;
+            }
+            70% {
+                transform: translate(100px, 50px) scale(1.1) rotate(270deg);
+                opacity: 0.7;
+            }
+            100% {
+                transform: translate(150px, 200px) scale(0.5) rotate(360deg);
+                opacity: 0;
+            }
         }
         
         .confetti {
@@ -333,12 +380,148 @@
             transition: all 0.3s ease;
             font-size: 16px;
             font-weight: bold;
+            position: relative;
         }
         
         .nav-btn:hover {
             background: rgba(255, 140, 66, 0.2);
             border-color: #ff8c42;
             transform: translateY(-2px);
+        }
+        
+        .inventory-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ff4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .inventory-popup {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
+            backdrop-filter: blur(15px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: none;
+            animation: slideInUp 0.5s ease-out;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 350px;
+        }
+        
+        @keyframes slideInUp {
+            0% {
+                transform: translate(-50%, 100%);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+        
+        .inventory-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+        
+        .inventory-items {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .inventory-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            animation: itemAppear 0.5s ease-out;
+        }
+        
+        @keyframes itemAppear {
+            0% {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        .inventory-item img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            margin-bottom: 10px;
+        }
+        
+        .inventory-item-name {
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .close-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 999;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
         }
         
         .cost-info {
@@ -364,6 +547,9 @@
                     <span>★</span>
                     <span>ЗВЕЗД</span>
                 </div>
+                <button class="top-up-button" onclick="topUpBalance()">
+                    💰 ПОПОЛНИТЬ
+                </button>
             </div>
         </div>
         
@@ -390,11 +576,22 @@
         <div class="navigation">
             <button class="nav-btn" onclick="showInventory()">
                 🎒<br>ИНВЕНТАРЬ
+                <div class="inventory-badge" id="inventoryBadge">1</div>
             </button>
             <button class="nav-btn" onclick="showCases()">
                 🎁<br>КЕЙСЫ
             </button>
         </div>
+    </div>
+
+    <!-- Оверлей и попап инвентаря -->
+    <div class="overlay" id="overlay"></div>
+    <div class="inventory-popup" id="inventoryPopup">
+        <div class="inventory-title">🎒 ВАШ ИНВЕНТАРЬ</div>
+        <div class="inventory-items" id="inventoryItems">
+            <!-- Сюда будут добавляться выигранные предметы -->
+        </div>
+        <button class="close-button" onclick="closeInventory()">ЗАКРЫТЬ</button>
     </div>
 
     <script>
@@ -406,24 +603,16 @@
         tg.setHeaderColor('#2d0c35');
         tg.setBackgroundColor('#0c0c0c');
         
-        // Призы для колеса с картинками (в правильном порядке по сегментам)
+        // Призы для колеса с картинками
         const prizes = [
-            // Оранжевый сегмент 1 (0°-45°) - МИШКА
-            { name: "Вам выпал мишка!", value: 10, type: "stars", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
-            // Фиолетовый сегмент 1 (45°-90°) - БУКЕТ
-            { name: "Вам выпал букет!", value: 25, type: "stars", image: "https://i.postimg.cc/Lqq5tbVv/removed-bg.png" },
-            // Зеленый сегмент 1 (90°-135°) - РОЗА
-            { name: "Вам выпала роза!", value: 50, type: "stars", image: "https://i.postimg.cc/wRBBwx8N/removed-bg.png" },
-            // Оранжевый сегмент 2 (135°-180°) - СЕРДЕЧКО
-            { name: "Вам выпало сердечко!", value: 75, type: "stars", image: "https://i.postimg.cc/KvCrqyBH/removed-7.png" },
-            // Фиолетовый сегмент 2 (180°-225°) - КУБОК
-            { name: "Вам выпал кубок!", value: 100, type: "stars", image: "https://i.postimg.cc/mh4CQ7Pq/removed-bg.png" },
-            // Зеленый сегмент 2 (225°-270°) - ПОДАРОК
-            { name: "Вам выпал подарок!", value: 150, type: "stars", image: "https://i.postimg.cc/xNq0KsMn/removed-bg.png" },
-            // Оранжевый сегмент 3 (270°-315°) - МИШКА
-            { name: "Вам выпал мишка!", value: 200, type: "stars", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
-            // Фиолетовый сегмент 3 (315°-360°) - КАЛЕНДАРИК
-            { name: "Вам выпал календарик!", value: 300, type: "stars", image: "https://i.postimg.cc/Hr0C7GRR/removed-bg.png" }
+            { name: "Мишка", value: 10, type: "item", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
+            { name: "Букет", value: 25, type: "item", image: "https://i.postimg.cc/Lqq5tbVv/removed-bg.png" },
+            { name: "Роза", value: 50, type: "item", image: "https://i.postimg.cc/wRBBwx8N/removed-bg.png" },
+            { name: "Сердечко", value: 75, type: "item", image: "https://i.postimg.cc/KvCrqyBH/removed-7.png" },
+            { name: "Кубок", value: 100, type: "item", image: "https://i.postimg.cc/mh4CQ7Pq/removed-bg.png" },
+            { name: "Подарок", value: 150, type: "item", image: "https://i.postimg.cc/xNq0KsMn/removed-bg.png" },
+            { name: "Мишка", value: 200, type: "item", image: "https://i.postimg.cc/K8KpjNDZ/removed-6.png" },
+            { name: "Календарик", value: 300, type: "item", image: "https://i.postimg.cc/Hr0C7GRR/removed-bg.png" }
         ];
         
         // Элементы DOM
@@ -432,8 +621,13 @@
         const resultPopup = document.getElementById('resultPopup');
         const prizeText = document.getElementById('prizeText');
         const balanceElement = document.getElementById('balance');
+        const inventoryBadge = document.getElementById('inventoryBadge');
+        const inventoryPopup = document.getElementById('inventoryPopup');
+        const overlay = document.getElementById('overlay');
+        const inventoryItems = document.getElementById('inventoryItems');
 
         let isSpinning = false;
+        let userInventory = [];
 
         // Создание колеса с сегментами
         function createWheel() {
@@ -445,34 +639,28 @@
                 segment.className = 'wheel-segment';
                 segment.style.transform = `rotate(${index * segmentAngle}deg)`;
                 
-                // Контейнер для содержимого сегмента
                 const content = document.createElement('div');
                 content.className = 'segment-content';
                 
-                // Создаем текст приза (всегда показываем)
                 const text = document.createElement('div');
                 text.className = 'segment-text';
                 
-                // Создаем короткое название для отображения на колесе
                 const shortNames = ["Мишка", "Букет", "Роза", "Сердце", "Кубок", "Подарок", "Мишка", "Календарь"];
                 text.textContent = shortNames[index];
                 content.appendChild(text);
                 
-                // Пробуем загрузить картинку
                 const img = document.createElement('img');
                 img.src = prize.image;
                 img.alt = prize.name;
                 img.className = 'segment-image';
-                img.style.display = 'none'; // Сначала скрываем
+                img.style.display = 'none';
                 
                 img.onload = function() {
-                    // Если картинка загрузилась, показываем её и скрываем текст
                     img.style.display = 'block';
                     text.style.display = 'none';
                 };
                 
                 img.onerror = function() {
-                    // Если картинка не загрузилась, оставляем текст
                     img.style.display = 'none';
                     text.style.display = 'block';
                 };
@@ -490,11 +678,39 @@
             }
             updateBalance(100);
             createWheel();
+            updateInventoryBadge();
         }
         
         function updateBalance(newBalance) {
             balanceElement.textContent = newBalance;
             spinButton.disabled = newBalance < 50 || isSpinning;
+        }
+        
+        function topUpBalance() {
+            tg.showPopup({
+                title: '💰 Пополнение баланса',
+                message: 'Сколько звезд вы хотите добавить?',
+                buttons: [
+                    { id: '100', type: 'default', text: '+100 звезд' },
+                    { id: '500', type: 'default', text: '+500 звезд' },
+                    { id: '1000', type: 'default', text: '+1000 звезд' },
+                    { type: 'cancel' }
+                ]
+            });
+            
+            tg.onEvent('popupClosed', (data) => {
+                if (data.button_id === '100' || data.button_id === '500' || data.button_id === '1000') {
+                    const amount = parseInt(data.button_id);
+                    const currentBalance = parseInt(balanceElement.textContent);
+                    updateBalance(currentBalance + amount);
+                    
+                    tg.showPopup({
+                        title: '✅ Успешно!',
+                        message: `Ваш баланс пополнен на ${amount} звезд!`,
+                        buttons: [{ type: 'ok' }]
+                    });
+                }
+            });
         }
         
         function createConfetti() {
@@ -508,6 +724,30 @@
                 
                 setTimeout(() => confetti.remove(), 3000);
             }
+        }
+        
+        function createFlyingPrize(prize) {
+            const flyingPrize = document.createElement('img');
+            flyingPrize.src = prize.image;
+            flyingPrize.className = 'flying-prize';
+            flyingPrize.style.left = '50%';
+            flyingPrize.style.top = '50%';
+            
+            document.body.appendChild(flyingPrize);
+            
+            // Добавляем приз в инвентарь после завершения анимации
+            setTimeout(() => {
+                flyingPrize.remove();
+                userInventory.push(prize);
+                updateInventoryBadge();
+                
+                // Показываем сообщение о добавлении в инвентарь
+                tg.showPopup({
+                    title: '🎉 Предмет добавлен!',
+                    message: `${prize.name} был добавлен в ваш инвентарь`,
+                    buttons: [{ type: 'ok' }]
+                });
+            }, 2000);
         }
         
         function spinWheel() {
@@ -528,54 +768,92 @@
             spinButton.disabled = true;
             resultPopup.style.display = 'none';
             
-            // Случайный приз (0-7)
             const prizeIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[prizeIndex];
             
-            // Угол сегмента
             const segmentAngle = 360 / prizes.length;
-            // Угол для остановки точно на середине цветного сегмента
             const targetAngle = 360 - (prizeIndex * segmentAngle + segmentAngle / 2);
-            // Полные обороты + целевой угол
             const totalRotation = 360 * 5 + targetAngle;
             
-            // Сбрасываем трансформацию перед каждым вращением
             wheel.style.transition = 'none';
             wheel.style.transform = 'rotate(0deg)';
             
-            // Даем время для сброса
             setTimeout(() => {
                 wheel.style.transition = `transform 4s cubic-bezier(0.2, 0.8, 0.1, 0.9)`;
                 wheel.style.transform = `rotate(${totalRotation}deg)`;
                 
                 setTimeout(() => {
-                    prizeText.textContent = prize.name;
+                    prizeText.textContent = `Вам выпал ${prize.name}!`;
                     resultPopup.style.display = 'block';
                     
-                    // Обновляем баланс
-                    const prizeValue = prize.type === "stars" ? prize.value : 0;
-                    updateBalance(currentBalance - 50 + prizeValue);
+                    // ИЗМЕНЕНИЕ: убрал прибавление баланса, оставил только списание 50 звезд
+                    updateBalance(currentBalance - 50);
                     
-                    // Создаем конфетти
                     createConfetti();
                     
-                    // Вибрация (если поддерживается)
+                    // Запускаем анимацию полета приза в инвентарь
+                    setTimeout(() => {
+                        createFlyingPrize(prize);
+                    }, 1000);
+                    
                     if (navigator.vibrate) {
                         navigator.vibrate([100, 50, 100]);
                     }
                     
                     isSpinning = false;
-                    spinButton.disabled = currentBalance - 50 + prizeValue < 50;
+                    spinButton.disabled = currentBalance - 50 < 50;
                 }, 4000);
             }, 50);
         }
         
+        function updateInventoryBadge() {
+            if (userInventory.length > 0) {
+                inventoryBadge.style.display = 'flex';
+                inventoryBadge.textContent = userInventory.length;
+            } else {
+                inventoryBadge.style.display = 'none';
+            }
+        }
+        
         function showInventory() {
-            tg.showPopup({
-                title: '🎒 Инвентарь',
-                message: 'Здесь будут отображаться ваши выигранные предметы',
-                buttons: [{ type: 'ok' }]
-            });
+            // Обновляем содержимое инвентаря
+            inventoryItems.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                const emptyMessage = document.createElement('div');
+                emptyMessage.style.color = 'white';
+                emptyMessage.style.textAlign = 'center';
+                emptyMessage.style.padding = '20px';
+                emptyMessage.textContent = 'Ваш инвентарь пуст';
+                inventoryItems.appendChild(emptyMessage);
+            } else {
+                userInventory.forEach((item, index) => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'inventory-item';
+                    itemElement.style.animationDelay = `${index * 0.1}s`;
+                    
+                    const img = document.createElement('img');
+                    img.src = item.image;
+                    img.alt = item.name;
+                    
+                    const name = document.createElement('div');
+                    name.className = 'inventory-item-name';
+                    name.textContent = item.name;
+                    
+                    itemElement.appendChild(img);
+                    itemElement.appendChild(name);
+                    inventoryItems.appendChild(itemElement);
+                });
+            }
+            
+            // Показываем попап с анимацией
+            overlay.style.display = 'block';
+            inventoryPopup.style.display = 'block';
+        }
+        
+        function closeInventory() {
+            overlay.style.display = 'none';
+            inventoryPopup.style.display = 'none';
         }
         
         function showCases() {
@@ -585,6 +863,9 @@
                 buttons: [{ type: 'ok' }]
             });
         }
+        
+        // Закрытие попапа по клику на оверлей
+        overlay.addEventListener('click', closeInventory);
         
         document.addEventListener('DOMContentLoaded', initUser);
     </script>
