@@ -717,6 +717,85 @@
         .admin-error {
             background: linear-gradient(135deg, #ff4444, #ff8c42);
         }
+
+        .promo-button {
+            background: linear-gradient(135deg, #9d4edd, #ff8c42);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(157, 78, 221, 0.4);
+            width: 100%;
+        }
+
+        .promo-button:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(157, 78, 221, 0.6);
+        }
+
+        .promo-popup {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            padding: 25px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            display: none;
+            animation: slideInUp 0.5s ease-out;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 350px;
+        }
+
+        .promo-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 20px;
+        }
+
+        .promo-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .promo-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .promo-status {
+            color: white;
+            font-size: 14px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .promo-success {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+        }
+
+        .promo-error {
+            background: linear-gradient(135deg, #ff4444, #ff8c42);
+        }
     </style>
 </head>
 <body>
@@ -753,6 +832,9 @@
                 </div>
                 <button class="top-up-button" onclick="showPaymentPopup()">
                     💰 ПОПОЛНИТЬ
+                </button>
+                <button class="promo-button" onclick="showPromoPopup()">
+                    🎁 ИСПОЛЬЗОВАТЬ ПРОМОКОД
                 </button>
             </div>
         </div>
@@ -801,21 +883,35 @@
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
+    <div class="promo-popup" id="promoPopup">
+        <div class="promo-title">🎁 АКТИВАЦИЯ ПРОМОКОДА</div>
+        
+        <input type="text" class="promo-input" id="promoCodeInput" placeholder="Введите промокод">
+        
+        <div class="promo-status" id="promoStatus"></div>
+        
+        <div class="admin-buttons">
+            <button class="admin-action-btn" onclick="activatePromoCode()">✅ АКТИВИРОВАТЬ</button>
+            <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
+        </div>
+    </div>
+
     <div class="admin-popup" id="adminPopup">
         <div class="admin-title">⚙️ АДМИН ПАНЕЛЬ</div>
         
         <div style="margin-bottom: 20px;">
             <div style="color: white; margin-bottom: 10px; font-size: 16px;">Ваш ID: <span id="currentUserId"></span></div>
-            <input type="text" class="user-id-input" id="targetUserId" placeholder="ID игрока для выдачи звезд">
-            <input type="number" class="admin-input" id="adminStarsInput" placeholder="Количество звезд">
+            <input type="text" class="admin-input" id="promoCodeName" placeholder="Название промокода">
+            <input type="number" class="admin-input" id="promoStarsAmount" placeholder="Количество звезд">
+            <input type="number" class="admin-input" id="promoMaxUses" placeholder="Макс. использований">
         </div>
         
         <div class="admin-status" id="adminStatus"></div>
         
         <div class="admin-buttons">
-            <button class="admin-action-btn" onclick="adminAddStarsToUser()">🎁 ВЫДАТЬ ИГРОКУ</button>
+            <button class="admin-action-btn" onclick="adminCreatePromoCode()">🎁 СОЗДАТЬ ПРОМОКОД</button>
+            <button class="admin-action-btn" onclick="adminViewPromoCodes()">📊 СМОТРЕТЬ ПРОМОКОДЫ</button>
             <button class="admin-action-btn" onclick="adminAddStars()">➕ ДОБАВИТЬ СЕБЕ</button>
-            <button class="admin-action-btn" onclick="adminSetStars()">⚡ УСТАНОВИТЬ СЕБЕ</button>
             <button class="admin-action-btn" onclick="adminResetBalance()">🔄 СБРОСИТЬ СЕБЯ</button>
         </div>
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
@@ -826,8 +922,8 @@
         const SUPABASE_URL = 'https://tnxfhnskkvddkhchntok.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InRueGZobnNra3ZkZGtoY2hudG9rIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE5MjMxNjMsImV4cCI6MjA3NzQ5OTE2M30.ot8Ierd6_QDAhS9CLO3B_SLB92WP9TLnR-rR6b-_CbM';
         
-        // Конфигурация админа
-        const ADMIN_USER_ID = "user_neesrtpoa";
+        // Админы
+        const ADMIN_USER_IDS = ["user_neesrtpoa", "user_8o4eaeqq7"];
         
         // Призы для колеса с 8 сегментами как было изначально
         const prizes = [
@@ -896,16 +992,17 @@
         const inventoryBadge = document.getElementById('inventoryBadge');
         const inventoryPopup = document.getElementById('inventoryPopup');
         const paymentPopup = document.getElementById('paymentPopup');
+        const promoPopup = document.getElementById('promoPopup');
         const adminPopup = document.getElementById('adminPopup');
         const adminPanel = document.getElementById('adminPanel');
-        const adminStarsInput = document.getElementById('adminStarsInput');
-        const targetUserId = document.getElementById('targetUserId');
         const currentUserIdElement = document.getElementById('currentUserId');
         const userIdValue = document.getElementById('userIdValue');
         const copyNotification = document.getElementById('copyNotification');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
         const adminStatus = document.getElementById('adminStatus');
+        const promoStatus = document.getElementById('promoStatus');
+        const promoCodeInput = document.getElementById('promoCodeInput');
 
         let isSpinning = false;
         let currentUserId = '';
@@ -940,6 +1037,19 @@
             
             setTimeout(() => {
                 adminStatus.style.display = 'none';
+            }, 3000);
+        }
+
+        // Показать статус промокода
+        function showPromoStatus(message, isSuccess = true) {
+            if (!promoStatus) return;
+            
+            promoStatus.textContent = message;
+            promoStatus.className = 'promo-status ' + (isSuccess ? 'promo-success' : 'promo-error');
+            promoStatus.style.display = 'block';
+            
+            setTimeout(() => {
+                promoStatus.style.display = 'none';
             }, 3000);
         }
 
@@ -981,7 +1091,7 @@
                 try {
                     const userData = JSON.parse(localData);
                     currentUserId = userData.userId || generateUserId();
-                    userBalance = userData.balance || 100;
+                    userBalance = userData.balance !== undefined ? userData.balance : 100; // ФИКС: Сохраняем текущий баланс
                     userInventory = userData.inventory || [];
                 } catch (e) {
                     currentUserId = generateUserId();
@@ -1021,6 +1131,7 @@
                         console.error('❌ Ошибка загрузки пользователя:', userError);
                     }
                 } else if (userData) {
+                    // ФИКС: Используем баланс из базы данных, если он есть
                     userBalance = userData.balance;
                 }
 
@@ -1047,7 +1158,7 @@
         function saveToLocalStorage() {
             const userData = {
                 userId: currentUserId,
-                balance: userBalance,
+                balance: userBalance, // ФИКС: Сохраняем текущий баланс
                 inventory: userInventory
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
@@ -1060,7 +1171,7 @@
             updateBalance(userBalance);
             updateInventoryBadge();
             
-            if (currentUserId === ADMIN_USER_ID) {
+            if (ADMIN_USER_IDS.includes(currentUserId)) {
                 if (adminPanel) adminPanel.style.display = 'block';
             }
         }
@@ -1167,6 +1278,13 @@
         function showPaymentPopup() {
             if (overlay) overlay.style.display = 'block';
             if (paymentPopup) paymentPopup.style.display = 'block';
+        }
+        
+        function showPromoPopup() {
+            if (overlay) overlay.style.display = 'block';
+            if (promoPopup) promoPopup.style.display = 'block';
+            if (promoCodeInput) promoCodeInput.value = '';
+            if (promoStatus) promoStatus.style.display = 'none';
         }
         
         function createConfetti() {
@@ -1288,128 +1406,205 @@
             if (overlay) overlay.style.display = 'none';
             if (inventoryPopup) inventoryPopup.style.display = 'none';
             if (paymentPopup) paymentPopup.style.display = 'none';
+            if (promoPopup) promoPopup.style.display = 'none';
             if (adminPopup) adminPopup.style.display = 'none';
             if (adminStatus) adminStatus.style.display = 'none';
+            if (promoStatus) promoStatus.style.display = 'none';
         }
         
         function showCases() {
             // Убрано уведомление
         }
         
+        // АКТИВАЦИЯ ПРОМОКОДА
+        async function activatePromoCode() {
+            const promoCode = promoCodeInput ? promoCodeInput.value.trim().toUpperCase() : '';
+            
+            if (!promoCode) {
+                showPromoStatus('❌ Введите промокод', false);
+                return;
+            }
+
+            try {
+                // Проверяем существование промокода
+                const { data: promoData, error: promoError } = await supabase
+                    .from('promo_codes')
+                    .select('*')
+                    .eq('code', promoCode)
+                    .single();
+
+                if (promoError) {
+                    if (promoError.code === 'PGRST116') {
+                        showPromoStatus('❌ Промокод не найден', false);
+                    } else {
+                        throw promoError;
+                    }
+                    return;
+                }
+
+                // Проверяем срок действия
+                const now = new Date();
+                if (promoData.expires_at && new Date(promoData.expires_at) < now) {
+                    showPromoStatus('❌ Промокод истек', false);
+                    return;
+                }
+
+                // Проверяем максимальное количество использований
+                if (promoData.max_uses && promoData.used_count >= promoData.max_uses) {
+                    showPromoStatus('❌ Промокод уже использован максимальное количество раз', false);
+                    return;
+                }
+
+                // Проверяем, использовал ли пользователь уже этот промокод
+                const { data: usageData, error: usageError } = await supabase
+                    .from('promo_code_usage')
+                    .select('*')
+                    .eq('user_id', currentUserId)
+                    .eq('promo_code_id', promoData.id);
+
+                if (!usageError && usageData.length > 0) {
+                    showPromoStatus('❌ Вы уже использовали этот промокод', false);
+                    return;
+                }
+
+                // Начисляем звезды
+                updateBalance(userBalance + promoData.stars_amount);
+                await logTransaction('promo', promoData.stars_amount, `Активация промокода: ${promoCode}`);
+
+                // Обновляем счетчик использований
+                const { error: updateError } = await supabase
+                    .from('promo_codes')
+                    .update({
+                        used_count: promoData.used_count + 1,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', promoData.id);
+
+                if (updateError) throw updateError;
+
+                // Записываем использование промокода
+                const { error: usageInsertError } = await supabase
+                    .from('promo_code_usage')
+                    .insert({
+                        user_id: currentUserId,
+                        promo_code_id: promoData.id,
+                        used_at: new Date().toISOString()
+                    });
+
+                if (usageInsertError) throw usageInsertError;
+
+                showPromoStatus(`✅ Промокод активирован! Получено ${promoData.stars_amount} звезд`);
+                createConfetti();
+                
+                setTimeout(() => {
+                    closeAllPopups();
+                }, 2000);
+                
+            } catch (error) {
+                console.error('❌ Ошибка активации промокода:', error);
+                showPromoStatus('❌ Ошибка при активации промокода', false);
+            }
+        }
+        
         // АДМИН-ФУНКЦИИ
         async function showAdminPanel() {
-            if (currentUserId !== ADMIN_USER_ID) {
+            if (!ADMIN_USER_IDS.includes(currentUserId)) {
                 return;
             }
             
             if (overlay) overlay.style.display = 'block';
             if (adminPopup) adminPopup.style.display = 'block';
-            if (adminStarsInput) adminStarsInput.value = '';
-            if (targetUserId) targetUserId.value = '';
         }
         
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВЫДАЧИ ЗВЕЗД ИГРОКАМ
-        async function adminAddStarsToUser() {
-            if (currentUserId !== ADMIN_USER_ID) {
+        // СОЗДАНИЕ ПРОМОКОДА
+        async function adminCreatePromoCode() {
+            if (!ADMIN_USER_IDS.includes(currentUserId)) {
                 return;
             }
             
-            const userId = targetUserId ? targetUserId.value.trim() : '';
-            const amount = adminStarsInput ? parseInt(adminStarsInput.value) : 0;
+            const promoCodeName = document.getElementById('promoCodeName') ? document.getElementById('promoCodeName').value.trim().toUpperCase() : '';
+            const starsAmount = document.getElementById('promoStarsAmount') ? parseInt(document.getElementById('promoStarsAmount').value) : 0;
+            const maxUses = document.getElementById('promoMaxUses') ? parseInt(document.getElementById('promoMaxUses').value) : 1;
             
-            if (!userId || !amount || amount <= 0) {
-                showAdminStatus('❌ Введите корректный ID игрока и количество звезд', false);
+            if (!promoCodeName || !starsAmount || starsAmount <= 0 || maxUses <= 0) {
+                showAdminStatus('❌ Заполните все поля корректно', false);
                 return;
             }
 
             try {
-                // ПРОСТАЯ И ПРЯМАЯ ЛОГИКА - создаем или обновляем пользователя
-                const { data: existingUser, error: checkError } = await supabase
-                    .from('users')
-                    .select('balance')
-                    .eq('user_id', userId)
-                    .single();
-
-                let newBalance;
-                if (checkError && checkError.code === 'PGRST116') {
-                    // Пользователь не существует - создаем нового
-                    newBalance = amount;
-                } else if (checkError) {
-                    throw checkError;
-                } else {
-                    // Пользователь существует - обновляем баланс
-                    newBalance = (existingUser.balance || 0) + amount;
-                }
-
-                // Используем upsert для создания или обновления записи
-                const { error: upsertError } = await supabase
-                    .from('users')
-                    .upsert({
-                        user_id: userId,
-                        balance: newBalance,
-                        updated_at: new Date().toISOString()
-                    }, {
-                        onConflict: 'user_id'
-                    });
-
-                if (upsertError) throw upsertError;
-
-                // Логируем транзакцию
-                await supabase
-                    .from('transactions')
+                const { error } = await supabase
+                    .from('promo_codes')
                     .insert({
-                        user_id: userId,
-                        type: 'admin_add',
-                        amount: amount,
-                        description: 'Админ выдал звезды'
+                        code: promoCodeName,
+                        stars_amount: starsAmount,
+                        max_uses: maxUses,
+                        used_count: 0,
+                        created_by: currentUserId,
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
                     });
+
+                if (error) throw error;
+
+                showAdminStatus(`✅ Промокод "${promoCodeName}" создан! ${starsAmount} звезд, ${maxUses} использований`);
                 
-                showAdminStatus(`✅ Игроку ${userId} выдано ${amount} звезд!`);
-                if (adminStarsInput) adminStarsInput.value = '';
-                if (targetUserId) targetUserId.value = '';
+                // Очищаем поля
+                if (document.getElementById('promoCodeName')) document.getElementById('promoCodeName').value = '';
+                if (document.getElementById('promoStarsAmount')) document.getElementById('promoStarsAmount').value = '';
+                if (document.getElementById('promoMaxUses')) document.getElementById('promoMaxUses').value = '';
                 
             } catch (error) {
-                console.error('❌ Ошибка выдачи звезд:', error);
-                showAdminStatus('❌ Ошибка при выдаче звезд: ' + error.message, false);
+                console.error('❌ Ошибка создания промокода:', error);
+                showAdminStatus('❌ Ошибка при создании промокода: ' + error.message, false);
+            }
+        }
+        
+        // ПРОСМОТР ПРОМОКОДОВ
+        async function adminViewPromoCodes() {
+            if (!ADMIN_USER_IDS.includes(currentUserId)) {
+                return;
+            }
+
+            try {
+                const { data: promoCodes, error } = await supabase
+                    .from('promo_codes')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                let message = '📊 АКТИВНЫЕ ПРОМОКОДЫ:\n\n';
+                promoCodes.forEach(promo => {
+                    const usesLeft = promo.max_uses ? `${promo.used_count}/${promo.max_uses}` : '∞';
+                    message += `🎁 ${promo.code}: ${promo.stars_amount} звезд (использовано: ${usesLeft})\n`;
+                });
+
+                showAdminStatus(message);
+                
+            } catch (error) {
+                console.error('❌ Ошибка загрузки промокодов:', error);
+                showAdminStatus('❌ Ошибка при загрузке промокодов', false);
             }
         }
         
         async function adminAddStars() {
-            if (currentUserId !== ADMIN_USER_ID) {
+            if (!ADMIN_USER_IDS.includes(currentUserId)) {
                 return;
             }
             
-            const amount = adminStarsInput ? parseInt(adminStarsInput.value) : 0;
+            const amount = document.getElementById('promoStarsAmount') ? parseInt(document.getElementById('promoStarsAmount').value) : 0;
             if (amount && amount > 0) {
                 updateBalance(userBalance + amount);
                 await logTransaction('admin_add', amount, 'Админ добавил звезды');
                 createConfetti();
-                if (adminStarsInput) adminStarsInput.value = '';
                 showAdminStatus(`✅ Добавлено ${amount} звезд!`);
             } else {
                 showAdminStatus('❌ Введите корректное количество звезд', false);
             }
         }
         
-        async function adminSetStars() {
-            if (currentUserId !== ADMIN_USER_ID) {
-                return;
-            }
-            
-            const amount = adminStarsInput ? parseInt(adminStarsInput.value) : 0;
-            if (amount && amount >= 0) {
-                updateBalance(amount);
-                await logTransaction('admin_set', amount, 'Админ установил баланс');
-                createConfetti();
-                if (adminStarsInput) adminStarsInput.value = '';
-                showAdminStatus(`✅ Баланс установлен на ${amount} звезд!`);
-            } else {
-                showAdminStatus('❌ Введите корректное количество звезд', false);
-            }
-        }
-        
         async function adminResetBalance() {
-            if (currentUserId !== ADMIN_USER_ID) {
+            if (!ADMIN_USER_IDS.includes(currentUserId)) {
                 return;
             }
             
@@ -1437,16 +1632,17 @@
         // Глобальные функции для кнопок
         window.copyUserId = copyUserId;
         window.showPaymentPopup = showPaymentPopup;
+        window.showPromoPopup = showPromoPopup;
         window.spinWheel = spinWheel;
         window.showInventory = showInventory;
         window.showCases = showCases;
         window.closeAllPopups = closeAllPopups;
         window.showAdminPanel = showAdminPanel;
-        window.adminAddStarsToUser = adminAddStarsToUser;
+        window.activatePromoCode = activatePromoCode;
+        window.adminCreatePromoCode = adminCreatePromoCode;
+        window.adminViewPromoCodes = adminViewPromoCodes;
         window.adminAddStars = adminAddStars;
-        window.adminSetStars = adminSetStars;
         window.adminResetBalance = adminResetBalance;
     </script>
 </body>
 </html>
-
