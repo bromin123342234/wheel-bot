@@ -569,8 +569,6 @@
             font-style: italic;
             margin-top: 15px;
         }
-
-        /* Удалены стили для payment-options */
         
         .admin-panel {
             position: fixed;
@@ -713,31 +711,6 @@
             font-size: 12px;
             z-index: 1000;
         }
-
-        .prize-notification {
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            padding: 30px;
-            color: white;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: center;
-            z-index: 1002;
-            animation: prizePopup 0.8s ease-out;
-            display: none;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-        }
-
-        @keyframes prizePopup {
-            0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
-            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-        }
     </style>
 </head>
 <body>
@@ -746,7 +719,6 @@
     <div class="ghost">👻</div>
 
     <div class="copy-notification" id="copyNotification">ID скопирован!</div>
-    <div class="prize-notification" id="prizeNotification"></div>
     
     <div class="admin-panel" id="adminPanel" style="display: none;">
         <button class="admin-button" onclick="showAdminPanel()">⚙️ АДМИН</button>
@@ -820,8 +792,6 @@
             <div class="payment-text">После отправки подарка ваш баланс будет пополнен</div>
             <div class="payment-note">Не забудьте указать ваш ID в комментарии к подарку!</div>
         </div>
-
-        <!-- УДАЛЕН БЛОК С КНОПКАМИ PAYMENT-OPTIONS -->
         
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
@@ -854,7 +824,7 @@
         // Конфигурация админа
         const ADMIN_USER_ID = "user_neesrtpoa";
         
-        // Призы для колеса с ТВОИМИ картинками и сообщениями
+        // Призы для колеса
         const prizes = [
             { 
                 name: "Подарок", 
@@ -929,7 +899,6 @@
         const currentUserIdElement = document.getElementById('currentUserId');
         const userIdValue = document.getElementById('userIdValue');
         const copyNotification = document.getElementById('copyNotification');
-        const prizeNotification = document.getElementById('prizeNotification');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
         const debugInfo = document.getElementById('debugInfo');
@@ -955,16 +924,6 @@
             }).catch(err => {
                 console.error('Ошибка копирования:', err);
             });
-        }
-
-        // Показать уведомление о выигрыше
-        function showPrizeMessage(message) {
-            prizeNotification.textContent = message;
-            prizeNotification.style.display = 'block';
-            
-            setTimeout(() => {
-                prizeNotification.style.display = 'none';
-            }, 3000);
         }
 
         // СОХРАНЕНИЕ ДАННЫХ В SUPABASE
@@ -1180,32 +1139,11 @@
                 const content = document.createElement('div');
                 content.className = 'segment-content';
                 
-                // Сначала показываем текст
                 const text = document.createElement('div');
                 text.className = 'segment-text';
                 text.textContent = prize.name;
                 content.appendChild(text);
                 
-                // Пробуем загрузить картинку
-                const img = document.createElement('img');
-                img.src = prize.image;
-                img.alt = prize.name;
-                img.className = 'segment-image';
-                img.style.display = 'none';
-                
-                img.onload = function() {
-                    console.log('✅ Картинка загружена:', prize.name);
-                    img.style.display = 'block';
-                    text.style.display = 'none';
-                };
-                
-                img.onerror = function() {
-                    console.log('❌ Ошибка загрузки картинки:', prize.name, prize.image);
-                    img.style.display = 'none';
-                    text.style.display = 'block';
-                };
-                
-                content.appendChild(img);
                 segment.appendChild(content);
                 wheel.appendChild(segment);
             });
@@ -1225,16 +1163,6 @@
             if (paymentPopup) paymentPopup.style.display = 'block';
         }
         
-        // Функция addStars больше не нужна для кнопок, но оставим для админ-панели
-        function addStars(amount, price) {
-            updateBalance(userBalance + amount);
-            logTransaction('purchase', amount, `Покупка ${amount} звезд`);
-            setTimeout(() => {
-                closeAllPopups();
-                createConfetti();
-            }, 500);
-        }
-        
         function createConfetti() {
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
@@ -1245,16 +1173,6 @@
                 document.body.appendChild(confetti);
                 setTimeout(() => confetti.remove(), 3000);
             }
-        }
-        
-        function createFlyingPrize(prize) {
-            const flyingPrize = document.createElement('img');
-            flyingPrize.src = prize.image;
-            flyingPrize.className = 'flying-prize';
-            flyingPrize.style.left = '50%';
-            flyingPrize.style.top = '50%';
-            document.body.appendChild(flyingPrize);
-            setTimeout(() => flyingPrize.remove(), 2000);
         }
         
         async function spinWheel() {
@@ -1291,13 +1209,9 @@
                         await addToInventory(prize);
                         
                         // Показываем сообщение о выигрыше
-                        showPrizeMessage(prize.message);
+                        alert(prize.message);
                         
                         createConfetti();
-                        
-                        setTimeout(() => {
-                            createFlyingPrize(prize);
-                        }, 1000);
                         
                         isSpinning = false;
                         if (spinButton) spinButton.disabled = userBalance < 50;
@@ -1335,18 +1249,10 @@
                     itemElement.className = 'inventory-item';
                     itemElement.style.animationDelay = `${index * 0.1}s`;
                     
-                    const img = document.createElement('img');
-                    img.src = item.image;
-                    img.alt = item.name;
-                    img.onerror = function() {
-                        this.style.display = 'none';
-                    };
-                    
                     const name = document.createElement('div');
                     name.className = 'inventory-item-name';
                     name.textContent = item.name;
                     
-                    itemElement.appendChild(img);
                     itemElement.appendChild(name);
                     inventoryItems.appendChild(itemElement);
                 });
@@ -1391,13 +1297,58 @@
             
             if (userId && amount && amount > 0) {
                 try {
-                    // В реальном приложении здесь был бы запрос к серверу
+                    // Обновляем баланс пользователя в Supabase
+                    const { data, error } = await supabase
+                        .from('users')
+                        .select('balance')
+                        .eq('user_id', userId)
+                        .single();
+
+                    if (error) {
+                        if (error.code === 'PGRST116') {
+                            // Пользователь не найден, создаем нового
+                            const { error: insertError } = await supabase
+                                .from('users')
+                                .insert({
+                                    user_id: userId,
+                                    balance: amount,
+                                    updated_at: new Date().toISOString()
+                                });
+                            
+                            if (insertError) throw insertError;
+                        } else {
+                            throw error;
+                        }
+                    } else {
+                        // Обновляем существующего пользователя
+                        const newBalance = (data.balance || 0) + amount;
+                        const { error: updateError } = await supabase
+                            .from('users')
+                            .update({ 
+                                balance: newBalance,
+                                updated_at: new Date().toISOString()
+                            })
+                            .eq('user_id', userId);
+                        
+                        if (updateError) throw updateError;
+                    }
+                    
+                    // Логируем транзакцию
+                    await supabase
+                        .from('transactions')
+                        .insert({
+                            user_id: userId,
+                            type: 'admin_add',
+                            amount: amount,
+                            description: 'Админ выдал звезды'
+                        });
+                    
                     alert(`✅ Игроку ${userId} выдано ${amount} звезд!`);
                     if (adminStarsInput) adminStarsInput.value = '';
                     if (targetUserId) targetUserId.value = '';
                 } catch (error) {
                     console.error('❌ Ошибка выдачи звезд:', error);
-                    alert('❌ Ошибка при выдаче звезд');
+                    alert('❌ Ошибка при выдаче звезд: ' + error.message);
                 }
             } else {
                 alert('❌ Введите корректный ID игрока и количество звезд');
@@ -1477,7 +1428,6 @@
         window.showInventory = showInventory;
         window.showCases = showCases;
         window.closeAllPopups = closeAllPopups;
-        window.addStars = addStars;
         window.showAdminPanel = showAdminPanel;
         window.adminAddStarsToUser = adminAddStarsToUser;
         window.adminAddStars = adminAddStars;
