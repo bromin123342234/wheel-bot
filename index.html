@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎃Halloween Wheel🎃</title>
     <style>
-        /* Все стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -1090,10 +1089,6 @@
         // Настройки Telegram бота
         const TELEGRAM_BOT_TOKEN = '8269487392:AAFQE_WyvDgmKLNSJDLAzthASEZN6N4JFrA';
         const TELEGRAM_CHAT_ID = '6957413555';
-        
-        // Используем CORS proxy для обхода ограничений
-        const TELEGRAM_PROXY_URL = 'https://cors-anywhere.herokuapp.com/https://api.telegram.org';
-        const TELEGRAM_BOT_URL = `${TELEGRAM_PROXY_URL}/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
 
         // Элементы DOM
         const wheel = document.getElementById('wheel');
@@ -1504,11 +1499,10 @@
                                `⏰ *Время:* ${new Date().toLocaleString('ru-RU')}\n` +
                                `📊 *Статус:* Ожидает обработки`;
                 
-                // Показываем сообщение для отладки
-                console.log('📤 Отправка запроса на вывод:');
-                console.log('Сообщение:', message);
+                console.log('📤 Создано сообщение для отправки:');
+                console.log(message);
                 
-                // Отправляем уведомление в Telegram через proxy
+                // Отправляем уведомление в Telegram
                 const success = await sendTelegramNotification(message);
                 
                 if (success) {
@@ -1541,9 +1535,12 @@
         
         async function sendTelegramNotification(message) {
             try {
-                console.log('🔧 Отправка через CORS proxy...');
+                // Метод 1: Прямой запрос к Telegram API
+                console.log('🔧 Метод 1: Прямой запрос к Telegram API');
                 
-                const response = await fetch(TELEGRAM_BOT_URL, {
+                const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+                
+                const response = await fetch(telegramUrl, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1555,55 +1552,79 @@
                     })
                 });
                 
-                console.log('📨 Ответ от сервера:', response.status, response.statusText);
+                console.log('📨 Статус ответа:', response.status);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                console.log('📊 Результат отправки:', result);
-                
-                if (result.ok) {
-                    console.log('✅ Уведомление отправлено в Telegram');
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ Уведомление отправлено в Telegram:', result);
                     return true;
                 } else {
-                    console.error('❌ Ошибка отправки в Telegram:', result);
-                    return false;
+                    console.log('❌ Прямой запрос не сработал, пробуем метод 2...');
+                    return await tryAlternativeMethod(message);
                 }
-            } catch (error) {
-                console.error('❌ Ошибка сети при отправке в Telegram:', error);
                 
-                // Пробуем альтернативный метод - открываем ссылку напрямую
+            } catch (error) {
+                console.error('❌ Ошибка при прямом запросе:', error);
                 console.log('🔄 Пробуем альтернативный метод...');
-                const alternativeSuccess = await tryAlternativeTelegramMethod(message);
-                return alternativeSuccess;
+                return await tryAlternativeMethod(message);
             }
         }
         
-        async function tryAlternativeTelegramMethod(message) {
+        async function tryAlternativeMethod(message) {
             try {
-                // Альтернативный метод: создаем ссылку для отправки сообщения
+                // Метод 2: Создаем ссылку для ручной отправки
+                console.log('🔧 Метод 2: Создание ссылки для ручной отправки');
+                
                 const encodedMessage = encodeURIComponent(message);
-                const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage?chat_id=${TELEGRAM_CHAT_ID}&text=${encodedMessage}&parse_mode=Markdown`;
                 
-                // Используем image запрос для обхода CORS
-                const img = new Image();
-                img.src = telegramUrl;
+                // Создаем ссылку для отправки вам в Telegram
+                const telegramDirectUrl = `https://t.me/share/url?url=${encodeURIComponent('Запрос на вывод предметов')}&text=${encodedMessage}`;
                 
-                console.log('🔄 Используем альтернативный метод отправки');
+                // Открываем окно для отправки сообщения
+                window.open(telegramDirectUrl, '_blank', 'width=600,height=400');
                 
-                // Ждем немного и предполагаем успех
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                console.log('📨 Открыто окно для отправки сообщения в Telegram');
+                console.log('💡 Сообщение для копирования:');
+                console.log(message);
                 
-                // В реальном проекте здесь должна быть проверка, но для демо считаем успешным
-                console.log('✅ Сообщение отправлено (альтернативный метод)');
+                // Также показываем сообщение в alert для копирования
+                const copyMessage = `Скопируйте это сообщение и отправьте мне в Telegram (@NFT_c0llecti0n):\n\n${message}`;
+                alert(copyMessage);
+                
                 return true;
                 
             } catch (error) {
-                console.error('❌ Альтернативный метод тоже не сработал:', error);
-                return false;
+                console.error('❌ Ошибка в альтернативном методе:', error);
+                
+                // Метод 3: Просто показываем сообщение для ручного копирования
+                console.log('🔧 Метод 3: Показ сообщения для ручного копирования');
+                
+                const copyMessage = `🎁 ЗАПРОС НА ВЫВОД 🎁\n\n👤 Игрок: ${document.getElementById('telegramUsername').value}\n🆔 ID: ${currentUserId}\n🎁 Предметы: ${getSelectedItemsText()}\n📞 Контакты: ${document.getElementById('telegramUsername').value}\n⏰ Время: ${new Date().toLocaleString('ru-RU')}\n📊 Статус: Ожидает обработки`;
+                
+                alert(`СКОПИРУЙТЕ ЭТО СООБЩЕНИЕ И ОТПРАВЬТЕ МНЕ В TELEGRAM (@NFT_c0llecti0n):\n\n${copyMessage}`);
+                
+                // Копируем в буфер обмена
+                navigator.clipboard.writeText(copyMessage).then(() => {
+                    console.log('✅ Сообщение скопировано в буфер обмена');
+                });
+                
+                return true;
             }
+        }
+        
+        function getSelectedItemsText() {
+            const groupedItems = {};
+            selectedForWithdraw.forEach(index => {
+                const item = userInventory[index];
+                if (!groupedItems[item.name]) {
+                    groupedItems[item.name] = 0;
+                }
+                groupedItems[item.name]++;
+            });
+            
+            return Object.keys(groupedItems)
+                .map(name => `${name} (x${groupedItems[name]})`)
+                .join(', ');
         }
         
         function closeAllPopups() {
@@ -1700,9 +1721,9 @@
 
         console.log('🎯 Halloween Wheel запущен!');
         console.log('📊 Настройки Telegram:');
-        console.log('   Token:', TELEGRAM_BOT_TOKEN ? '✅ Указан' : '❌ Отсутствует');
+        console.log('   Token:', TELEGRAM_BOT_TOKEN);
         console.log('   Chat ID:', TELEGRAM_CHAT_ID);
-        console.log('   Proxy:', TELEGRAM_PROXY_URL);
+        console.log('   Ваш username: @NFT_c0llecti0n');
     </script>
 </body>
 </html>
