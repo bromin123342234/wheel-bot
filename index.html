@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎃Halloween Wheel🎃</title>
     <style>
-        /* Все стили остаются такими же */
+        /* Все стили остаются прежними */
         * {
             margin: 0;
             padding: 0;
@@ -916,6 +916,9 @@
             { name: "Сюрприз", type: "item", image: "https://i.ibb.co/q3xL5y2h/image.png" }
         ];
 
+        // URL для JSON файла с промокодами (замените на ваш)
+        const PROMOCODES_JSON_URL = 'https://raw.githubusercontent.com/ВАШ_USERNAME/ВАШ_РЕПОЗИТОРИЙ/main/promocodes.json';
+
         // Элементы DOM
         const wheel = document.getElementById('wheel');
         const spinButton = document.getElementById('spinButton');
@@ -934,6 +937,7 @@
         let currentUserId = '';
         let userBalance = 100;
         let userInventory = [];
+        let serverPromoCodes = [];
 
         // Генерация ID пользователя
         function generateUserId() {
@@ -1002,45 +1006,37 @@
             updateUI();
         }
 
-        // Промокоды через Google Sheets (бесплатный сервер)
-        const PROMO_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1YOUR_SHEET_ID/gviz/tq?tqx=out:json';
-        
+        // Загрузка промокодов с JSON файла
         async function loadPromoCodesFromServer() {
             try {
-                // Пробуем загрузить с Google Sheets
-                const response = await fetch(PROMO_SHEET_URL);
-                const text = await response.text();
-                const json = JSON.parse(text.substring(47).slice(0, -2));
+                const response = await fetch(PROMOCODES_JSON_URL);
+                if (!response.ok) throw new Error('Не удалось загрузить промокоды');
                 
-                const promoCodes = json.table.rows.map(row => ({
-                    code: row.c[0]?.v,
-                    stars: row.c[1]?.v,
-                    maxUses: row.c[2]?.v,
-                    usedCount: row.c[3]?.v || 0
-                }));
+                const data = await response.json();
+                serverPromoCodes = data.promoCodes || [];
                 
-                localStorage.setItem('server_promoCodes', JSON.stringify(promoCodes));
+                console.log('✅ Промокоды загружены с сервера:', serverPromoCodes);
             } catch (error) {
-                console.log('Не удалось загрузить промокоды с сервера, используем локальные');
+                console.log('⚠️ Не удалось загрузить промокоды с сервера, используем локальные');
                 // Используем локальные промокоды как fallback
                 if (!localStorage.getItem('local_promoCodes')) {
-                    const defaultPromoCodes = [
-                        { code: "WELCOME100", stars: 100, maxUses: 100, usedCount: 0 },
-                        { code: "HALLOWEEN", stars: 50, maxUses: 1000, usedCount: 0 }
+                    serverPromoCodes = [
+                        { code: "WELCOME100", stars: 100, maxUses: 1000, usedCount: 0 },
+                        { code: "HALLOWEEN", stars: 50, maxUses: 5000, usedCount: 0 }
                     ];
-                    localStorage.setItem('local_promoCodes', JSON.stringify(defaultPromoCodes));
+                } else {
+                    serverPromoCodes = JSON.parse(localStorage.getItem('local_promoCodes'));
                 }
+            }
+            
+            if (!localStorage.getItem('promoUsage')) {
+                localStorage.setItem('promoUsage', JSON.stringify([]));
             }
         }
 
         function getPromoCodes() {
-            // Сначала пробуем серверные промокоды
-            const serverPromos = localStorage.getItem('server_promoCodes');
-            if (serverPromos) {
-                return JSON.parse(serverPromos);
-            }
-            // Если нет серверных, используем локальные
-            return JSON.parse(localStorage.getItem('local_promoCodes') || '[]');
+            // Используем серверные промокоды
+            return serverPromoCodes;
         }
 
         function getPromoUsage() {
@@ -1049,16 +1045,8 @@
 
         function savePromoCodes(promoCodes) {
             // Сохраняем в локальные промокоды (для админов)
+            serverPromoCodes = promoCodes;
             localStorage.setItem('local_promoCodes', JSON.stringify(promoCodes));
-            
-            // Пытаемся синхронизировать с сервером
-            syncPromoCodesToServer(promoCodes);
-        }
-
-        async function syncPromoCodesToServer(promoCodes) {
-            // Здесь должна быть логика отправки на сервер
-            // Для демо просто сохраняем в localStorage
-            console.log('Синхронизация промокодов с сервером:', promoCodes);
         }
 
         function savePromoUsage(usage) {
