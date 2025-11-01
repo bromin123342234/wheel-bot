@@ -6,7 +6,6 @@
     <title>🎃Halloween Wheel🎃</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        /* Стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -925,78 +924,46 @@
         // Админы
         const ADMIN_USER_IDS = ["user_neesrtpoa", "user_8o4eaeqq7"];
         
-        // Призы для колеса с 8 сегментами как было изначально
+        // Призы для колеса
         const prizes = [
-            { 
-                name: "Подарок", 
-                type: "item", 
-                image: "https://i.ibb.co/q3xL5y2h/image.png",
-                message: "🎁 Вам выпал подарок!"
-            },
-            { 
-                name: "Сердечко", 
-                type: "item", 
-                image: "https://i.ibb.co/5gkW5WjD/image.png",
-                message: "💖 Вам выпало сердечко!"
-            },
-            { 
-                name: "Букет", 
-                type: "item", 
-                image: "https://i.ibb.co/N6CmQdcD/image.png",
-                message: "💐 Вам выпал букет!"
-            },
-            { 
-                name: "Календарик", 
-                type: "item", 
-                image: "https://i.ibb.co/CprKQQW2/image.png",
-                message: "📅 Вам выпал календарик!"
-            },
-            { 
-                name: "Подарок", 
-                type: "item", 
-                image: "https://i.ibb.co/LD05XPNV/image.png",
-                message: "🎁 Вам выпал подарок!"
-            },
-            { 
-                name: "Подарок", 
-                type: "item", 
-                image: "https://i.ibb.co/7dyYVq4T/image.png",
-                message: "🎁 Вам выпал подарок!"
-            },
-            { 
-                name: "Подарок", 
-                type: "item", 
-                image: "https://i.ibb.co/Y4cQLGqG/image.png",
-                message: "🎁 Вам выпал подарок!"
-            },
-            { 
-                name: "Сюрприз", 
-                type: "item", 
-                image: "https://i.ibb.co/q3xL5y2h/image.png",
-                message: "🎉 Вам выпал сюрприз!"
-            }
+            { name: "Подарок", type: "item", image: "https://i.ibb.co/q3xL5y2h/image.png" },
+            { name: "Сердечко", type: "item", image: "https://i.ibb.co/5gkW5WjD/image.png" },
+            { name: "Букет", type: "item", image: "https://i.ibb.co/N6CmQdcD/image.png" },
+            { name: "Календарик", type: "item", image: "https://i.ibb.co/CprKQQW2/image.png" },
+            { name: "Подарок", type: "item", image: "https://i.ibb.co/LD05XPNV/image.png" },
+            { name: "Подарок", type: "item", image: "https://i.ibb.co/7dyYVq4T/image.png" },
+            { name: "Подарок", type: "item", image: "https://i.ibb.co/Y4cQLGqG/image.png" },
+            { name: "Сюрприз", type: "item", image: "https://i.ibb.co/q3xL5y2h/image.png" }
         ];
         
-        // Инициализация Supabase
+        // Инициализация Supabase с защитой от ошибок
         let supabase;
         try {
-            supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+                console.log('✅ Supabase инициализирован');
+            } else {
+                throw new Error('Supabase не загружен');
+            }
         } catch (error) {
             console.error('❌ Ошибка инициализации Supabase:', error);
+            supabase = {
+                from: () => ({
+                    select: () => Promise.resolve({ data: null, error: new Error('Supabase не доступен') }),
+                    upsert: () => Promise.resolve({ data: null, error: new Error('Supabase не доступен') }),
+                    insert: () => Promise.resolve({ data: null, error: new Error('Supabase не доступен') }),
+                    update: () => Promise.resolve({ data: null, error: new Error('Supabase не доступен') })
+                })
+            };
         }
-        
+
         // Элементы DOM
         const wheel = document.getElementById('wheel');
         const spinButton = document.getElementById('spinButton');
         const balanceElement = document.getElementById('balance');
         const inventoryBadge = document.getElementById('inventoryBadge');
-        const inventoryPopup = document.getElementById('inventoryPopup');
-        const paymentPopup = document.getElementById('paymentPopup');
-        const promoPopup = document.getElementById('promoPopup');
-        const adminPopup = document.getElementById('adminPopup');
-        const adminPanel = document.getElementById('adminPanel');
-        const currentUserIdElement = document.getElementById('currentUserId');
         const userIdValue = document.getElementById('userIdValue');
+        const currentUserIdElement = document.getElementById('currentUserId');
         const copyNotification = document.getElementById('copyNotification');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
@@ -1009,59 +976,51 @@
         let userBalance = 100;
         let userInventory = [];
 
-        // Генерация уникального ID пользователя
+        // Проверка доступности Supabase
+        function isSupabaseAvailable() {
+            return supabase && typeof supabase.from === 'function';
+        }
+
+        // Генерация ID пользователя
         function generateUserId() {
             return 'user_' + Math.random().toString(36).substr(2, 9);
         }
 
-        // Копирование ID в буфер обмена
+        // Копирование ID
         function copyUserId() {
             if (!currentUserId) return;
             navigator.clipboard.writeText(currentUserId).then(() => {
                 copyNotification.style.display = 'block';
-                setTimeout(() => {
-                    copyNotification.style.display = 'none';
-                }, 2000);
-            }).catch(err => {
-                console.error('Ошибка копирования:', err);
+                setTimeout(() => copyNotification.style.display = 'none', 2000);
             });
         }
 
-        // Показать статус админ-действия
+        // Показать статус
         function showAdminStatus(message, isSuccess = true) {
             if (!adminStatus) return;
-            
             adminStatus.textContent = message;
             adminStatus.className = 'admin-status ' + (isSuccess ? 'admin-success' : 'admin-error');
             adminStatus.style.display = 'block';
-            
-            setTimeout(() => {
-                adminStatus.style.display = 'none';
-            }, 3000);
+            setTimeout(() => adminStatus.style.display = 'none', 3000);
         }
 
-        // Показать статус промокода
         function showPromoStatus(message, isSuccess = true) {
             if (!promoStatus) return;
-            
             promoStatus.textContent = message;
             promoStatus.className = 'promo-status ' + (isSuccess ? 'promo-success' : 'promo-error');
             promoStatus.style.display = 'block';
-            
-            setTimeout(() => {
-                promoStatus.style.display = 'none';
-            }, 3000);
+            setTimeout(() => promoStatus.style.display = 'none', 3000);
         }
 
-        // СОХРАНЕНИЕ ДАННЫХ В SUPABASE
+        // Сохранение данных
         async function saveUserData() {
-            if (!supabase) {
+            if (!isSupabaseAvailable()) {
                 saveToLocalStorage();
                 return;
             }
 
             try {
-                const { data, error } = await supabase
+                const { error } = await supabase
                     .from('users')
                     .upsert({
                         user_id: currentUserId,
@@ -1069,12 +1028,7 @@
                         updated_at: new Date().toISOString()
                     });
 
-                if (error) {
-                    console.error('❌ Ошибка сохранения в Supabase:', error);
-                    saveToLocalStorage();
-                    return;
-                }
-                
+                if (error) throw error;
                 saveToLocalStorage();
             } catch (error) {
                 console.error('❌ Ошибка сохранения:', error);
@@ -1082,16 +1036,15 @@
             }
         }
 
-        // ЗАГРУЗКА ДАННЫХ
+        // Загрузка данных
         async function loadUserData() {
-            // Сначала пробуем из localStorage
             const localData = localStorage.getItem('halloweenWheelData');
             
             if (localData) {
                 try {
                     const userData = JSON.parse(localData);
                     currentUserId = userData.userId || generateUserId();
-                    userBalance = userData.balance !== undefined ? userData.balance : 100; // ФИКС: Сохраняем текущий баланс
+                    userBalance = userData.balance !== undefined ? userData.balance : 100;
                     userInventory = userData.inventory || [];
                 } catch (e) {
                     currentUserId = generateUserId();
@@ -1104,38 +1057,24 @@
                 userInventory = [];
             }
             
-            // Затем пробуем загрузить из Supabase
             await loadFromSupabase();
             updateUI();
         }
 
-        // Загрузка данных из Supabase
         async function loadFromSupabase() {
-            if (!supabase || !currentUserId) {
-                return;
-            }
+            if (!isSupabaseAvailable() || !currentUserId) return;
 
             try {
-                // Загружаем данные пользователя
                 const { data: userData, error: userError } = await supabase
                     .from('users')
                     .select('*')
                     .eq('user_id', currentUserId)
                     .single();
 
-                if (userError) {
-                    if (userError.code === 'PGRST116') {
-                        // Пользователь не найден, создаем нового
-                        await saveUserData();
-                    } else {
-                        console.error('❌ Ошибка загрузки пользователя:', userError);
-                    }
-                } else if (userData) {
-                    // ФИКС: Используем баланс из базы данных, если он есть
+                if (!userError && userData) {
                     userBalance = userData.balance;
                 }
 
-                // Загружаем инвентарь
                 const { data: inventoryData, error: inventoryError } = await supabase
                     .from('user_inventory')
                     .select('*')
@@ -1148,19 +1087,13 @@
                         image: item.item_image
                     }));
                 }
-
             } catch (error) {
-                console.error('❌ Ошибка загрузки из Supabase:', error);
+                console.error('❌ Ошибка загрузки:', error);
             }
         }
 
-        // Сохранение в localStorage
         function saveToLocalStorage() {
-            const userData = {
-                userId: currentUserId,
-                balance: userBalance, // ФИКС: Сохраняем текущий баланс
-                inventory: userInventory
-            };
+            const userData = { userId: currentUserId, balance: userBalance, inventory: userInventory };
             localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
         }
 
@@ -1172,20 +1105,27 @@
             updateInventoryBadge();
             
             if (ADMIN_USER_IDS.includes(currentUserId)) {
-                if (adminPanel) adminPanel.style.display = 'block';
+                document.getElementById('adminPanel').style.display = 'block';
             }
         }
 
-        // Добавление предмета в инвентарь
+        function updateBalance(newBalance) {
+            userBalance = newBalance;
+            if (balanceElement) balanceElement.textContent = userBalance;
+            if (spinButton) spinButton.disabled = userBalance < 50 || isSpinning;
+            saveUserData();
+        }
+
+        // Инвентарь
         async function addToInventory(prize) {
             userInventory.push(prize);
             updateInventoryBadge();
             saveToLocalStorage();
 
-            if (!supabase) return;
+            if (!isSupabaseAvailable()) return;
 
             try {
-                const { data, error } = await supabase
+                const { error } = await supabase
                     .from('user_inventory')
                     .insert({
                         user_id: currentUserId,
@@ -1194,40 +1134,25 @@
                         item_image: prize.image
                     });
 
-                if (error) {
-                    console.error('❌ Ошибка добавления в инвентарь:', error);
-                }
+                if (error) console.error('❌ Ошибка инвентаря:', error);
             } catch (error) {
-                console.error('❌ Ошибка добавления в инвентарь:', error);
+                console.error('❌ Ошибка инвентаря:', error);
             }
         }
 
-        // Запись транзакции
-        async function logTransaction(type, amount, description = '') {
-            if (!supabase) return;
-            
-            try {
-                const { error } = await supabase
-                    .from('transactions')
-                    .insert({
-                        user_id: currentUserId,
-                        type: type,
-                        amount: amount,
-                        description: description
-                    });
-
-                if (error) {
-                    console.error('❌ Ошибка записи транзакции:', error);
-                }
-            } catch (error) {
-                console.error('❌ Ошибка записи транзакции:', error);
+        function updateInventoryBadge() {
+            if (!inventoryBadge) return;
+            if (userInventory.length > 0) {
+                inventoryBadge.style.display = 'flex';
+                inventoryBadge.textContent = userInventory.length;
+            } else {
+                inventoryBadge.style.display = 'none';
             }
         }
 
-        // Создание колеса
+        // Колесо
         function createWheel() {
             if (!wheel) return;
-            
             wheel.innerHTML = '';
             const segmentAngle = 360 / prizes.length;
             
@@ -1239,13 +1164,11 @@
                 const content = document.createElement('div');
                 content.className = 'segment-content';
                 
-                // Сначала показываем текст
                 const text = document.createElement('div');
                 text.className = 'segment-text';
                 text.textContent = prize.name;
                 content.appendChild(text);
                 
-                // Пробуем загрузить картинку
                 const img = document.createElement('img');
                 img.src = prize.image;
                 img.alt = prize.name;
@@ -1268,25 +1191,39 @@
             });
         }
 
-        function updateBalance(newBalance) {
-            userBalance = newBalance;
-            if (balanceElement) balanceElement.textContent = userBalance;
-            if (spinButton) spinButton.disabled = userBalance < 50 || isSpinning;
-            saveUserData();
+        async function spinWheel() {
+            if (isSpinning || userBalance < 50) return;
+            
+            isSpinning = true;
+            if (spinButton) spinButton.disabled = true;
+            
+            const prizeIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[prizeIndex];
+            const segmentAngle = 360 / prizes.length;
+            const targetAngle = 360 - (prizeIndex * segmentAngle + segmentAngle / 2);
+            const totalRotation = 360 * 5 + targetAngle;
+            
+            if (wheel) {
+                wheel.style.transition = 'none';
+                wheel.style.transform = 'rotate(0deg)';
+                
+                setTimeout(() => {
+                    wheel.style.transition = `transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97)`;
+                    wheel.style.transform = `rotate(${totalRotation}deg)`;
+                    
+                    setTimeout(async () => {
+                        updateBalance(userBalance - 50);
+                        await addToInventory(prize);
+                        createConfetti();
+                        setTimeout(() => createFlyingPrize(prize), 1000);
+                        isSpinning = false;
+                        if (spinButton) spinButton.disabled = userBalance < 50;
+                    }, 5000);
+                }, 50);
+            }
         }
 
-        function showPaymentPopup() {
-            if (overlay) overlay.style.display = 'block';
-            if (paymentPopup) paymentPopup.style.display = 'block';
-        }
-        
-        function showPromoPopup() {
-            if (overlay) overlay.style.display = 'block';
-            if (promoPopup) promoPopup.style.display = 'block';
-            if (promoCodeInput) promoCodeInput.value = '';
-            if (promoStatus) promoStatus.style.display = 'none';
-        }
-        
+        // Анимации
         function createConfetti() {
             for (let i = 0; i < 50; i++) {
                 const confetti = document.createElement('div');
@@ -1308,64 +1245,22 @@
             document.body.appendChild(flyingPrize);
             setTimeout(() => flyingPrize.remove(), 2000);
         }
-        
-        async function spinWheel() {
-            if (isSpinning) return;
-            
-            if (userBalance < 50) {
-                return;
-            }
-            
-            isSpinning = true;
-            if (spinButton) spinButton.disabled = true;
-            
-            const prizeIndex = Math.floor(Math.random() * prizes.length);
-            const prize = prizes[prizeIndex];
-            
-            const segmentAngle = 360 / prizes.length;
-            const targetAngle = 360 - (prizeIndex * segmentAngle + segmentAngle / 2);
-            const totalRotation = 360 * 5 + targetAngle;
-            
-            if (wheel) {
-                wheel.style.transition = 'none';
-                wheel.style.transform = 'rotate(0deg)';
-                
-                setTimeout(() => {
-                    wheel.style.transition = `transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97)`;
-                    wheel.style.transform = `rotate(${totalRotation}deg)`;
-                    
-                    setTimeout(async () => {
-                        updateBalance(userBalance - 50);
-                        await logTransaction('spin', -50, `Выиграл: ${prize.name}`);
-                        await addToInventory(prize);
-                        
-                        createConfetti();
-                        
-                        setTimeout(() => {
-                            createFlyingPrize(prize);
-                        }, 1000);
-                        
-                        isSpinning = false;
-                        if (spinButton) spinButton.disabled = userBalance < 50;
-                    }, 5000);
-                }, 50);
-            }
+
+        // Попапы
+        function showPaymentPopup() {
+            overlay.style.display = 'block';
+            document.getElementById('paymentPopup').style.display = 'block';
         }
         
-        function updateInventoryBadge() {
-            if (!inventoryBadge) return;
-            
-            if (userInventory.length > 0) {
-                inventoryBadge.style.display = 'flex';
-                inventoryBadge.textContent = userInventory.length;
-            } else {
-                inventoryBadge.style.display = 'none';
-            }
+        function showPromoPopup() {
+            overlay.style.display = 'block';
+            document.getElementById('promoPopup').style.display = 'block';
+            promoCodeInput.value = '';
+            promoStatus.style.display = 'none';
         }
         
         function showInventory() {
-            if (!inventoryItems) return;
-            
+            const inventoryItems = document.getElementById('inventoryItems');
             inventoryItems.innerHTML = '';
             
             if (userInventory.length === 0) {
@@ -1384,9 +1279,7 @@
                     const img = document.createElement('img');
                     img.src = item.image;
                     img.alt = item.name;
-                    img.onerror = function() {
-                        this.style.display = 'none';
-                    };
+                    img.onerror = function() { this.style.display = 'none'; };
                     
                     const name = document.createElement('div');
                     name.className = 'inventory-item-name';
@@ -1398,35 +1291,40 @@
                 });
             }
             
-            if (overlay) overlay.style.display = 'block';
-            if (inventoryPopup) inventoryPopup.style.display = 'block';
+            overlay.style.display = 'block';
+            document.getElementById('inventoryPopup').style.display = 'block';
         }
         
         function closeAllPopups() {
-            if (overlay) overlay.style.display = 'none';
-            if (inventoryPopup) inventoryPopup.style.display = 'none';
-            if (paymentPopup) paymentPopup.style.display = 'none';
-            if (promoPopup) promoPopup.style.display = 'none';
-            if (adminPopup) adminPopup.style.display = 'none';
+            overlay.style.display = 'none';
+            document.getElementById('inventoryPopup').style.display = 'none';
+            document.getElementById('paymentPopup').style.display = 'none';
+            document.getElementById('promoPopup').style.display = 'none';
+            document.getElementById('adminPopup').style.display = 'none';
             if (adminStatus) adminStatus.style.display = 'none';
             if (promoStatus) promoStatus.style.display = 'none';
         }
         
         function showCases() {
-            // Убрано уведомление
+            // Заглушка для кейсов
         }
-        
-        // АКТИВАЦИЯ ПРОМОКОДА
+
+        // Промокоды
         async function activatePromoCode() {
-            const promoCode = promoCodeInput ? promoCodeInput.value.trim().toUpperCase() : '';
+            const promoCode = promoCodeInput.value.trim().toUpperCase();
             
             if (!promoCode) {
                 showPromoStatus('❌ Введите промокод', false);
                 return;
             }
 
+            if (!isSupabaseAvailable()) {
+                showPromoStatus('❌ База данных недоступна', false);
+                return;
+            }
+
             try {
-                // Проверяем существование промокода
+                // Проверяем промокод
                 const { data: promoData, error: promoError } = await supabase
                     .from('promo_codes')
                     .select('*')
@@ -1434,11 +1332,7 @@
                     .single();
 
                 if (promoError) {
-                    if (promoError.code === 'PGRST116') {
-                        showPromoStatus('❌ Промокод не найден', false);
-                    } else {
-                        throw promoError;
-                    }
+                    showPromoStatus('❌ Промокод не найден', false);
                     return;
                 }
 
@@ -1449,30 +1343,29 @@
                     return;
                 }
 
-                // Проверяем максимальное количество использований
+                // Проверяем лимит использований
                 if (promoData.max_uses && promoData.used_count >= promoData.max_uses) {
-                    showPromoStatus('❌ Промокод уже использован максимальное количество раз', false);
+                    showPromoStatus('❌ Промокод уже использован', false);
                     return;
                 }
 
-                // Проверяем, использовал ли пользователь уже этот промокод
-                const { data: usageData, error: usageError } = await supabase
-                    .from('promo_code_usage')
+                // Проверяем не использовал ли уже пользователь
+                const { data: usageData } = await supabase
+                    .from('promo_code_redemptions')
                     .select('*')
                     .eq('user_id', currentUserId)
                     .eq('promo_code_id', promoData.id);
 
-                if (!usageError && usageData.length > 0) {
+                if (usageData && usageData.length > 0) {
                     showPromoStatus('❌ Вы уже использовали этот промокод', false);
                     return;
                 }
 
                 // Начисляем звезды
                 updateBalance(userBalance + promoData.stars_amount);
-                await logTransaction('promo', promoData.stars_amount, `Активация промокода: ${promoCode}`);
 
                 // Обновляем счетчик использований
-                const { error: updateError } = await supabase
+                await supabase
                     .from('promo_codes')
                     .update({
                         used_count: promoData.used_count + 1,
@@ -1480,20 +1373,16 @@
                     })
                     .eq('id', promoData.id);
 
-                if (updateError) throw updateError;
-
-                // Записываем использование промокода
-                const { error: usageInsertError } = await supabase
-                    .from('promo_code_usage')
+                // Записываем использование
+                await supabase
+                    .from('promo_code_redemptions')
                     .insert({
                         user_id: currentUserId,
                         promo_code_id: promoData.id,
                         used_at: new Date().toISOString()
                     });
 
-                if (usageInsertError) throw usageInsertError;
-
-                showPromoStatus(`✅ Промокод активирован! Получено ${promoData.stars_amount} звезд`);
+                showPromoStatus(`✅ Промокод активирован! +${promoData.stars_amount} звезд`);
                 createConfetti();
                 
                 setTimeout(() => {
@@ -1501,33 +1390,32 @@
                 }, 2000);
                 
             } catch (error) {
-                console.error('❌ Ошибка активации промокода:', error);
-                showPromoStatus('❌ Ошибка при активации промокода', false);
+                console.error('❌ Ошибка активации:', error);
+                showPromoStatus('❌ Ошибка при активации', false);
             }
         }
-        
-        // АДМИН-ФУНКЦИИ
+
+        // Админ-функции
         async function showAdminPanel() {
-            if (!ADMIN_USER_IDS.includes(currentUserId)) {
-                return;
-            }
-            
-            if (overlay) overlay.style.display = 'block';
-            if (adminPopup) adminPopup.style.display = 'block';
+            if (!ADMIN_USER_IDS.includes(currentUserId)) return;
+            overlay.style.display = 'block';
+            document.getElementById('adminPopup').style.display = 'block';
         }
         
-        // СОЗДАНИЕ ПРОМОКОДА
         async function adminCreatePromoCode() {
-            if (!ADMIN_USER_IDS.includes(currentUserId)) {
-                return;
-            }
+            if (!ADMIN_USER_IDS.includes(currentUserId)) return;
             
-            const promoCodeName = document.getElementById('promoCodeName') ? document.getElementById('promoCodeName').value.trim().toUpperCase() : '';
-            const starsAmount = document.getElementById('promoStarsAmount') ? parseInt(document.getElementById('promoStarsAmount').value) : 0;
-            const maxUses = document.getElementById('promoMaxUses') ? parseInt(document.getElementById('promoMaxUses').value) : 1;
+            const promoCodeName = document.getElementById('promoCodeName').value.trim().toUpperCase();
+            const starsAmount = parseInt(document.getElementById('promoStarsAmount').value) || 0;
+            const maxUses = parseInt(document.getElementById('promoMaxUses').value) || 1;
             
             if (!promoCodeName || !starsAmount || starsAmount <= 0 || maxUses <= 0) {
-                showAdminStatus('❌ Заполните все поля корректно', false);
+                showAdminStatus('❌ Заполните все поля', false);
+                return;
+            }
+
+            if (!isSupabaseAvailable()) {
+                showAdminStatus('❌ База данных недоступна', false);
                 return;
             }
 
@@ -1548,22 +1436,18 @@
 
                 showAdminStatus(`✅ Промокод "${promoCodeName}" создан! ${starsAmount} звезд, ${maxUses} использований`);
                 
-                // Очищаем поля
-                if (document.getElementById('promoCodeName')) document.getElementById('promoCodeName').value = '';
-                if (document.getElementById('promoStarsAmount')) document.getElementById('promoStarsAmount').value = '';
-                if (document.getElementById('promoMaxUses')) document.getElementById('promoMaxUses').value = '';
+                document.getElementById('promoCodeName').value = '';
+                document.getElementById('promoStarsAmount').value = '';
+                document.getElementById('promoMaxUses').value = '';
                 
             } catch (error) {
-                console.error('❌ Ошибка создания промокода:', error);
-                showAdminStatus('❌ Ошибка при создании промокода: ' + error.message, false);
+                console.error('❌ Ошибка создания:', error);
+                showAdminStatus('❌ Ошибка при создании', false);
             }
         }
         
-        // ПРОСМОТР ПРОМОКОДОВ
         async function adminViewPromoCodes() {
-            if (!ADMIN_USER_IDS.includes(currentUserId)) {
-                return;
-            }
+            if (!ADMIN_USER_IDS.includes(currentUserId)) return;
 
             try {
                 const { data: promoCodes, error } = await supabase
@@ -1574,62 +1458,53 @@
                 if (error) throw error;
 
                 let message = '📊 АКТИВНЫЕ ПРОМОКОДЫ:\n\n';
-                promoCodes.forEach(promo => {
-                    const usesLeft = promo.max_uses ? `${promo.used_count}/${promo.max_uses}` : '∞';
-                    message += `🎁 ${promo.code}: ${promo.stars_amount} звезд (использовано: ${usesLeft})\n`;
-                });
+                if (promoCodes && promoCodes.length > 0) {
+                    promoCodes.forEach(promo => {
+                        const usesLeft = promo.max_uses ? `${promo.used_count}/${promo.max_uses}` : '∞';
+                        message += `🎁 ${promo.code}: ${promo.stars_amount} звезд (использовано: ${usesLeft})\n`;
+                    });
+                } else {
+                    message = '📊 ПРОМОКОДОВ НЕТ';
+                }
 
                 showAdminStatus(message);
                 
             } catch (error) {
-                console.error('❌ Ошибка загрузки промокодов:', error);
-                showAdminStatus('❌ Ошибка при загрузке промокодов', false);
+                console.error('❌ Ошибка загрузки:', error);
+                showAdminStatus('❌ Ошибка при загрузке', false);
             }
         }
         
         async function adminAddStars() {
-            if (!ADMIN_USER_IDS.includes(currentUserId)) {
-                return;
-            }
-            
-            const amount = document.getElementById('promoStarsAmount') ? parseInt(document.getElementById('promoStarsAmount').value) : 0;
-            if (amount && amount > 0) {
+            if (!ADMIN_USER_IDS.includes(currentUserId)) return;
+            const amount = parseInt(document.getElementById('promoStarsAmount').value) || 0;
+            if (amount > 0) {
                 updateBalance(userBalance + amount);
-                await logTransaction('admin_add', amount, 'Админ добавил звезды');
                 createConfetti();
                 showAdminStatus(`✅ Добавлено ${amount} звезд!`);
             } else {
-                showAdminStatus('❌ Введите корректное количество звезд', false);
+                showAdminStatus('❌ Введите количество звезд', false);
             }
         }
         
         async function adminResetBalance() {
-            if (!ADMIN_USER_IDS.includes(currentUserId)) {
-                return;
-            }
-            
+            if (!ADMIN_USER_IDS.includes(currentUserId)) return;
             updateBalance(100);
-            await logTransaction('admin_reset', 100, 'Админ сбросил баланс');
             createConfetti();
             showAdminStatus('✅ Баланс сброшен до 100 звезд!');
         }
-        
+
         // Инициализация
         async function initUser() {
             await loadUserData();
             createWheel();
         }
 
-        // Запуск при загрузке страницы
-        document.addEventListener('DOMContentLoaded', function() {
-            initUser();
-        });
+        // Запуск
+        document.addEventListener('DOMContentLoaded', initUser);
+        overlay.addEventListener('click', closeAllPopups);
 
-        if (overlay) {
-            overlay.addEventListener('click', closeAllPopups);
-        }
-
-        // Глобальные функции для кнопок
+        // Глобальные функции
         window.copyUserId = copyUserId;
         window.showPaymentPopup = showPaymentPopup;
         window.showPromoPopup = showPromoPopup;
