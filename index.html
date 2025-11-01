@@ -923,6 +923,28 @@
         .withdraw-error {
             background: linear-gradient(135deg, #ff4444, #ff8c42);
         }
+
+        /* Стили для верификации */
+        .verification-code {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            padding: 15px;
+            border-radius: 15px;
+            margin: 15px 0;
+            font-size: 18px;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .verification-instruction {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
     </style>
 </head>
 <body>
@@ -1018,7 +1040,7 @@
         <div class="withdraw-status" id="withdrawStatus"></div>
         
         <div class="admin-buttons">
-            <button class="admin-action-btn" onclick="submitWithdrawRequest()">✅ ЗАПРОСИТЬ ВЫВОД</button>
+            <button class="admin-action-btn" onclick="generateVerificationCode()">🔐 СОЗДАТЬ КОД ПОДТВЕРЖДЕНИЯ</button>
             <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
         </div>
     </div>
@@ -1086,10 +1108,6 @@
             { name: "Сюрприз", type: "item", image: "https://i.ibb.co/q3xL5y2h/image.png" }
         ];
 
-        // Настройки Telegram бота
-        const TELEGRAM_BOT_TOKEN = '8269487392:AAFQE_WyvDgmKLNSJDLAzthASEZN6N4JFrA';
-        const TELEGRAM_CHAT_ID = '6957413555';
-
         // Элементы DOM
         const wheel = document.getElementById('wheel');
         const spinButton = document.getElementById('spinButton');
@@ -1113,10 +1131,102 @@
         let userInventory = [];
         let serverPromoCodes = [];
         let selectedForWithdraw = [];
+        let currentVerificationCode = '';
 
         // Генерация ID пользователя
         function generateUserId() {
             return 'user_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Генерация кода подтверждения
+        function generateVerificationCode() {
+            const telegramUsername = document.getElementById('telegramUsername').value.trim();
+            
+            if (!telegramUsername) {
+                showWithdrawStatus('❌ Введите ваш Telegram username', false);
+                return;
+            }
+            
+            if (!telegramUsername.startsWith('@')) {
+                showWithdrawStatus('❌ Username должен начинаться с @', false);
+                return;
+            }
+            
+            if (selectedForWithdraw.length === 0) {
+                showWithdrawStatus('❌ Выберите предметы для вывода', false);
+                return;
+            }
+
+            // Генерируем уникальный код подтверждения
+            currentVerificationCode = 'HW-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            
+            // Формируем список предметов
+            const itemsForWithdraw = selectedForWithdraw.map(index => userInventory[index]);
+            const groupedItems = {};
+            itemsForWithdraw.forEach(item => {
+                if (!groupedItems[item.name]) {
+                    groupedItems[item.name] = 0;
+                }
+                groupedItems[item.name]++;
+            });
+            
+            const itemsText = Object.keys(groupedItems)
+                .map(name => `${name} (x${groupedItems[name]})`)
+                .join(', ');
+
+            // Показываем код подтверждения
+            showVerificationCode(currentVerificationCode, telegramUsername, itemsText);
+        }
+
+        function showVerificationCode(code, telegramUsername, itemsText) {
+            const withdrawPopup = document.getElementById('withdrawPopup');
+            
+            withdrawPopup.innerHTML = `
+                <div class="withdraw-title">🔐 ПОДТВЕРЖДЕНИЕ ВЫВОДА</div>
+                
+                <div class="verification-instruction">
+                    <strong>Инструкция:</strong><br>
+                    1. Скопируйте код подтверждения ниже<br>
+                    2. Напишите мне в Telegram: <strong>@NFT_c0llecti0n</strong><br>
+                    3. Отправьте этот код и ваш username<br>
+                    4. Я проверю ваш инвентарь и отправлю предметы
+                </div>
+                
+                <div class="verification-code" id="verificationCode">
+                    ${code}
+                </div>
+                
+                <div style="color: white; text-align: center; margin: 15px 0; font-size: 14px;">
+                    <strong>Данные запроса:</strong><br>
+                    Username: ${telegramUsername}<br>
+                    Предметы: ${itemsText}<br>
+                    ID: ${currentUserId}
+                </div>
+                
+                <div class="admin-buttons">
+                    <button class="admin-action-btn" onclick="copyVerificationCode()">📋 КОПИРОВАТЬ КОД</button>
+                    <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
+                </div>
+            `;
+        }
+
+        function copyVerificationCode() {
+            const code = currentVerificationCode;
+            const telegramUsername = document.getElementById('telegramUsername').value.trim();
+            
+            // Формируем сообщение для копирования
+            const message = `Код подтверждения вывода: ${code}\nUsername: ${telegramUsername}\nID: ${currentUserId}`;
+            
+            navigator.clipboard.writeText(message).then(() => {
+                const copyBtn = document.querySelector('.admin-action-btn');
+                copyBtn.innerHTML = '✅ СКОПИРОВАНО!';
+                copyBtn.style.background = 'linear-gradient(135deg, #228b22, #32cd32)';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = '📋 КОПИРОВАТЬ КОД';
+                    copyBtn.style.background = '';
+                }, 2000);
+            });
         }
 
         // Копирование ID
@@ -1455,178 +1565,6 @@
             });
         }
         
-        async function submitWithdrawRequest() {
-            const telegramUsername = document.getElementById('telegramUsername').value.trim();
-            
-            if (!telegramUsername) {
-                showWithdrawStatus('❌ Введите ваш Telegram username', false);
-                return;
-            }
-            
-            if (!telegramUsername.startsWith('@')) {
-                showWithdrawStatus('❌ Username должен начинаться с @', false);
-                return;
-            }
-            
-            if (selectedForWithdraw.length === 0) {
-                showWithdrawStatus('❌ Выберите предметы для вывода', false);
-                return;
-            }
-            
-            try {
-                // Формируем список предметов для вывода
-                const itemsForWithdraw = selectedForWithdraw.map(index => userInventory[index]);
-                
-                // Группируем предметы для сообщения
-                const groupedItems = {};
-                itemsForWithdraw.forEach(item => {
-                    if (!groupedItems[item.name]) {
-                        groupedItems[item.name] = 0;
-                    }
-                    groupedItems[item.name]++;
-                });
-                
-                const itemsText = Object.keys(groupedItems)
-                    .map(name => `${name} (x${groupedItems[name]})`)
-                    .join(', ');
-                
-                // Формируем сообщение для Telegram
-                const message = `🎁 *ЗАПРОС НА ВЫВОД* 🎁\n\n` +
-                               `👤 *Игрок:* ${telegramUsername}\n` +
-                               `🆔 *ID:* ${currentUserId}\n` +
-                               `🎁 *Предметы:* ${itemsText}\n` +
-                               `📞 *Контакты:* ${telegramUsername}\n` +
-                               `⏰ *Время:* ${new Date().toLocaleString('ru-RU')}\n` +
-                               `📊 *Статус:* Ожидает обработки`;
-                
-                console.log('📤 Создано сообщение для отправки:');
-                console.log(message);
-                
-                // Отправляем уведомление в Telegram
-                const success = await sendTelegramNotification(message);
-                
-                if (success) {
-                    // Удаляем предметы из инвентаря
-                    selectedForWithdraw.sort((a, b) => b - a);
-                    selectedForWithdraw.forEach(index => {
-                        userInventory.splice(index, 1);
-                    });
-                    
-                    // Сохраняем изменения
-                    saveUserData();
-                    updateInventoryBadge();
-                    
-                    showWithdrawStatus('✅ Запрос на вывод отправлен! Мы свяжемся с вами в Telegram.');
-                    createConfetti();
-                    
-                    setTimeout(() => {
-                        closeAllPopups();
-                        selectedForWithdraw = [];
-                    }, 2000);
-                } else {
-                    showWithdrawStatus('❌ Ошибка при отправке запроса. Попробуйте позже.', false);
-                }
-                
-            } catch (error) {
-                console.error('❌ Ошибка отправки запроса:', error);
-                showWithdrawStatus('❌ Ошибка при отправке запроса', false);
-            }
-        }
-        
-        async function sendTelegramNotification(message) {
-            try {
-                // Метод 1: Прямой запрос к Telegram API
-                console.log('🔧 Метод 1: Прямой запрос к Telegram API');
-                
-                const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-                
-                const response = await fetch(telegramUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: 'Markdown'
-                    })
-                });
-                
-                console.log('📨 Статус ответа:', response.status);
-                
-                if (response.ok) {
-                    const result = await response.json();
-                    console.log('✅ Уведомление отправлено в Telegram:', result);
-                    return true;
-                } else {
-                    console.log('❌ Прямой запрос не сработал, пробуем метод 2...');
-                    return await tryAlternativeMethod(message);
-                }
-                
-            } catch (error) {
-                console.error('❌ Ошибка при прямом запросе:', error);
-                console.log('🔄 Пробуем альтернативный метод...');
-                return await tryAlternativeMethod(message);
-            }
-        }
-        
-        async function tryAlternativeMethod(message) {
-            try {
-                // Метод 2: Создаем ссылку для ручной отправки
-                console.log('🔧 Метод 2: Создание ссылки для ручной отправки');
-                
-                const encodedMessage = encodeURIComponent(message);
-                
-                // Создаем ссылку для отправки вам в Telegram
-                const telegramDirectUrl = `https://t.me/share/url?url=${encodeURIComponent('Запрос на вывод предметов')}&text=${encodedMessage}`;
-                
-                // Открываем окно для отправки сообщения
-                window.open(telegramDirectUrl, '_blank', 'width=600,height=400');
-                
-                console.log('📨 Открыто окно для отправки сообщения в Telegram');
-                console.log('💡 Сообщение для копирования:');
-                console.log(message);
-                
-                // Также показываем сообщение в alert для копирования
-                const copyMessage = `Скопируйте это сообщение и отправьте мне в Telegram (@NFT_c0llecti0n):\n\n${message}`;
-                alert(copyMessage);
-                
-                return true;
-                
-            } catch (error) {
-                console.error('❌ Ошибка в альтернативном методе:', error);
-                
-                // Метод 3: Просто показываем сообщение для ручного копирования
-                console.log('🔧 Метод 3: Показ сообщения для ручного копирования');
-                
-                const copyMessage = `🎁 ЗАПРОС НА ВЫВОД 🎁\n\n👤 Игрок: ${document.getElementById('telegramUsername').value}\n🆔 ID: ${currentUserId}\n🎁 Предметы: ${getSelectedItemsText()}\n📞 Контакты: ${document.getElementById('telegramUsername').value}\n⏰ Время: ${new Date().toLocaleString('ru-RU')}\n📊 Статус: Ожидает обработки`;
-                
-                alert(`СКОПИРУЙТЕ ЭТО СООБЩЕНИЕ И ОТПРАВЬТЕ МНЕ В TELEGRAM (@NFT_c0llecti0n):\n\n${copyMessage}`);
-                
-                // Копируем в буфер обмена
-                navigator.clipboard.writeText(copyMessage).then(() => {
-                    console.log('✅ Сообщение скопировано в буфер обмена');
-                });
-                
-                return true;
-            }
-        }
-        
-        function getSelectedItemsText() {
-            const groupedItems = {};
-            selectedForWithdraw.forEach(index => {
-                const item = userInventory[index];
-                if (!groupedItems[item.name]) {
-                    groupedItems[item.name] = 0;
-                }
-                groupedItems[item.name]++;
-            });
-            
-            return Object.keys(groupedItems)
-                .map(name => `${name} (x${groupedItems[name]})`)
-                .join(', ');
-        }
-        
         function closeAllPopups() {
             overlay.style.display = 'none';
             document.getElementById('inventoryPopup').style.display = 'none';
@@ -1637,6 +1575,33 @@
             if (adminStatus) adminStatus.style.display = 'none';
             if (promoStatus) promoStatus.style.display = 'none';
             if (withdrawStatus) withdrawStatus.style.display = 'none';
+            
+            // Восстанавливаем оригинальный попап вывода
+            initWithdrawPopup();
+        }
+
+        function initWithdrawPopup() {
+            const withdrawPopup = document.getElementById('withdrawPopup');
+            withdrawPopup.innerHTML = `
+                <div class="withdraw-title">📤 ВЫВОД ПРЕДМЕТОВ</div>
+                
+                <input type="text" class="withdraw-input" id="telegramUsername" placeholder="Ваш Telegram @username">
+                
+                <div class="selected-items" id="selectedItems">
+                    <div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">
+                        Выберите предметы для вывода
+                    </div>
+                </div>
+                
+                <div class="withdraw-items" id="withdrawItems"></div>
+                
+                <div class="withdraw-status" id="withdrawStatus"></div>
+                
+                <div class="admin-buttons">
+                    <button class="admin-action-btn" onclick="generateVerificationCode()">🔐 СОЗДАТЬ КОД ПОДТВЕРЖДЕНИЯ</button>
+                    <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
+                </div>
+            `;
         }
 
         // Промокоды
@@ -1699,6 +1664,7 @@
         function initUser() {
             loadUserData();
             createWheel();
+            initWithdrawPopup();
         }
 
         // Запуск
@@ -1712,7 +1678,8 @@
         window.spinWheel = spinWheel;
         window.showInventory = showInventory;
         window.showWithdrawPopup = showWithdrawPopup;
-        window.submitWithdrawRequest = submitWithdrawRequest;
+        window.generateVerificationCode = generateVerificationCode;
+        window.copyVerificationCode = copyVerificationCode;
         window.closeAllPopups = closeAllPopups;
         window.showAdminPanel = showAdminPanel;
         window.activatePromoCode = activatePromoCode;
@@ -1720,10 +1687,7 @@
         window.adminResetBalance = adminResetBalance;
 
         console.log('🎯 Halloween Wheel запущен!');
-        console.log('📊 Настройки Telegram:');
-        console.log('   Token:', TELEGRAM_BOT_TOKEN);
-        console.log('   Chat ID:', TELEGRAM_CHAT_ID);
-        console.log('   Ваш username: @NFT_c0llecti0n');
+        console.log('🔐 Безопасная система вывода активирована');
     </script>
 </body>
 </html>
