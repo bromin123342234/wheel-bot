@@ -699,18 +699,6 @@
             0% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
             100% { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
-
-        .debug-info {
-            position: fixed;
-            bottom: 10px;
-            left: 10px;
-            background: rgba(0,0,0,0.7);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            z-index: 1000;
-        }
     </style>
 </head>
 <body>
@@ -814,8 +802,6 @@
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
-    <div class="debug-info" id="debugInfo"></div>
-
     <script>
         // Конфигурация Supabase
         const SUPABASE_URL = 'https://tnxfhnskkvddkhchntok.supabase.co';
@@ -824,7 +810,7 @@
         // Конфигурация админа
         const ADMIN_USER_ID = "user_neesrtpoa";
         
-        // Призы для колеса
+        // Призы для колеса с 8 сегментами как было изначально
         const prizes = [
             { 
                 name: "Подарок", 
@@ -880,7 +866,6 @@
         let supabase;
         try {
             supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase инициализирован');
         } catch (error) {
             console.error('❌ Ошибка инициализации Supabase:', error);
         }
@@ -901,7 +886,6 @@
         const copyNotification = document.getElementById('copyNotification');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
-        const debugInfo = document.getElementById('debugInfo');
 
         let isSpinning = false;
         let currentUserId = '';
@@ -929,7 +913,6 @@
         // СОХРАНЕНИЕ ДАННЫХ В SUPABASE
         async function saveUserData() {
             if (!supabase) {
-                console.log('❌ Supabase не доступен, сохраняем только в localStorage');
                 saveToLocalStorage();
                 return;
             }
@@ -944,23 +927,18 @@
                     });
 
                 if (error) {
-                    console.error('❌ Ошибка сохранения в Supabase:', error);
                     saveToLocalStorage();
                     return;
                 }
                 
-                console.log('✅ Данные сохранены в Supabase');
                 saveToLocalStorage();
             } catch (error) {
-                console.error('❌ Ошибка сохранения:', error);
                 saveToLocalStorage();
             }
         }
 
         // ЗАГРУЗКА ДАННЫХ
         async function loadUserData() {
-            console.log('🔄 Загрузка данных пользователя...');
-            
             // Сначала пробуем из localStorage
             const localData = localStorage.getItem('halloweenWheelData');
             
@@ -970,9 +948,7 @@
                     currentUserId = userData.userId || generateUserId();
                     userBalance = userData.balance || 100;
                     userInventory = userData.inventory || [];
-                    console.log('✅ Данные загружены из localStorage');
                 } catch (e) {
-                    console.error('❌ Ошибка парсинга localStorage:', e);
                     currentUserId = generateUserId();
                     userBalance = 100;
                     userInventory = [];
@@ -981,7 +957,6 @@
                 currentUserId = generateUserId();
                 userBalance = 100;
                 userInventory = [];
-                console.log('✅ Создан новый пользователь');
             }
             
             // Затем пробуем загрузить из Supabase
@@ -992,13 +967,10 @@
         // Загрузка данных из Supabase
         async function loadFromSupabase() {
             if (!supabase || !currentUserId) {
-                console.log('❌ Supabase не доступен, используем localStorage');
                 return;
             }
 
             try {
-                console.log('🔄 Загрузка из Supabase для пользователя:', currentUserId);
-                
                 // Загружаем данные пользователя
                 const { data: userData, error: userError } = await supabase
                     .from('users')
@@ -1008,14 +980,10 @@
 
                 if (userError) {
                     if (userError.code === 'PGRST116') {
-                        console.log('👤 Пользователь не найден в Supabase, создаем нового');
                         await saveUserData();
-                    } else {
-                        console.error('❌ Ошибка загрузки пользователя:', userError);
                     }
                 } else if (userData) {
                     userBalance = userData.balance;
-                    console.log('✅ Баланс загружен из Supabase:', userBalance);
                 }
 
                 // Загружаем инвентарь
@@ -1024,15 +992,12 @@
                     .select('*')
                     .eq('user_id', currentUserId);
 
-                if (inventoryError) {
-                    console.error('❌ Ошибка загрузки инвентаря:', inventoryError);
-                } else if (inventoryData) {
+                if (!inventoryError && inventoryData) {
                     userInventory = inventoryData.map(item => ({
                         name: item.item_name,
                         type: item.item_type,
                         image: item.item_image
                     }));
-                    console.log('✅ Инвентарь загружен из Supabase:', userInventory.length, 'предметов');
                 }
 
             } catch (error) {
@@ -1048,13 +1013,10 @@
                 inventory: userInventory
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
-            console.log('💾 Данные сохранены в localStorage');
         }
 
         // Обновление интерфейса
         function updateUI() {
-            console.log('🔄 Обновление интерфейса...');
-            
             if (userIdValue) userIdValue.textContent = currentUserId;
             if (currentUserIdElement) currentUserIdElement.textContent = currentUserId;
             updateBalance(userBalance);
@@ -1062,21 +1024,11 @@
             
             if (currentUserId === ADMIN_USER_ID) {
                 if (adminPanel) adminPanel.style.display = 'block';
-                console.log('✅ Админ-панель активирована');
             }
-            
-            // Обновляем debug info
-            if (debugInfo) {
-                debugInfo.textContent = `ID: ${currentUserId} | Баланс: ${userBalance} | Предметы: ${userInventory.length}`;
-            }
-            
-            console.log('✅ Интерфейс обновлен');
         }
 
         // Добавление предмета в инвентарь
         async function addToInventory(prize) {
-            console.log('🎁 Добавление предмета в инвентарь:', prize.name);
-            
             userInventory.push(prize);
             updateInventoryBadge();
             saveToLocalStorage();
@@ -1092,9 +1044,6 @@
                         item_type: prize.type,
                         item_image: prize.image
                     });
-
-                if (error) throw error;
-                console.log('✅ Предмет добавлен в Supabase');
             } catch (error) {
                 console.error('❌ Ошибка добавления в инвентарь:', error);
             }
@@ -1113,8 +1062,6 @@
                         amount: amount,
                         description: description
                     });
-
-                if (error) throw error;
             } catch (error) {
                 console.error('❌ Ошибка записи транзакции:', error);
             }
@@ -1122,11 +1069,7 @@
 
         // Создание колеса
         function createWheel() {
-            console.log('🎡 Создание колеса...');
-            if (!wheel) {
-                console.error('❌ Элемент wheel не найден');
-                return;
-            }
+            if (!wheel) return;
             
             wheel.innerHTML = '';
             const segmentAngle = 360 / prizes.length;
@@ -1139,16 +1082,33 @@
                 const content = document.createElement('div');
                 content.className = 'segment-content';
                 
+                // Сначала показываем текст
                 const text = document.createElement('div');
                 text.className = 'segment-text';
                 text.textContent = prize.name;
                 content.appendChild(text);
                 
+                // Пробуем загрузить картинку
+                const img = document.createElement('img');
+                img.src = prize.image;
+                img.alt = prize.name;
+                img.className = 'segment-image';
+                img.style.display = 'none';
+                
+                img.onload = function() {
+                    img.style.display = 'block';
+                    text.style.display = 'none';
+                };
+                
+                img.onerror = function() {
+                    img.style.display = 'none';
+                    text.style.display = 'block';
+                };
+                
+                content.appendChild(img);
                 segment.appendChild(content);
                 wheel.appendChild(segment);
             });
-            
-            console.log('✅ Колесо создано');
         }
 
         function updateBalance(newBalance) {
@@ -1175,6 +1135,16 @@
             }
         }
         
+        function createFlyingPrize(prize) {
+            const flyingPrize = document.createElement('img');
+            flyingPrize.src = prize.image;
+            flyingPrize.className = 'flying-prize';
+            flyingPrize.style.left = '50%';
+            flyingPrize.style.top = '50%';
+            document.body.appendChild(flyingPrize);
+            setTimeout(() => flyingPrize.remove(), 2000);
+        }
+        
         async function spinWheel() {
             if (isSpinning) return;
             
@@ -1188,8 +1158,6 @@
             
             const prizeIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[prizeIndex];
-            
-            console.log('🎯 Выпал приз:', prize.name);
             
             const segmentAngle = 360 / prizes.length;
             const targetAngle = 360 - (prizeIndex * segmentAngle + segmentAngle / 2);
@@ -1212,6 +1180,10 @@
                         alert(prize.message);
                         
                         createConfetti();
+                        
+                        setTimeout(() => {
+                            createFlyingPrize(prize);
+                        }, 1000);
                         
                         isSpinning = false;
                         if (spinButton) spinButton.disabled = userBalance < 50;
@@ -1249,10 +1221,18 @@
                     itemElement.className = 'inventory-item';
                     itemElement.style.animationDelay = `${index * 0.1}s`;
                     
+                    const img = document.createElement('img');
+                    img.src = item.image;
+                    img.alt = item.name;
+                    img.onerror = function() {
+                        this.style.display = 'none';
+                    };
+                    
                     const name = document.createElement('div');
                     name.className = 'inventory-item-name';
                     name.textContent = item.name;
                     
+                    itemElement.appendChild(img);
                     itemElement.appendChild(name);
                     inventoryItems.appendChild(itemElement);
                 });
@@ -1297,31 +1277,29 @@
             
             if (userId && amount && amount > 0) {
                 try {
-                    // Обновляем баланс пользователя в Supabase
-                    const { data, error } = await supabase
+                    // Проверяем существование пользователя
+                    const { data: userData, error: userError } = await supabase
                         .from('users')
                         .select('balance')
                         .eq('user_id', userId)
                         .single();
 
-                    if (error) {
-                        if (error.code === 'PGRST116') {
-                            // Пользователь не найден, создаем нового
-                            const { error: insertError } = await supabase
-                                .from('users')
-                                .insert({
-                                    user_id: userId,
-                                    balance: amount,
-                                    updated_at: new Date().toISOString()
-                                });
-                            
-                            if (insertError) throw insertError;
-                        } else {
-                            throw error;
-                        }
+                    if (userError && userError.code === 'PGRST116') {
+                        // Пользователь не найден, создаем нового
+                        const { error: insertError } = await supabase
+                            .from('users')
+                            .insert({
+                                user_id: userId,
+                                balance: amount,
+                                updated_at: new Date().toISOString()
+                            });
+                        
+                        if (insertError) throw insertError;
+                    } else if (userError) {
+                        throw userError;
                     } else {
                         // Обновляем существующего пользователя
-                        const newBalance = (data.balance || 0) + amount;
+                        const newBalance = (userData.balance || 0) + amount;
                         const { error: updateError } = await supabase
                             .from('users')
                             .update({ 
@@ -1405,15 +1383,12 @@
         
         // Инициализация
         async function initUser() {
-            console.log('🚀 Инициализация приложения...');
             await loadUserData();
             createWheel();
-            console.log('✅ Приложение инициализировано');
         }
 
         // Запуск при загрузке страницы
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('📄 DOM загружен');
             initUser();
         });
 
