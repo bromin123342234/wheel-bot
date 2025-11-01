@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎃Halloween Wheel🎃</title>
     <style>
+        /* Все стили остаются такими же */
         * {
             margin: 0;
             padding: 0;
@@ -996,29 +997,50 @@
                 userInventory = [];
             }
             
-            // Загружаем промокоды
-            loadPromoCodes();
+            // Загружаем промокоды с сервера
+            loadPromoCodesFromServer();
             updateUI();
         }
 
-        // Промокоды в localStorage
-        function loadPromoCodes() {
-            if (!localStorage.getItem('promoCodes')) {
-                // Создаем тестовые промокоды
-                const defaultPromoCodes = [
-                    { code: "WELCOME100", stars: 100, maxUses: 100, usedCount: 0, createdBy: "system" },
-                    { code: "HALLOWEEN", stars: 50, maxUses: 1000, usedCount: 0, createdBy: "system" }
-                ];
-                localStorage.setItem('promoCodes', JSON.stringify(defaultPromoCodes));
-            }
-            
-            if (!localStorage.getItem('promoUsage')) {
-                localStorage.setItem('promoUsage', JSON.stringify([]));
+        // Промокоды через Google Sheets (бесплатный сервер)
+        const PROMO_SHEET_URL = 'https://docs.google.com/spreadsheets/d/1YOUR_SHEET_ID/gviz/tq?tqx=out:json';
+        
+        async function loadPromoCodesFromServer() {
+            try {
+                // Пробуем загрузить с Google Sheets
+                const response = await fetch(PROMO_SHEET_URL);
+                const text = await response.text();
+                const json = JSON.parse(text.substring(47).slice(0, -2));
+                
+                const promoCodes = json.table.rows.map(row => ({
+                    code: row.c[0]?.v,
+                    stars: row.c[1]?.v,
+                    maxUses: row.c[2]?.v,
+                    usedCount: row.c[3]?.v || 0
+                }));
+                
+                localStorage.setItem('server_promoCodes', JSON.stringify(promoCodes));
+            } catch (error) {
+                console.log('Не удалось загрузить промокоды с сервера, используем локальные');
+                // Используем локальные промокоды как fallback
+                if (!localStorage.getItem('local_promoCodes')) {
+                    const defaultPromoCodes = [
+                        { code: "WELCOME100", stars: 100, maxUses: 100, usedCount: 0 },
+                        { code: "HALLOWEEN", stars: 50, maxUses: 1000, usedCount: 0 }
+                    ];
+                    localStorage.setItem('local_promoCodes', JSON.stringify(defaultPromoCodes));
+                }
             }
         }
 
         function getPromoCodes() {
-            return JSON.parse(localStorage.getItem('promoCodes') || '[]');
+            // Сначала пробуем серверные промокоды
+            const serverPromos = localStorage.getItem('server_promoCodes');
+            if (serverPromos) {
+                return JSON.parse(serverPromos);
+            }
+            // Если нет серверных, используем локальные
+            return JSON.parse(localStorage.getItem('local_promoCodes') || '[]');
         }
 
         function getPromoUsage() {
@@ -1026,7 +1048,17 @@
         }
 
         function savePromoCodes(promoCodes) {
-            localStorage.setItem('promoCodes', JSON.stringify(promoCodes));
+            // Сохраняем в локальные промокоды (для админов)
+            localStorage.setItem('local_promoCodes', JSON.stringify(promoCodes));
+            
+            // Пытаемся синхронизировать с сервером
+            syncPromoCodesToServer(promoCodes);
+        }
+
+        async function syncPromoCodesToServer(promoCodes) {
+            // Здесь должна быть логика отправки на сервер
+            // Для демо просто сохраняем в localStorage
+            console.log('Синхронизация промокодов с сервером:', promoCodes);
         }
 
         function savePromoUsage(usage) {
