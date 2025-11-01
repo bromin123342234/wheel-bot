@@ -6,6 +6,7 @@
     <title>🎃 Halloween Wheel</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
+        /* Стили остаются без изменений */
         * {
             margin: 0;
             padding: 0;
@@ -483,7 +484,6 @@
             margin-top: 5px;
         }
 
-        /* Обновленные стили для окна пополнения баланса */
         .payment-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.98), rgba(255, 140, 66, 0.98));
             border: 3px solid rgba(255, 255, 255, 0.3);
@@ -788,7 +788,6 @@
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
-    <!-- Обновленное окно пополнения баланса БЕЗ КНОПОК -->
     <div class="payment-popup" id="paymentPopup">
         <div class="payment-title">💰 ПОПОЛНЕНИЕ БАЛАНСА</div>
         
@@ -1309,6 +1308,7 @@
             if (targetUserId) targetUserId.value = '';
         }
         
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВЫДАЧИ ЗВЕЗД ИГРОКАМ
         async function adminAddStarsToUser() {
             if (currentUserId !== ADMIN_USER_ID) {
                 return;
@@ -1323,42 +1323,37 @@
             }
 
             try {
-                // Проверяем существование пользователя
-                const { data: userData, error: userError } = await supabase
+                // ПРОСТАЯ И ПРЯМАЯ ЛОГИКА - создаем или обновляем пользователя
+                const { data: existingUser, error: checkError } = await supabase
                     .from('users')
                     .select('balance')
                     .eq('user_id', userId)
                     .single();
 
                 let newBalance;
-                if (userError && userError.code === 'PGRST116') {
-                    // Пользователь не найден, создаем нового
+                if (checkError && checkError.code === 'PGRST116') {
+                    // Пользователь не существует - создаем нового
                     newBalance = amount;
-                    const { error: insertError } = await supabase
-                        .from('users')
-                        .insert({
-                            user_id: userId,
-                            balance: newBalance,
-                            updated_at: new Date().toISOString()
-                        });
-                    
-                    if (insertError) throw insertError;
-                } else if (userError) {
-                    throw userError;
+                } else if (checkError) {
+                    throw checkError;
                 } else {
-                    // Обновляем существующего пользователя
-                    newBalance = (userData.balance || 0) + amount;
-                    const { error: updateError } = await supabase
-                        .from('users')
-                        .update({ 
-                            balance: newBalance,
-                            updated_at: new Date().toISOString()
-                        })
-                        .eq('user_id', userId);
-                    
-                    if (updateError) throw updateError;
+                    // Пользователь существует - обновляем баланс
+                    newBalance = (existingUser.balance || 0) + amount;
                 }
-                
+
+                // Используем upsert для создания или обновления записи
+                const { error: upsertError } = await supabase
+                    .from('users')
+                    .upsert({
+                        user_id: userId,
+                        balance: newBalance,
+                        updated_at: new Date().toISOString()
+                    }, {
+                        onConflict: 'user_id'
+                    });
+
+                if (upsertError) throw upsertError;
+
                 // Логируем транзакцию
                 await supabase
                     .from('transactions')
@@ -1372,9 +1367,10 @@
                 showAdminStatus(`✅ Игроку ${userId} выдано ${amount} звезд!`);
                 if (adminStarsInput) adminStarsInput.value = '';
                 if (targetUserId) targetUserId.value = '';
+                
             } catch (error) {
                 console.error('❌ Ошибка выдачи звезд:', error);
-                showAdminStatus('❌ Ошибка при выдаче звезд', false);
+                showAdminStatus('❌ Ошибка при выдаче звезд: ' + error.message, false);
             }
         }
         
