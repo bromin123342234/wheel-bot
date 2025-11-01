@@ -607,7 +607,7 @@
             transform: translate(-50%, -50%);
             z-index: 1000;
             width: 90%;
-            max-width: 350px;
+            max-width: 400px;
         }
 
         @keyframes popIn {
@@ -698,6 +698,24 @@
         @keyframes slideDown {
             0% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
             100% { transform: translateX(-50%) translateY(0); opacity: 1; }
+        }
+
+        .admin-status {
+            color: white;
+            font-size: 14px;
+            margin: 10px 0;
+            padding: 10px;
+            border-radius: 10px;
+            text-align: center;
+            display: none;
+        }
+
+        .admin-success {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+        }
+
+        .admin-error {
+            background: linear-gradient(135deg, #ff4444, #ff8c42);
         }
     </style>
 </head>
@@ -793,6 +811,8 @@
             <input type="number" class="admin-input" id="adminStarsInput" placeholder="Количество звезд">
         </div>
         
+        <div class="admin-status" id="adminStatus"></div>
+        
         <div class="admin-buttons">
             <button class="admin-action-btn" onclick="adminAddStarsToUser()">🎁 ВЫДАТЬ ИГРОКУ</button>
             <button class="admin-action-btn" onclick="adminAddStars()">➕ ДОБАВИТЬ СЕБЕ</button>
@@ -886,6 +906,7 @@
         const copyNotification = document.getElementById('copyNotification');
         const overlay = document.getElementById('overlay');
         const inventoryItems = document.getElementById('inventoryItems');
+        const adminStatus = document.getElementById('adminStatus');
 
         let isSpinning = false;
         let currentUserId = '';
@@ -910,6 +931,19 @@
             });
         }
 
+        // Показать статус админ-действия
+        function showAdminStatus(message, isSuccess = true) {
+            if (!adminStatus) return;
+            
+            adminStatus.textContent = message;
+            adminStatus.className = 'admin-status ' + (isSuccess ? 'admin-success' : 'admin-error');
+            adminStatus.style.display = 'block';
+            
+            setTimeout(() => {
+                adminStatus.style.display = 'none';
+            }, 3000);
+        }
+
         // СОХРАНЕНИЕ ДАННЫХ В SUPABASE
         async function saveUserData() {
             if (!supabase) {
@@ -927,12 +961,14 @@
                     });
 
                 if (error) {
+                    console.error('❌ Ошибка сохранения в Supabase:', error);
                     saveToLocalStorage();
                     return;
                 }
                 
                 saveToLocalStorage();
             } catch (error) {
+                console.error('❌ Ошибка сохранения:', error);
                 saveToLocalStorage();
             }
         }
@@ -980,7 +1016,10 @@
 
                 if (userError) {
                     if (userError.code === 'PGRST116') {
+                        // Пользователь не найден, создаем нового
                         await saveUserData();
+                    } else {
+                        console.error('❌ Ошибка загрузки пользователя:', userError);
                     }
                 } else if (userData) {
                     userBalance = userData.balance;
@@ -1044,6 +1083,10 @@
                         item_type: prize.type,
                         item_image: prize.image
                     });
+
+                if (error) {
+                    console.error('❌ Ошибка добавления в инвентарь:', error);
+                }
             } catch (error) {
                 console.error('❌ Ошибка добавления в инвентарь:', error);
             }
@@ -1062,6 +1105,10 @@
                         amount: amount,
                         description: description
                     });
+
+                if (error) {
+                    console.error('❌ Ошибка записи транзакции:', error);
+                }
             } catch (error) {
                 console.error('❌ Ошибка записи транзакции:', error);
             }
@@ -1149,7 +1196,6 @@
             if (isSpinning) return;
             
             if (userBalance < 50) {
-                alert('❌ Недостаточно звезд\nДля вращения колеса нужно 50 звезд');
                 return;
             }
             
@@ -1175,9 +1221,6 @@
                         updateBalance(userBalance - 50);
                         await logTransaction('spin', -50, `Выиграл: ${prize.name}`);
                         await addToInventory(prize);
-                        
-                        // Показываем сообщение о выигрыше
-                        alert(prize.message);
                         
                         createConfetti();
                         
@@ -1247,16 +1290,16 @@
             if (inventoryPopup) inventoryPopup.style.display = 'none';
             if (paymentPopup) paymentPopup.style.display = 'none';
             if (adminPopup) adminPopup.style.display = 'none';
+            if (adminStatus) adminStatus.style.display = 'none';
         }
         
         function showCases() {
-            alert('🎁 Кейсы\nСпециальные хэллоуинские кейсы скоро появятся!');
+            // Убрано уведомление
         }
         
         // АДМИН-ФУНКЦИИ
         async function showAdminPanel() {
             if (currentUserId !== ADMIN_USER_ID) {
-                alert('❌ Доступ запрещен!');
                 return;
             }
             
@@ -1268,74 +1311,75 @@
         
         async function adminAddStarsToUser() {
             if (currentUserId !== ADMIN_USER_ID) {
-                alert('❌ Доступ запрещен!');
                 return;
             }
             
             const userId = targetUserId ? targetUserId.value.trim() : '';
             const amount = adminStarsInput ? parseInt(adminStarsInput.value) : 0;
             
-            if (userId && amount && amount > 0) {
-                try {
-                    // Проверяем существование пользователя
-                    const { data: userData, error: userError } = await supabase
-                        .from('users')
-                        .select('balance')
-                        .eq('user_id', userId)
-                        .single();
+            if (!userId || !amount || amount <= 0) {
+                showAdminStatus('❌ Введите корректный ID игрока и количество звезд', false);
+                return;
+            }
 
-                    if (userError && userError.code === 'PGRST116') {
-                        // Пользователь не найден, создаем нового
-                        const { error: insertError } = await supabase
-                            .from('users')
-                            .insert({
-                                user_id: userId,
-                                balance: amount,
-                                updated_at: new Date().toISOString()
-                            });
-                        
-                        if (insertError) throw insertError;
-                    } else if (userError) {
-                        throw userError;
-                    } else {
-                        // Обновляем существующего пользователя
-                        const newBalance = (userData.balance || 0) + amount;
-                        const { error: updateError } = await supabase
-                            .from('users')
-                            .update({ 
-                                balance: newBalance,
-                                updated_at: new Date().toISOString()
-                            })
-                            .eq('user_id', userId);
-                        
-                        if (updateError) throw updateError;
-                    }
-                    
-                    // Логируем транзакцию
-                    await supabase
-                        .from('transactions')
+            try {
+                // Проверяем существование пользователя
+                const { data: userData, error: userError } = await supabase
+                    .from('users')
+                    .select('balance')
+                    .eq('user_id', userId)
+                    .single();
+
+                let newBalance;
+                if (userError && userError.code === 'PGRST116') {
+                    // Пользователь не найден, создаем нового
+                    newBalance = amount;
+                    const { error: insertError } = await supabase
+                        .from('users')
                         .insert({
                             user_id: userId,
-                            type: 'admin_add',
-                            amount: amount,
-                            description: 'Админ выдал звезды'
+                            balance: newBalance,
+                            updated_at: new Date().toISOString()
                         });
                     
-                    alert(`✅ Игроку ${userId} выдано ${amount} звезд!`);
-                    if (adminStarsInput) adminStarsInput.value = '';
-                    if (targetUserId) targetUserId.value = '';
-                } catch (error) {
-                    console.error('❌ Ошибка выдачи звезд:', error);
-                    alert('❌ Ошибка при выдаче звезд: ' + error.message);
+                    if (insertError) throw insertError;
+                } else if (userError) {
+                    throw userError;
+                } else {
+                    // Обновляем существующего пользователя
+                    newBalance = (userData.balance || 0) + amount;
+                    const { error: updateError } = await supabase
+                        .from('users')
+                        .update({ 
+                            balance: newBalance,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('user_id', userId);
+                    
+                    if (updateError) throw updateError;
                 }
-            } else {
-                alert('❌ Введите корректный ID игрока и количество звезд');
+                
+                // Логируем транзакцию
+                await supabase
+                    .from('transactions')
+                    .insert({
+                        user_id: userId,
+                        type: 'admin_add',
+                        amount: amount,
+                        description: 'Админ выдал звезды'
+                    });
+                
+                showAdminStatus(`✅ Игроку ${userId} выдано ${amount} звезд!`);
+                if (adminStarsInput) adminStarsInput.value = '';
+                if (targetUserId) targetUserId.value = '';
+            } catch (error) {
+                console.error('❌ Ошибка выдачи звезд:', error);
+                showAdminStatus('❌ Ошибка при выдаче звезд', false);
             }
         }
         
         async function adminAddStars() {
             if (currentUserId !== ADMIN_USER_ID) {
-                alert('❌ Доступ запрещен!');
                 return;
             }
             
@@ -1345,15 +1389,14 @@
                 await logTransaction('admin_add', amount, 'Админ добавил звезды');
                 createConfetti();
                 if (adminStarsInput) adminStarsInput.value = '';
-                alert(`✅ Добавлено ${amount} звезд!`);
+                showAdminStatus(`✅ Добавлено ${amount} звезд!`);
             } else {
-                alert('❌ Введите корректное количество звезд');
+                showAdminStatus('❌ Введите корректное количество звезд', false);
             }
         }
         
         async function adminSetStars() {
             if (currentUserId !== ADMIN_USER_ID) {
-                alert('❌ Доступ запрещен!');
                 return;
             }
             
@@ -1363,22 +1406,21 @@
                 await logTransaction('admin_set', amount, 'Админ установил баланс');
                 createConfetti();
                 if (adminStarsInput) adminStarsInput.value = '';
-                alert(`✅ Баланс установлен на ${amount} звезд!`);
+                showAdminStatus(`✅ Баланс установлен на ${amount} звезд!`);
             } else {
-                alert('❌ Введите корректное количество звезд');
+                showAdminStatus('❌ Введите корректное количество звезд', false);
             }
         }
         
         async function adminResetBalance() {
             if (currentUserId !== ADMIN_USER_ID) {
-                alert('❌ Доступ запрещен!');
                 return;
             }
             
             updateBalance(100);
             await logTransaction('admin_reset', 100, 'Админ сбросил баланс');
             createConfetti();
-            alert('✅ Баланс сброшен до 100 звезд!');
+            showAdminStatus('✅ Баланс сброшен до 100 звезд!');
         }
         
         // Инициализация
