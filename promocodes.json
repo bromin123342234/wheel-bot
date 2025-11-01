@@ -1,0 +1,16 @@
+{
+  "promoCodes": [
+    {
+      "code": "WELCOME100",
+      "stars": 100,
+      "maxUses": 1000,
+      "usedCount": 0
+    },
+    {
+      "code": "HALLOWEEN",
+      "stars": 50,
+      "maxUses": 5000,
+      "usedCount": 0
+    }
+  ]
+}
