@@ -779,7 +779,6 @@
             background: linear-gradient(135deg, #ff4444, #ff8c42);
         }
 
-        /* Стили для вывода предметов */
         .withdraw-section {
             margin-top: 20px;
             padding-top: 20px;
@@ -924,7 +923,6 @@
             background: linear-gradient(135deg, #ff4444, #ff8c42);
         }
 
-        /* Стили для верификации */
         .verification-code {
             background: linear-gradient(135deg, #228b22, #32cd32);
             color: white;
@@ -944,6 +942,64 @@
             margin: 15px 0;
             font-size: 14px;
             line-height: 1.4;
+        }
+
+        .admin-verification-section {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .admin-verification-title {
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .user-data-display {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .user-data-item {
+            color: white;
+            font-size: 12px;
+            margin: 5px 0;
+            word-break: break-all;
+        }
+
+        .items-preview {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .item-preview {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 8px;
+            text-align: center;
+        }
+
+        .item-preview img {
+            width: 30px;
+            height: 30px;
+            object-fit: contain;
+            margin-bottom: 3px;
+        }
+
+        .item-preview-name {
+            color: white;
+            font-size: 9px;
+            font-weight: bold;
         }
     </style>
 </head>
@@ -1025,24 +1081,7 @@
     </div>
 
     <div class="withdraw-popup" id="withdrawPopup">
-        <div class="withdraw-title">📤 ВЫВОД ПРЕДМЕТОВ</div>
-        
-        <input type="text" class="withdraw-input" id="telegramUsername" placeholder="Ваш Telegram @username">
-        
-        <div class="selected-items" id="selectedItems">
-            <div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">
-                Выберите предметы для вывода
-            </div>
-        </div>
-        
-        <div class="withdraw-items" id="withdrawItems"></div>
-        
-        <div class="withdraw-status" id="withdrawStatus"></div>
-        
-        <div class="admin-buttons">
-            <button class="admin-action-btn" onclick="generateVerificationCode()">🔐 СОЗДАТЬ КОД ПОДТВЕРЖДЕНИЯ</button>
-            <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
-        </div>
+        <!-- Содержимое будет заполняться динамически -->
     </div>
 
     <div class="payment-popup" id="paymentPopup">
@@ -1073,6 +1112,14 @@
 
     <div class="admin-popup" id="adminPopup">
         <div class="admin-title">⚙️ АДМИН ПАНЕЛЬ</div>
+        
+        <div class="admin-verification-section">
+            <div class="admin-verification-title">🔍 ПРОВЕРКА ВЫВОДА</div>
+            <input type="text" class="admin-input" id="verificationCodeInput" placeholder="Введите код подтверждения">
+            <button class="admin-action-btn" onclick="verifyWithdrawalCode()">🔎 ПРОВЕРИТЬ КОД</button>
+            
+            <div id="verificationResult"></div>
+        </div>
         
         <div style="margin-bottom: 20px;">
             <div style="color: white; margin-bottom: 10px; font-size: 16px;">Ваш ID: <span id="currentUserId"></span></div>
@@ -1121,112 +1168,20 @@
         const adminStatus = document.getElementById('adminStatus');
         const promoStatus = document.getElementById('promoStatus');
         const promoCodeInput = document.getElementById('promoCodeInput');
-        const withdrawItems = document.getElementById('withdrawItems');
-        const selectedItems = document.getElementById('selectedItems');
-        const withdrawStatus = document.getElementById('withdrawStatus');
 
         let isSpinning = false;
         let currentUserId = '';
         let userBalance = 100;
         let userInventory = [];
-        let serverPromoCodes = [];
         let selectedForWithdraw = [];
         let currentVerificationCode = '';
+        
+        // Хранилище кодов подтверждения (в реальном приложении это должно быть на сервере)
+        let withdrawalCodes = {};
 
         // Генерация ID пользователя
         function generateUserId() {
             return 'user_' + Math.random().toString(36).substr(2, 9);
-        }
-
-        // Генерация кода подтверждения
-        function generateVerificationCode() {
-            const telegramUsername = document.getElementById('telegramUsername').value.trim();
-            
-            if (!telegramUsername) {
-                showWithdrawStatus('❌ Введите ваш Telegram username', false);
-                return;
-            }
-            
-            if (!telegramUsername.startsWith('@')) {
-                showWithdrawStatus('❌ Username должен начинаться с @', false);
-                return;
-            }
-            
-            if (selectedForWithdraw.length === 0) {
-                showWithdrawStatus('❌ Выберите предметы для вывода', false);
-                return;
-            }
-
-            // Генерируем уникальный код подтверждения
-            currentVerificationCode = 'HW-' + Math.random().toString(36).substr(2, 8).toUpperCase();
-            
-            // Формируем список предметов
-            const itemsForWithdraw = selectedForWithdraw.map(index => userInventory[index]);
-            const groupedItems = {};
-            itemsForWithdraw.forEach(item => {
-                if (!groupedItems[item.name]) {
-                    groupedItems[item.name] = 0;
-                }
-                groupedItems[item.name]++;
-            });
-            
-            const itemsText = Object.keys(groupedItems)
-                .map(name => `${name} (x${groupedItems[name]})`)
-                .join(', ');
-
-            // Показываем код подтверждения
-            showVerificationCode(currentVerificationCode, telegramUsername, itemsText);
-        }
-
-        function showVerificationCode(code, telegramUsername, itemsText) {
-            const withdrawPopup = document.getElementById('withdrawPopup');
-            
-            withdrawPopup.innerHTML = `
-                <div class="withdraw-title">🔐 ПОДТВЕРЖДЕНИЕ ВЫВОДА</div>
-                
-                <div class="verification-instruction">
-                    <strong>Инструкция:</strong><br>
-                    1. Скопируйте код подтверждения ниже<br>
-                    2. Напишите мне в Telegram: <strong>@NFT_c0llecti0n</strong><br>
-                    3. Отправьте этот код и ваш username<br>
-                    4. Я проверю ваш инвентарь и отправлю предметы
-                </div>
-                
-                <div class="verification-code" id="verificationCode">
-                    ${code}
-                </div>
-                
-                <div style="color: white; text-align: center; margin: 15px 0; font-size: 14px;">
-                    <strong>Данные запроса:</strong><br>
-                    Username: ${telegramUsername}<br>
-                    Предметы: ${itemsText}<br>
-                    ID: ${currentUserId}
-                </div>
-                
-                <div class="admin-buttons">
-                    <button class="admin-action-btn" onclick="copyVerificationCode()">📋 КОПИРОВАТЬ КОД</button>
-                    <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
-                </div>
-            `;
-        }
-
-        function copyVerificationCode() {
-            const code = currentVerificationCode;
-            const telegramUsername = document.getElementById('telegramUsername').value.trim();
-            
-            // Формируем сообщение для копирования
-            const message = `Код подтверждения вывода: ${code}\nUsername: ${telegramUsername}\nID: ${currentUserId}`;
-            
-            navigator.clipboard.writeText(message).then(() => {
-                const copyBtn = document.querySelector('.admin-action-btn');
-                copyBtn.innerHTML = '✅ СКОПИРОВАНО!';
-                copyBtn.style.background = 'linear-gradient(135deg, #228b22, #32cd32)';
-                
-                setTimeout(() => {
-                    copyBtn.innerHTML = '📋 КОПИРОВАТЬ КОД';
-                    copyBtn.style.background = '';
-                }, 2000);
-            });
         }
 
         // Копирование ID
@@ -1236,31 +1191,6 @@
                 copyNotification.style.display = 'block';
                 setTimeout(() => copyNotification.style.display = 'none', 2000);
             });
-        }
-
-        // Показать статус
-        function showAdminStatus(message, isSuccess = true) {
-            if (!adminStatus) return;
-            adminStatus.textContent = message;
-            adminStatus.className = 'admin-status ' + (isSuccess ? 'admin-success' : 'admin-error');
-            adminStatus.style.display = 'block';
-            setTimeout(() => adminStatus.style.display = 'none', 3000);
-        }
-
-        function showPromoStatus(message, isSuccess = true) {
-            if (!promoStatus) return;
-            promoStatus.textContent = message;
-            promoStatus.className = 'promo-status ' + (isSuccess ? 'promo-success' : 'promo-error');
-            promoStatus.style.display = 'block';
-            setTimeout(() => promoStatus.style.display = 'none', 3000);
-        }
-
-        function showWithdrawStatus(message, isSuccess = true) {
-            if (!withdrawStatus) return;
-            withdrawStatus.textContent = message;
-            withdrawStatus.className = 'withdraw-status ' + (isSuccess ? 'withdraw-success' : 'withdraw-error');
-            withdrawStatus.style.display = 'block';
-            setTimeout(() => withdrawStatus.style.display = 'none', 3000);
         }
 
         // Сохранение данных
@@ -1429,7 +1359,338 @@
             setTimeout(() => flyingPrize.remove(), 2000);
         }
 
-        // Попапы
+        // ПОПАП ВЫВОДА
+        function showWithdrawPopup() {
+            if (userInventory.length === 0) {
+                alert('❌ Ваш инвентарь пуст');
+                return;
+            }
+            
+            selectedForWithdraw = [];
+            
+            // СОЗДАЕМ ПОПАП С НУЛЯ
+            const withdrawPopup = document.getElementById('withdrawPopup');
+            withdrawPopup.innerHTML = `
+                <div class="withdraw-title">📤 ВЫВОД ПРЕДМЕТОВ</div>
+                
+                <input type="text" class="withdraw-input" id="telegramUsername" placeholder="Ваш Telegram @username">
+                
+                <div class="selected-items" id="selectedItems">
+                    <div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">
+                        Выберите предметы для вывода
+                    </div>
+                </div>
+                
+                <div class="withdraw-items" id="withdrawItems"></div>
+                
+                <div class="withdraw-status" id="withdrawStatus"></div>
+                
+                <div class="admin-buttons">
+                    <button class="admin-action-btn" onclick="generateVerificationCode()">🔐 СОЗДАТЬ КОД ПОДТВЕРЖДЕНИЯ</button>
+                    <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
+                </div>
+            `;
+            
+            // ЗАПОЛНЯЕМ ПРЕДМЕТЫ
+            fillWithdrawItems();
+            
+            overlay.style.display = 'block';
+            withdrawPopup.style.display = 'block';
+        }
+
+        // Функция заполнения предметов для вывода
+        function fillWithdrawItems() {
+            const withdrawItemsContainer = document.getElementById('withdrawItems');
+            if (!withdrawItemsContainer) return;
+            
+            withdrawItemsContainer.innerHTML = '';
+            
+            userInventory.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'withdraw-item';
+                if (selectedForWithdraw.includes(index)) {
+                    itemElement.classList.add('selected');
+                }
+                
+                itemElement.onclick = () => {
+                    const itemIndex = selectedForWithdraw.indexOf(index);
+                    if (itemIndex === -1) {
+                        selectedForWithdraw.push(index);
+                    } else {
+                        selectedForWithdraw.splice(itemIndex, 1);
+                    }
+                    updateWithdrawSelection();
+                };
+                
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name;
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const textFallback = document.createElement('div');
+                    textFallback.style.color = 'white';
+                    textFallback.style.fontSize = '10px';
+                    textFallback.textContent = item.name;
+                    itemElement.appendChild(textFallback);
+                };
+                
+                const name = document.createElement('div');
+                name.className = 'withdraw-item-name';
+                name.textContent = item.name;
+                
+                itemElement.appendChild(img);
+                itemElement.appendChild(name);
+                withdrawItemsContainer.appendChild(itemElement);
+            });
+        }
+
+        // Обновление выбора предметов
+        function updateWithdrawSelection() {
+            const withdrawItemsContainer = document.getElementById('withdrawItems');
+            const selectedItemsContainer = document.getElementById('selectedItems');
+            
+            if (!withdrawItemsContainer || !selectedItemsContainer) return;
+            
+            // Обновляем выделение предметов
+            const items = withdrawItemsContainer.querySelectorAll('.withdraw-item');
+            items.forEach((item, index) => {
+                if (selectedForWithdraw.includes(index)) {
+                    item.classList.add('selected');
+                } else {
+                    item.classList.remove('selected');
+                }
+            });
+            
+            // Обновляем список выбранных предметов
+            if (selectedForWithdraw.length === 0) {
+                selectedItemsContainer.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">Выберите предметы для вывода</div>';
+            } else {
+                selectedItemsContainer.innerHTML = '';
+                
+                // Группируем предметы по имени
+                const groupedItems = {};
+                selectedForWithdraw.forEach(index => {
+                    const item = userInventory[index];
+                    if (!groupedItems[item.name]) {
+                        groupedItems[item.name] = 0;
+                    }
+                    groupedItems[item.name]++;
+                });
+                
+                // Создаем элементы для отображения
+                Object.keys(groupedItems).forEach(itemName => {
+                    const itemData = groupedItems[itemName];
+                    const itemElement = document.createElement('span');
+                    itemElement.className = 'selected-item';
+                    itemElement.textContent = `${itemName} (x${itemData.count})`;
+                    selectedItemsContainer.appendChild(itemElement);
+                });
+            }
+        }
+
+        // Генерация кода подтверждения
+        function generateVerificationCode() {
+            const telegramUsernameInput = document.getElementById('telegramUsername');
+            const telegramUsername = telegramUsernameInput ? telegramUsernameInput.value.trim() : '';
+            
+            if (!telegramUsername) {
+                showWithdrawStatus('❌ Введите ваш Telegram username', false);
+                return;
+            }
+            
+            if (!telegramUsername.startsWith('@')) {
+                showWithdrawStatus('❌ Username должен начинаться с @', false);
+                return;
+            }
+            
+            if (selectedForWithdraw.length === 0) {
+                showWithdrawStatus('❌ Выберите предметы для вывода', false);
+                return;
+            }
+
+            // Генерируем уникальный код подтверждения
+            currentVerificationCode = 'HW-' + Math.random().toString(36).substr(2, 8).toUpperCase();
+            
+            // Формируем список предметов для вывода
+            const itemsForWithdraw = selectedForWithdraw.map(index => userInventory[index]);
+            
+            // Сохраняем код в хранилище (в реальном приложении это должно быть на сервере)
+            withdrawalCodes[currentVerificationCode] = {
+                userId: currentUserId,
+                telegramUsername: telegramUsername,
+                items: itemsForWithdraw,
+                timestamp: new Date().toISOString()
+            };
+            
+            // Сохраняем в localStorage для персистентности
+            localStorage.setItem('withdrawalCodes', JSON.stringify(withdrawalCodes));
+
+            // Показываем код подтверждения
+            showVerificationCode(currentVerificationCode, telegramUsername, itemsForWithdraw);
+        }
+
+        function showVerificationCode(code, telegramUsername, items) {
+            const withdrawPopup = document.getElementById('withdrawPopup');
+            
+            // Группируем предметы для отображения
+            const groupedItems = {};
+            items.forEach(item => {
+                if (!groupedItems[item.name]) {
+                    groupedItems[item.name] = 0;
+                }
+                groupedItems[item.name]++;
+            });
+            
+            const itemsText = Object.keys(groupedItems)
+                .map(name => `${name} (x${groupedItems[name]})`)
+                .join(', ');
+
+            withdrawPopup.innerHTML = `
+                <div class="withdraw-title">🔐 ПОДТВЕРЖДЕНИЕ ВЫВОДА</div>
+                
+                <div class="verification-instruction">
+                    <strong>Инструкция:</strong><br>
+                    1. Скопируйте код подтверждения ниже<br>
+                    2. Напишите мне в Telegram: <strong>@NFT_c0llecti0n</strong><br>
+                    3. Отправьте этот код и ваш username<br>
+                    4. Я проверю ваш инвентарь и отправлю предметы
+                </div>
+                
+                <div class="verification-code" id="verificationCode">
+                    ${code}
+                </div>
+                
+                <div style="color: white; text-align: center; margin: 15px 0; font-size: 14px;">
+                    <strong>Данные запроса:</strong><br>
+                    Username: ${telegramUsername}<br>
+                    Предметы: ${itemsText}<br>
+                    ID: ${currentUserId}
+                </div>
+                
+                <div class="admin-buttons">
+                    <button class="admin-action-btn" onclick="copyVerificationCode()">📋 КОПИРОВАТЬ КОД</button>
+                    <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
+                </div>
+            `;
+        }
+
+        function copyVerificationCode() {
+            const code = currentVerificationCode;
+            const telegramUsernameInput = document.getElementById('telegramUsername');
+            const telegramUsername = telegramUsernameInput ? telegramUsernameInput.value.trim() : '';
+            
+            const message = `Код подтверждения вывода: ${code}\nUsername: ${telegramUsername}\nID: ${currentUserId}`;
+            
+            navigator.clipboard.writeText(message).then(() => {
+                const copyBtn = document.querySelector('.admin-action-btn');
+                if (copyBtn) {
+                    copyBtn.innerHTML = '✅ СКОПИРОВАНО!';
+                    copyBtn.style.background = 'linear-gradient(135deg, #228b22, #32cd32)';
+                    
+                    setTimeout(() => {
+                        copyBtn.innerHTML = '📋 КОПИРОВАТЬ КОД';
+                        copyBtn.style.background = '';
+                    }, 2000);
+                }
+            });
+        }
+
+        // ФУНКЦИЯ ПРОВЕРКИ КОДА ДЛЯ АДМИНА
+        function verifyWithdrawalCode() {
+            const codeInput = document.getElementById('verificationCodeInput');
+            const code = codeInput.value.trim().toUpperCase();
+            const resultDiv = document.getElementById('verificationResult');
+            
+            if (!code) {
+                resultDiv.innerHTML = '<div class="withdraw-error">❌ Введите код для проверки</div>';
+                return;
+            }
+            
+            // Загружаем коды из localStorage
+            const savedCodes = localStorage.getItem('withdrawalCodes');
+            if (savedCodes) {
+                withdrawalCodes = JSON.parse(savedCodes);
+            }
+            
+            if (!withdrawalCodes[code]) {
+                resultDiv.innerHTML = '<div class="withdraw-error">❌ Код не найден или устарел</div>';
+                return;
+            }
+            
+            const withdrawalData = withdrawalCodes[code];
+            const items = withdrawalData.items;
+            
+            // Группируем предметы
+            const groupedItems = {};
+            items.forEach(item => {
+                if (!groupedItems[item.name]) {
+                    groupedItems[item.name] = { count: 0, item: item };
+                }
+                groupedItems[item.name].count++;
+            });
+            
+            // Создаем превью предметов
+            let itemsPreviewHTML = '';
+            Object.keys(groupedItems).forEach(itemName => {
+                const itemData = groupedItems[itemName];
+                itemsPreviewHTML += `
+                    <div class="item-preview">
+                        <img src="${itemData.item.image}" alt="${itemName}" onerror="this.style.display='none'">
+                        <div class="item-preview-name">${itemName} (x${itemData.count})</div>
+                    </div>
+                `;
+            });
+            
+            resultDiv.innerHTML = `
+                <div class="withdraw-success">
+                    ✅ Код действителен!
+                </div>
+                <div class="user-data-display">
+                    <div class="user-data-item"><strong>ID пользователя:</strong> ${withdrawalData.userId}</div>
+                    <div class="user-data-item"><strong>Telegram:</strong> ${withdrawalData.telegramUsername}</div>
+                    <div class="user-data-item"><strong>Время запроса:</strong> ${new Date(withdrawalData.timestamp).toLocaleString()}</div>
+                    <div class="user-data-item"><strong>Предметы для вывода:</strong></div>
+                    <div class="items-preview">
+                        ${itemsPreviewHTML}
+                    </div>
+                </div>
+                <button class="admin-action-btn" onclick="completeWithdrawal('${code}')">✅ ПОДТВЕРДИТЬ ВЫДАЧУ</button>
+                <button class="admin-action-btn" onclick="rejectWithdrawal('${code}')">❌ ОТКЛОНИТЬ</button>
+            `;
+        }
+
+        function completeWithdrawal(code) {
+            if (withdrawalCodes[code]) {
+                // Удаляем использованный код
+                delete withdrawalCodes[code];
+                localStorage.setItem('withdrawalCodes', JSON.stringify(withdrawalCodes));
+                
+                document.getElementById('verificationResult').innerHTML = 
+                    '<div class="withdraw-success">✅ Выдача подтверждена! Код удален.</div>';
+            }
+        }
+
+        function rejectWithdrawal(code) {
+            if (withdrawalCodes[code]) {
+                // Удаляем код
+                delete withdrawalCodes[code];
+                localStorage.setItem('withdrawalCodes', JSON.stringify(withdrawalCodes));
+                
+                document.getElementById('verificationResult').innerHTML = 
+                    '<div class="withdraw-error">❌ Выдача отклонена! Код удален.</div>';
+            }
+        }
+
+        function showWithdrawStatus(message, isSuccess = true) {
+            const withdrawStatus = document.getElementById('withdrawStatus');
+            if (!withdrawStatus) return;
+            withdrawStatus.textContent = message;
+            withdrawStatus.className = 'withdraw-status ' + (isSuccess ? 'withdraw-success' : 'withdraw-error');
+            withdrawStatus.style.display = 'block';
+            setTimeout(() => withdrawStatus.style.display = 'none', 3000);
+        }
+
+        // Остальные функции попапов
         function showPaymentPopup() {
             overlay.style.display = 'block';
             document.getElementById('paymentPopup').style.display = 'block';
@@ -1439,7 +1700,7 @@
             overlay.style.display = 'block';
             document.getElementById('promoPopup').style.display = 'block';
             promoCodeInput.value = '';
-            promoStatus.style.display = 'none';
+            if (promoStatus) promoStatus.style.display = 'none';
         }
         
         function showInventory() {
@@ -1477,94 +1738,7 @@
             overlay.style.display = 'block';
             document.getElementById('inventoryPopup').style.display = 'block';
         }
-        
-        function showWithdrawPopup() {
-            if (userInventory.length === 0) {
-                showWithdrawStatus('❌ Ваш инвентарь пуст', false);
-                return;
-            }
-            
-            selectedForWithdraw = [];
-            updateWithdrawItems();
-            updateSelectedItems();
-            
-            document.getElementById('telegramUsername').value = '';
-            withdrawStatus.style.display = 'none';
-            
-            overlay.style.display = 'block';
-            document.getElementById('withdrawPopup').style.display = 'block';
-        }
-        
-        function updateWithdrawItems() {
-            if (!withdrawItems) return;
-            withdrawItems.innerHTML = '';
-            
-            userInventory.forEach((item, index) => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'withdraw-item';
-                if (selectedForWithdraw.includes(index)) {
-                    itemElement.classList.add('selected');
-                }
-                itemElement.onclick = () => toggleItemSelection(index);
-                
-                const img = document.createElement('img');
-                img.src = item.image;
-                img.alt = item.name;
-                img.onerror = function() { this.style.display = 'none'; };
-                
-                const name = document.createElement('div');
-                name.className = 'withdraw-item-name';
-                name.textContent = item.name;
-                
-                itemElement.appendChild(img);
-                itemElement.appendChild(name);
-                withdrawItems.appendChild(itemElement);
-            });
-        }
-        
-        function toggleItemSelection(index) {
-            const itemIndex = selectedForWithdraw.indexOf(index);
-            
-            if (itemIndex === -1) {
-                selectedForWithdraw.push(index);
-            } else {
-                selectedForWithdraw.splice(itemIndex, 1);
-            }
-            
-            updateSelectedItems();
-            updateWithdrawItems();
-        }
-        
-        function updateSelectedItems() {
-            if (!selectedItems) return;
-            
-            if (selectedForWithdraw.length === 0) {
-                selectedItems.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">Выберите предметы для вывода</div>';
-                return;
-            }
-            
-            selectedItems.innerHTML = '';
-            
-            // Группируем предметы по имени
-            const groupedItems = {};
-            selectedForWithdraw.forEach(index => {
-                const item = userInventory[index];
-                if (!groupedItems[item.name]) {
-                    groupedItems[item.name] = { count: 0, item: item };
-                }
-                groupedItems[item.name].count++;
-            });
-            
-            // Создаем элементы для отображения
-            Object.keys(groupedItems).forEach(itemName => {
-                const itemData = groupedItems[itemName];
-                const itemElement = document.createElement('span');
-                itemElement.className = 'selected-item';
-                itemElement.textContent = `${itemName} (x${itemData.count})`;
-                selectedItems.appendChild(itemElement);
-            });
-        }
-        
+
         function closeAllPopups() {
             overlay.style.display = 'none';
             document.getElementById('inventoryPopup').style.display = 'none';
@@ -1574,34 +1748,6 @@
             document.getElementById('withdrawPopup').style.display = 'none';
             if (adminStatus) adminStatus.style.display = 'none';
             if (promoStatus) promoStatus.style.display = 'none';
-            if (withdrawStatus) withdrawStatus.style.display = 'none';
-            
-            // Восстанавливаем оригинальный попап вывода
-            initWithdrawPopup();
-        }
-
-        function initWithdrawPopup() {
-            const withdrawPopup = document.getElementById('withdrawPopup');
-            withdrawPopup.innerHTML = `
-                <div class="withdraw-title">📤 ВЫВОД ПРЕДМЕТОВ</div>
-                
-                <input type="text" class="withdraw-input" id="telegramUsername" placeholder="Ваш Telegram @username">
-                
-                <div class="selected-items" id="selectedItems">
-                    <div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">
-                        Выберите предметы для вывода
-                    </div>
-                </div>
-                
-                <div class="withdraw-items" id="withdrawItems"></div>
-                
-                <div class="withdraw-status" id="withdrawStatus"></div>
-                
-                <div class="admin-buttons">
-                    <button class="admin-action-btn" onclick="generateVerificationCode()">🔐 СОЗДАТЬ КОД ПОДТВЕРЖДЕНИЯ</button>
-                    <button class="admin-action-btn" onclick="closeAllPopups()">❌ ОТМЕНА</button>
-                </div>
-            `;
         }
 
         // Промокоды
@@ -1634,6 +1780,14 @@
             }
         }
 
+        function showPromoStatus(message, isSuccess = true) {
+            if (!promoStatus) return;
+            promoStatus.textContent = message;
+            promoStatus.className = 'promo-status ' + (isSuccess ? 'promo-success' : 'promo-error');
+            promoStatus.style.display = 'block';
+            setTimeout(() => promoStatus.style.display = 'none', 3000);
+        }
+
         // Админ-функции
         function showAdminPanel() {
             if (!ADMIN_USER_IDS.includes(currentUserId)) return;
@@ -1660,11 +1814,27 @@
             showAdminStatus('✅ Баланс сброшен до 100 звезд!');
         }
 
+        function showAdminStatus(message, isSuccess = true) {
+            if (!adminStatus) return;
+            adminStatus.textContent = message;
+            adminStatus.className = 'admin-status ' + (isSuccess ? 'admin-success' : 'admin-error');
+            adminStatus.style.display = 'block';
+            setTimeout(() => adminStatus.style.display = 'none', 3000);
+        }
+
+        // Загрузка кодов при инициализации
+        function loadWithdrawalCodes() {
+            const savedCodes = localStorage.getItem('withdrawalCodes');
+            if (savedCodes) {
+                withdrawalCodes = JSON.parse(savedCodes);
+            }
+        }
+
         // Инициализация
         function initUser() {
             loadUserData();
             createWheel();
-            initWithdrawPopup();
+            loadWithdrawalCodes();
         }
 
         // Запуск
@@ -1685,9 +1855,9 @@
         window.activatePromoCode = activatePromoCode;
         window.adminAddStars = adminAddStars;
         window.adminResetBalance = adminResetBalance;
-
-        console.log('🎯 Halloween Wheel запущен!');
-        console.log('🔐 Безопасная система вывода активирована');
+        window.verifyWithdrawalCode = verifyWithdrawalCode;
+        window.completeWithdrawal = completeWithdrawal;
+        window.rejectWithdrawal = rejectWithdrawal;
     </script>
 </body>
 </html>
