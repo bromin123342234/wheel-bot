@@ -1001,6 +1001,22 @@
             font-size: 9px;
             font-weight: bold;
         }
+
+        .refresh-button {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 12px;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-button:hover {
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -1115,6 +1131,8 @@
         
         <div class="admin-verification-section">
             <div class="admin-verification-title">🔍 ПРОВЕРКА ВЫВОДА</div>
+            <button class="refresh-button" onclick="loadAllWithdrawalCodes()">🔄 ОБНОВИТЬ БАЗУ КОДОВ</button>
+            
             <input type="text" class="admin-input" id="verificationCodeInput" placeholder="Введите код подтверждения">
             <button class="admin-action-btn" onclick="verifyWithdrawalCode()">🔎 ПРОВЕРИТЬ КОД</button>
             
@@ -1131,8 +1149,6 @@
         <div class="admin-status" id="adminStatus"></div>
         
         <div class="admin-buttons">
-            <button class="admin-action-btn" onclick="adminCreatePromoCode()">🎁 СОЗДАТЬ ПРОМОКОД</button>
-            <button class="admin-action-btn" onclick="adminViewPromoCodes()">📊 СМОТРЕТЬ ПРОМОКОДЫ</button>
             <button class="admin-action-btn" onclick="adminAddStars()">➕ ДОБАВИТЬ СЕБЕ</button>
             <button class="admin-action-btn" onclick="adminResetBalance()">🔄 СБРОСИТЬ СЕБЯ</button>
         </div>
@@ -1176,8 +1192,8 @@
         let selectedForWithdraw = [];
         let currentVerificationCode = '';
         
-        // Хранилище кодов подтверждения (в реальном приложении это должно быть на сервере)
-        let withdrawalCodes = {};
+        // ЕДИНОЕ ХРАНИЛИЩЕ КОДОВ ДЛЯ ВСЕХ ПОЛЬЗОВАТЕЛЕЙ
+        let globalWithdrawalCodes = {};
 
         // Генерация ID пользователя
         function generateUserId() {
@@ -1193,7 +1209,7 @@
             });
         }
 
-        // Сохранение данных
+        // Сохранение данных пользователя
         function saveUserData() {
             const userData = { 
                 userId: currentUserId, 
@@ -1203,7 +1219,7 @@
             localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
         }
 
-        // Загрузка данных
+        // Загрузка данных пользователя
         function loadUserData() {
             const localData = localStorage.getItem('halloweenWheelData');
             
@@ -1368,7 +1384,6 @@
             
             selectedForWithdraw = [];
             
-            // СОЗДАЕМ ПОПАП С НУЛЯ
             const withdrawPopup = document.getElementById('withdrawPopup');
             withdrawPopup.innerHTML = `
                 <div class="withdraw-title">📤 ВЫВОД ПРЕДМЕТОВ</div>
@@ -1391,7 +1406,6 @@
                 </div>
             `;
             
-            // ЗАПОЛНЯЕМ ПРЕДМЕТЫ
             fillWithdrawItems();
             
             overlay.style.display = 'block';
@@ -1451,7 +1465,6 @@
             
             if (!withdrawItemsContainer || !selectedItemsContainer) return;
             
-            // Обновляем выделение предметов
             const items = withdrawItemsContainer.querySelectorAll('.withdraw-item');
             items.forEach((item, index) => {
                 if (selectedForWithdraw.includes(index)) {
@@ -1461,13 +1474,11 @@
                 }
             });
             
-            // Обновляем список выбранных предметов
             if (selectedForWithdraw.length === 0) {
                 selectedItemsContainer.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">Выберите предметы для вывода</div>';
             } else {
                 selectedItemsContainer.innerHTML = '';
                 
-                // Группируем предметы по имени
                 const groupedItems = {};
                 selectedForWithdraw.forEach(index => {
                     const item = userInventory[index];
@@ -1477,7 +1488,6 @@
                     groupedItems[item.name]++;
                 });
                 
-                // Создаем элементы для отображения
                 Object.keys(groupedItems).forEach(itemName => {
                     const itemData = groupedItems[itemName];
                     const itemElement = document.createElement('span');
@@ -1514,25 +1524,45 @@
             // Формируем список предметов для вывода
             const itemsForWithdraw = selectedForWithdraw.map(index => userInventory[index]);
             
-            // Сохраняем код в хранилище (в реальном приложении это должно быть на сервере)
-            withdrawalCodes[currentVerificationCode] = {
+            // СОХРАНЯЕМ КОД В ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ
+            saveWithdrawalCode(currentVerificationCode, {
                 userId: currentUserId,
                 telegramUsername: telegramUsername,
                 items: itemsForWithdraw,
                 timestamp: new Date().toISOString()
-            };
-            
-            // Сохраняем в localStorage для персистентности
-            localStorage.setItem('withdrawalCodes', JSON.stringify(withdrawalCodes));
+            });
 
             // Показываем код подтверждения
             showVerificationCode(currentVerificationCode, telegramUsername, itemsForWithdraw);
         }
 
+        // СОХРАНЕНИЕ КОДА В ГЛОБАЛЬНОЕ ХРАНИЛИЩЕ
+        function saveWithdrawalCode(code, data) {
+            // Загружаем текущие коды
+            loadAllWithdrawalCodes();
+            
+            // Добавляем новый код
+            globalWithdrawalCodes[code] = data;
+            
+            // Сохраняем обратно в localStorage
+            localStorage.setItem('globalWithdrawalCodes', JSON.stringify(globalWithdrawalCodes));
+        }
+
+        // ЗАГРУЗКА ВСЕХ КОДОВ ИЗ ГЛОБАЛЬНОГО ХРАНИЛИЩА
+        function loadAllWithdrawalCodes() {
+            const savedCodes = localStorage.getItem('globalWithdrawalCodes');
+            if (savedCodes) {
+                globalWithdrawalCodes = JSON.parse(savedCodes);
+                showAdminStatus(`✅ База обновлена! Найдено ${Object.keys(globalWithdrawalCodes).length} кодов`);
+            } else {
+                globalWithdrawalCodes = {};
+            }
+            return globalWithdrawalCodes;
+        }
+
         function showVerificationCode(code, telegramUsername, items) {
             const withdrawPopup = document.getElementById('withdrawPopup');
             
-            // Группируем предметы для отображения
             const groupedItems = {};
             items.forEach(item => {
                 if (!groupedItems[item.name]) {
@@ -1606,18 +1636,15 @@
                 return;
             }
             
-            // Загружаем коды из localStorage
-            const savedCodes = localStorage.getItem('withdrawalCodes');
-            if (savedCodes) {
-                withdrawalCodes = JSON.parse(savedCodes);
-            }
+            // ЗАГРУЖАЕМ ВСЕ КОДЫ ПЕРЕД ПРОВЕРКОЙ
+            loadAllWithdrawalCodes();
             
-            if (!withdrawalCodes[code]) {
-                resultDiv.innerHTML = '<div class="withdraw-error">❌ Код не найден или устарел</div>';
+            if (!globalWithdrawalCodes[code]) {
+                resultDiv.innerHTML = '<div class="withdraw-error">❌ Код не найден. Нажмите "ОБНОВИТЬ БАЗУ КОДОВ"</div>';
                 return;
             }
             
-            const withdrawalData = withdrawalCodes[code];
+            const withdrawalData = globalWithdrawalCodes[code];
             const items = withdrawalData.items;
             
             // Группируем предметы
@@ -1660,10 +1687,10 @@
         }
 
         function completeWithdrawal(code) {
-            if (withdrawalCodes[code]) {
-                // Удаляем использованный код
-                delete withdrawalCodes[code];
-                localStorage.setItem('withdrawalCodes', JSON.stringify(withdrawalCodes));
+            if (globalWithdrawalCodes[code]) {
+                // Удаляем использованный код из глобального хранилища
+                delete globalWithdrawalCodes[code];
+                localStorage.setItem('globalWithdrawalCodes', JSON.stringify(globalWithdrawalCodes));
                 
                 document.getElementById('verificationResult').innerHTML = 
                     '<div class="withdraw-success">✅ Выдача подтверждена! Код удален.</div>';
@@ -1671,10 +1698,10 @@
         }
 
         function rejectWithdrawal(code) {
-            if (withdrawalCodes[code]) {
-                // Удаляем код
-                delete withdrawalCodes[code];
-                localStorage.setItem('withdrawalCodes', JSON.stringify(withdrawalCodes));
+            if (globalWithdrawalCodes[code]) {
+                // Удаляем код из глобального хранилища
+                delete globalWithdrawalCodes[code];
+                localStorage.setItem('globalWithdrawalCodes', JSON.stringify(globalWithdrawalCodes));
                 
                 document.getElementById('verificationResult').innerHTML = 
                     '<div class="withdraw-error">❌ Выдача отклонена! Код удален.</div>';
@@ -1793,6 +1820,8 @@
             if (!ADMIN_USER_IDS.includes(currentUserId)) return;
             overlay.style.display = 'block';
             document.getElementById('adminPopup').style.display = 'block';
+            // Автоматически загружаем коды при открытии админ-панели
+            loadAllWithdrawalCodes();
         }
         
         function adminAddStars() {
@@ -1822,19 +1851,12 @@
             setTimeout(() => adminStatus.style.display = 'none', 3000);
         }
 
-        // Загрузка кодов при инициализации
-        function loadWithdrawalCodes() {
-            const savedCodes = localStorage.getItem('withdrawalCodes');
-            if (savedCodes) {
-                withdrawalCodes = JSON.parse(savedCodes);
-            }
-        }
-
         // Инициализация
         function initUser() {
             loadUserData();
             createWheel();
-            loadWithdrawalCodes();
+            // Загружаем глобальные коды при старте
+            loadAllWithdrawalCodes();
         }
 
         // Запуск
@@ -1858,6 +1880,7 @@
         window.verifyWithdrawalCode = verifyWithdrawalCode;
         window.completeWithdrawal = completeWithdrawal;
         window.rejectWithdrawal = rejectWithdrawal;
+        window.loadAllWithdrawalCodes = loadAllWithdrawalCodes;
     </script>
 </body>
 </html>
