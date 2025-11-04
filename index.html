@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎃Halloween Wheel🎃</title>
     <style>
-        /* ВСЕ СТИЛИ ОСТАЮТСЯ БЕЗ ИЗМЕНЕНИЙ */
         * {
             margin: 0;
             padding: 0;
@@ -318,30 +317,54 @@
             100% { transform: translateY(500px) rotate(360deg); opacity: 0; }
         }
         
+        /* НОВАЯ НАВИГАЦИЯ - 5 КНОПОК */
         .navigation {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
             margin-top: 30px;
+            padding: 0 5px;
         }
         
         .nav-btn {
             background: rgba(255, 255, 255, 0.1);
             color: #ff8c42;
             border: 2px solid rgba(255, 140, 66, 0.3);
-            padding: 15px;
-            border-radius: 15px;
+            padding: 12px 5px;
+            border-radius: 12px;
             cursor: pointer;
             transition: all 0.3s ease;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
             position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60px;
         }
         
         .nav-btn:hover {
             background: rgba(255, 140, 66, 0.2);
             border-color: #ff8c42;
             transform: translateY(-2px);
+        }
+        
+        .nav-btn.active {
+            background: rgba(255, 140, 66, 0.3);
+            border-color: #ff8c42;
+            box-shadow: 0 0 15px rgba(255, 140, 66, 0.4);
+        }
+        
+        .nav-icon {
+            font-size: 18px;
+            margin-bottom: 4px;
+        }
+        
+        .nav-text {
+            font-size: 10px;
+            text-align: center;
+            line-height: 1.1;
         }
         
         .inventory-badge {
@@ -351,9 +374,9 @@
             background: #ff4444;
             color: white;
             border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            font-size: 12px;
+            width: 18px;
+            height: 18px;
+            font-size: 10px;
             display: none;
             align-items: center;
             justify-content: center;
@@ -365,6 +388,137 @@
             50% { transform: scale(1.1); }
             100% { transform: scale(1); }
         }
+        
+        /* СТРАНИЦА ПРОФИЛЯ */
+        .profile-section {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .profile-card {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .profile-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .profile-info {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+        }
+        
+        .profile-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 12px 0;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255, 140, 66, 0.2);
+        }
+        
+        .profile-label {
+            font-size: 14px;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+        
+        .profile-value {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff8c42;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 140, 66, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff8c42;
+        }
+        
+        .stat-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+            font-weight: bold;
+        }
+        
+        .profile-top-up-button {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.4);
+            width: 100%;
+        }
+        
+        .profile-top-up-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.6);
+        }
+        
+        .back-button {
+            background: linear-gradient(135deg, #ff8c42, #9d4edd);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.4);
+            width: 100%;
+        }
+        
+        .back-button:hover {
+            transform: scale(1.05);
+        }
+
+        /* Остальные стили остаются без изменений... */
         
         .inventory-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
@@ -941,33 +1095,34 @@
     </div>
     
     <div class="container">
-        <div class="header">
-            <h1 class="title">🎃 HALLOWEEN WHEEL 🎃</h1>
-            
-            <div class="user-id-card">
-                <div class="user-id-title">ВАШ УНИКАЛЬНЫЙ ID</div>
-                <div class="user-id-value" id="userIdValue" onclick="copyUserId()">
-                    Загрузка...
+        <!-- ОСНОВНАЯ СТРАНИЦА С РУЛЕТКОЙ -->
+        <div class="wheel-section" id="mainPage">
+            <div class="header">
+                <h1 class="title">🎃 HALLOWEEN WHEEL 🎃</h1>
+                
+                <div class="user-id-card">
+                    <div class="user-id-title">ВАШ УНИКАЛЬНЫЙ ID</div>
+                    <div class="user-id-value" id="userIdValue" onclick="copyUserId()">
+                        Загрузка...
+                    </div>
+                    <div style="font-size: 10px; opacity: 0.6; margin-top: 5px;">
+                        Нажмите чтобы скопировать ID для пополнения баланса
+                    </div>
                 </div>
-                <div style="font-size: 10px; opacity: 0.6; margin-top: 5px;">
-                    Нажмите чтобы скопировать ID для пополнения баланса
+                
+                <div class="balance-card">
+                    <div class="balance-title">ВАШ БАЛАНС</div>
+                    <div class="balance-amount" id="balance">100</div>
+                    <div class="balance-stars">
+                        <span>★</span>
+                        <span>ЗВЕЗД</span>
+                    </div>
+                    <button class="top-up-button" onclick="showPaymentPopup()">
+                        💰 ПОПОЛНИТЬ
+                    </button>
                 </div>
             </div>
             
-            <div class="balance-card">
-                <div class="balance-title">ВАШ БАЛАНС</div>
-                <div class="balance-amount" id="balance">100</div>
-                <div class="balance-stars">
-                    <span>★</span>
-                    <span>ЗВЕЗД</span>
-                </div>
-                <button class="top-up-button" onclick="showPaymentPopup()">
-                    💰 ПОПОЛНИТЬ
-                </button>
-            </div>
-        </div>
-        
-        <div class="wheel-section">
             <div class="wheel-container">
                 <div class="wheel-pointer"></div>
                 <div class="wheel" id="wheel"></div>
@@ -979,17 +1134,87 @@
             <div class="cost-info">Одно вращение = 50 звезд</div>
         </div>
         
+        <!-- СТРАНИЦА ПРОФИЛЯ -->
+        <div class="profile-section" id="profilePage">
+            <div class="profile-card">
+                <div class="profile-title">👤 ВАШ ПРОФИЛЬ</div>
+                
+                <div class="profile-info">
+                    <div class="profile-item">
+                        <div class="profile-label">УНИКАЛЬНЫЙ ID:</div>
+                        <div class="profile-value" id="profileUserId" onclick="copyUserId()" style="cursor: pointer;">Загрузка...</div>
+                    </div>
+                    
+                    <div class="profile-item">
+                        <div class="profile-label">БАЛАНС:</div>
+                        <div class="profile-value" id="profileBalance">100 ★</div>
+                    </div>
+                    
+                    <div class="profile-item">
+                        <div class="profile-label">В ИНВЕНТАРЕ:</div>
+                        <div class="profile-value" id="profileInventory">0 предметов</div>
+                    </div>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="wheelSpins">0</div>
+                        <div class="stat-label">ВРАЩЕНИЙ РУЛЕТКИ</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number" id="casesOpened">0</div>
+                        <div class="stat-label">ОТКРЫТО КЕЙСОВ</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalSpent">0</div>
+                        <div class="stat-label">ПОТРАЧЕНО ЗВЕЗД</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-number" id="itemsWon">0</div>
+                        <div class="stat-label">ВЫИГРАНО ПРЕДМЕТОВ</div>
+                    </div>
+                </div>
+                
+                <button class="profile-top-up-button" onclick="showPaymentPopup()">
+                    💰 ПОПОЛНИТЬ БАЛАНС
+                </button>
+                
+                <button class="back-button" onclick="showMainPage()">
+                    🔙 НАЗАД К РУЛЕТКЕ
+                </button>
+            </div>
+        </div>
+        
+        <!-- НАВИГАЦИЯ -->
         <div class="navigation">
-            <button class="nav-btn" onclick="showInventory()">
-                🎒<br>ИНВЕНТАРЬ
-                <div class="inventory-badge" id="inventoryBadge">1</div>
+            <button class="nav-btn" onclick="showProfilePage()">
+                <div class="nav-icon">👤</div>
+                <div class="nav-text">ПРОФИЛЬ</div>
             </button>
             <button class="nav-btn" onclick="showGiftWithdraw()">
-                💰<br>ВЫВОД ПОДАРКА
+                <div class="nav-icon">💰</div>
+                <div class="nav-text">ВЫВОД</div>
+            </button>
+            <button class="nav-btn active" id="wheelNavBtn" onclick="showMainPage()">
+                <div class="nav-icon">🎡</div>
+                <div class="nav-text">РУЛЕТКА</div>
+            </button>
+            <button class="nav-btn" onclick="showCases()">
+                <div class="nav-icon">🎁</div>
+                <div class="nav-text">КЕЙСЫ</div>
+                <div class="inventory-badge" id="casesBadge">1</div>
+            </button>
+            <button class="nav-btn" onclick="showShop()">
+                <div class="nav-icon">🛒</div>
+                <div class="nav-text">МАГАЗИН</div>
             </button>
         </div>
     </div>
 
+    <!-- Остальные попапы остаются без изменений -->
     <div class="overlay" id="overlay"></div>
     
     <div class="inventory-popup" id="inventoryPopup">
@@ -998,7 +1223,6 @@
         <button class="close-button" onclick="closeAllPopups()">ЗАКРЫТЬ</button>
     </div>
 
-    <!-- Новый попап для вывода подарков -->
     <div class="inventory-popup" id="giftWithdrawPopup" style="display: none; max-width: 400px;">
         <div class="inventory-title">💰 ВЫВОД ПОДАРКОВ</div>
         
@@ -1121,8 +1345,16 @@
         let currentUserId = '';
         let userBalance = 100;
         let userInventory = [];
-        let withdrawals = []; // Локальное хранилище заявок
+        let withdrawals = [];
         let selectedGifts = [];
+        
+        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ СТАТИСТИКИ
+        let userStats = {
+            wheelSpins: 0,
+            casesOpened: 0,
+            totalSpent: 0,
+            itemsWon: 0
+        };
 
         // Генерация уникального ID пользователя
         function generateUserId() {
@@ -1142,7 +1374,7 @@
             });
         }
 
-        // Загрузка данных (только localStorage)
+        // Загрузка данных
         function loadUserData() {
             const localData = localStorage.getItem('halloweenWheelData');
             
@@ -1153,30 +1385,50 @@
                     userBalance = userData.balance || 100;
                     userInventory = userData.inventory || [];
                     withdrawals = userData.withdrawals || [];
+                    userStats = userData.stats || {
+                        wheelSpins: 0,
+                        casesOpened: 0,
+                        totalSpent: 0,
+                        itemsWon: userInventory.length
+                    };
                 } catch (e) {
                     currentUserId = generateUserId();
                     userBalance = 100;
                     userInventory = [];
                     withdrawals = [];
+                    userStats = {
+                        wheelSpins: 0,
+                        casesOpened: 0,
+                        totalSpent: 0,
+                        itemsWon: 0
+                    };
                 }
             } else {
                 currentUserId = generateUserId();
                 userBalance = 100;
                 userInventory = [];
                 withdrawals = [];
+                userStats = {
+                    wheelSpins: 0,
+                    casesOpened: 0,
+                    totalSpent: 0,
+                    itemsWon: 0
+                };
             }
             
             updateUI();
+            updateProfileStats();
             console.log('✅ Данные загружены из localStorage');
         }
 
-        // Сохранение данных (только localStorage)
+        // Сохранение данных
         function saveUserData() {
             const userData = {
                 userId: currentUserId,
                 balance: userBalance,
                 inventory: userInventory,
-                withdrawals: withdrawals
+                withdrawals: withdrawals,
+                stats: userStats
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
             console.log('💾 Данные сохранены в localStorage');
@@ -1195,17 +1447,58 @@
             }
         }
 
+        // Обновление статистики профиля
+        function updateProfileStats() {
+            document.getElementById('profileUserId').textContent = currentUserId;
+            document.getElementById('profileBalance').textContent = userBalance + ' ★';
+            document.getElementById('profileInventory').textContent = userInventory.length + ' предметов';
+            document.getElementById('wheelSpins').textContent = userStats.wheelSpins;
+            document.getElementById('casesOpened').textContent = userStats.casesOpened;
+            document.getElementById('totalSpent').textContent = userStats.totalSpent;
+            document.getElementById('itemsWon').textContent = userStats.itemsWon;
+        }
+
         // Добавление предмета в инвентарь
         function addToInventory(prize) {
             userInventory.push(prize);
+            userStats.itemsWon = userInventory.length;
             updateInventoryBadge();
+            updateProfileStats();
             saveUserData();
             console.log('🎁 Предмет добавлен в инвентарь:', prize.name);
         }
 
-        // Показать попап вывода подарков
+        // ПОКАЗАТЬ СТРАНИЦУ ПРОФИЛЯ
+        function showProfilePage() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('profilePage').style.display = 'block';
+            updateProfileStats();
+            setActiveNavButton(0);
+        }
+
+        // ПОКАЗАТЬ ОСНОВНУЮ СТРАНИЦУ
+        function showMainPage() {
+            document.getElementById('mainPage').style.display = 'block';
+            document.getElementById('profilePage').style.display = 'none';
+            setActiveNavButton(2);
+        }
+
+        // Установка активной кнопки навигации
+        function setActiveNavButton(index) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            const buttons = document.querySelectorAll('.nav-btn');
+            if (buttons[index]) {
+                buttons[index].classList.add('active');
+            }
+        }
+
+        // Остальные функции остаются без изменений...
         function showGiftWithdraw() {
             if (userInventory.length === 0) {
+                alert("🎒 Ваш инвентарь пуст!");
                 return;
             }
 
@@ -1218,7 +1511,6 @@
             document.getElementById('withdrawGiftButton').disabled = true;
         }
 
-        // Обновление выбора подарков
         function updateGiftSelection() {
             const giftSelection = document.getElementById('giftSelection');
             if (!giftSelection) return;
@@ -1252,43 +1544,38 @@
             });
         }
 
-        // Выбор/отмена выбора подарка
         function toggleGiftSelection(index) {
             const giftElement = document.getElementById('giftSelection').children[index];
             
             if (selectedGifts.includes(index)) {
-                // Убираем из выбранных
                 selectedGifts = selectedGifts.filter(i => i !== index);
                 giftElement.classList.remove('selected');
             } else {
-                // Добавляем в выбранные
                 selectedGifts.push(index);
                 giftElement.classList.add('selected');
             }
             
-            // Обновляем состояние кнопки
             document.getElementById('withdrawGiftButton').disabled = 
                 selectedGifts.length === 0 || !document.getElementById('withdrawContact').value.trim();
         }
 
-        // Создание заявки на вывод подарков
         function createGiftWithdrawal() {
             const contact = document.getElementById('withdrawContact').value.trim();
 
             if (selectedGifts.length === 0) {
+                alert("❌ Выберите хотя бы один подарок для вывода!");
                 return;
             }
 
             if (!contact) {
+                alert("❌ Укажите ваш контакт (Telegram)!");
                 return;
             }
 
-            // Получаем выбранные подарки
             const selectedGiftItems = selectedGifts.map(index => userInventory[index]);
             const giftImages = selectedGiftItems.map(gift => gift.image);
             const giftNames = selectedGiftItems.map(gift => gift.name);
 
-            // Создаем заявку
             const withdrawal = {
                 id: Date.now().toString(),
                 user_id: currentUserId,
@@ -1301,28 +1588,27 @@
                 created_at: new Date().toISOString()
             };
 
-            // Сохраняем заявку
             withdrawals.unshift(withdrawal);
 
-            // Удаляем подарки из инвентаря
             selectedGifts.sort((a, b) => b - a);
             selectedGifts.forEach(index => {
                 userInventory.splice(index, 1);
             });
 
+            userStats.itemsWon = userInventory.length;
             updateInventoryBadge();
+            updateProfileStats();
             saveUserData();
             
+            alert("✅ Заявка на вывод отправлена! Ожидайте одобрения.");
             closeAllPopups();
         }
 
-        // Слушатель для поля контакта
         document.getElementById('withdrawContact').addEventListener('input', function() {
             document.getElementById('withdrawGiftButton').disabled = 
                 selectedGifts.length === 0 || !this.value.trim();
         });
 
-        // Показать заявки на вывод подарков (админ)
         function showGiftWithdrawals() {
             if (currentUserId !== ADMIN_USER_ID) return;
 
@@ -1397,7 +1683,6 @@
             return statusMap[status] || status;
         }
 
-        // Одобрить заявку
         function processWithdrawal(withdrawalId) {
             if (currentUserId !== ADMIN_USER_ID) return;
             
@@ -1413,7 +1698,6 @@
             }
         }
 
-        // Отклонить заявку
         function rejectWithdrawal(withdrawalId) {
             if (currentUserId !== ADMIN_USER_ID) return;
             
@@ -1429,7 +1713,6 @@
             }
         }
 
-        // Остальные функции
         function createWheel() {
             const wheel = document.getElementById('wheel');
             if (!wheel) return;
@@ -1510,6 +1793,7 @@
             if (isSpinning) return;
             
             if (userBalance < 50) {
+                alert("❌ Недостаточно звезд для вращения!\n\nПополните баланс или получите больше звезд.");
                 return;
             }
             
@@ -1533,6 +1817,10 @@
                     wheel.style.transform = `rotate(${totalRotation}deg)`;
                     
                     setTimeout(() => {
+                        // ОБНОВЛЯЕМ СТАТИСТИКУ
+                        userStats.wheelSpins++;
+                        userStats.totalSpent += 50;
+                        
                         updateBalance(userBalance - 50);
                         addToInventory(prize);
                         
@@ -1637,7 +1925,7 @@
                 return;
             }
 
-            // В упрощенной версии просто показываем сообщение
+            alert(`✅ Выдано ${amount} звезд пользователю ${userId}`);
             document.getElementById('adminStarsInput').value = '';
             document.getElementById('targetUserId').value = '';
         }
@@ -1674,7 +1962,6 @@
         function loadAllUsers() {
             if (currentUserId !== ADMIN_USER_ID) return;
 
-            // В демо-режине просто показываем текущего пользователя
             const usersPopup = document.createElement('div');
             usersPopup.className = 'admin-popup';
             usersPopup.style.maxWidth = '500px';
@@ -1697,6 +1984,17 @@
 
             document.body.appendChild(usersPopup);
             document.getElementById('overlay').style.display = 'block';
+        }
+        
+        // ФУНКЦИИ ДЛЯ ДРУГИХ РАЗДЕЛОВ
+        function showCases() {
+            alert("🎁 Раздел КЕЙСЫ в разработке\n\nЗдесь будут:\n• Разные типы кейсов\n• Редкие предметы\n• Специальные награды");
+            setActiveNavButton(3);
+        }
+
+        function showShop() {
+            alert("🛒 Раздел МАГАЗИН в разработке\n\nЗдесь будет:\n• Покупка звезд\n• Специальные предложения\n• Ограниченные товары");
+            setActiveNavButton(4);
         }
         
         // Инициализация
@@ -1731,6 +2029,11 @@
         window.loadAllUsers = loadAllUsers;
         window.createGiftWithdrawal = createGiftWithdrawal;
         window.toggleGiftSelection = toggleGiftSelection;
+        window.showProfilePage = showProfilePage;
+        window.showMainPage = showMainPage;
+        window.showCases = showCases;
+        window.showShop = showShop;
+        window.setActiveNavButton = setActiveNavButton;
     </script>
 </body>
 </html>
