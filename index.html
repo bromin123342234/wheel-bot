@@ -317,7 +317,7 @@
             100% { transform: translateY(500px) rotate(360deg); opacity: 0; }
         }
         
-        /* НОВАЯ НАВИГАЦИЯ - 5 КНОПОК */
+        /* НАВИГАЦИЯ */
         .navigation {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -518,7 +518,403 @@
             transform: scale(1.05);
         }
 
-        /* Остальные стили остаются без изменений... */
+        .cost-info {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-top: 5px;
+        }
+
+        /* СТИЛИ ДЛЯ ПРОМОКОДОВ */
+        .promo-section {
+            margin: 20px 0;
+        }
+        
+        .promo-input-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .promo-input {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .promo-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .promo-button {
+            background: linear-gradient(135deg, #ff8c42, #9d4edd);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .promo-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .promo-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .promo-history {
+            margin-top: 20px;
+        }
+        
+        .promo-history-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .promo-history-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 140, 66, 0.2);
+            border-radius: 10px;
+            padding: 10px 15px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+        }
+        
+        .promo-code {
+            font-weight: bold;
+            color: #ff8c42;
+        }
+        
+        .promo-reward {
+            color: #32cd32;
+            font-weight: bold;
+        }
+        
+        .promo-status {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+
+        /* ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ КЕЙСОВ */
+        .cases-section {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .cases-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 25px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .case-card {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
+            border: 3px solid rgba(255, 140, 66, 0.4);
+            border-radius: 25px;
+            padding: 30px 20px;
+            margin: 20px 0;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .case-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff8c42;
+            box-shadow: 0 15px 50px rgba(255, 140, 66, 0.3);
+        }
+        
+        .case-preview {
+            position: relative;
+            width: 250px;
+            height: 250px;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .case-image {
+            width: 200px;
+            height: 200px;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+        
+        .case-name {
+            font-size: 22px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 15px;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        /* УБИРАЕМ ОПИСАНИЕ */
+        .case-description {
+            display: none;
+        }
+        
+        .case-price {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .open-case-button {
+            background: linear-gradient(135deg, #ff8c42, #9d4edd);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4);
+            width: 100%;
+        }
+        
+        .open-case-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .open-case-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* ОБНОВЛЕННЫЕ СТИЛИ ДЛЯ АНИМАЦИИ ОТКРЫТИЯ КЕЙСА */
+        .case-opening-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            display: none;
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .case-opening-container {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            animation: caseOpen 0.5s ease-out;
+        }
+        
+        @keyframes caseOpen {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .case-opening-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .case-opening-image {
+            width: 180px;
+            height: 180px;
+            object-fit: contain;
+            margin: 0 auto 20px;
+            border-radius: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .rewards-animation {
+            position: relative;
+            height: 140px;
+            margin: 20px 0;
+            overflow: hidden;
+            border-radius: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        /* СТРЕЛКА ВЫШЕ */
+        .rewards-pointer {
+            position: absolute;
+            top: 20%; /* ПОДНИМАЕМ СТРЕЛКУ ВЫШЕ */
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: #ff8c42;
+            clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
+            z-index: 2;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+        }
+        
+        .rewards-track {
+            display: flex;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: transform 8s cubic-bezier(0.1, 0.8, 0.2, 1); /* УВЕЛИЧИВАЕМ ВРЕМЯ АНИМАЦИИ */
+        }
+        
+        .reward-item {
+            width: 100px;
+            height: 100px;
+            margin: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .reward-item.highlighted {
+            background: rgba(255, 140, 66, 0.3);
+            border-color: #ff8c42;
+            transform: scale(1.1);
+            box-shadow: 0 0 20px rgba(255, 140, 66, 0.5);
+        }
+        
+        .reward-item.won {
+            background: rgba(34, 139, 34, 0.3);
+            border-color: #32cd32;
+            transform: scale(1.2);
+            box-shadow: 0 0 30px rgba(34, 139, 34, 0.8);
+            animation: wonPulse 0.5s infinite alternate;
+        }
+        
+        @keyframes wonPulse {
+            from { transform: scale(1.2); box-shadow: 0 0 30px rgba(34, 139, 34, 0.8); }
+            to { transform: scale(1.3); box-shadow: 0 0 40px rgba(34, 139, 34, 1); }
+        }
+        
+        .reward-image {
+            width: 60px;
+            height: 60px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+        
+        .reward-name {
+            font-size: 11px;
+            color: white;
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* УБИРАЕМ ТАЙМЕР */
+        .spin-counter {
+            display: none;
+        }
+        
+        .won-item {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 3px solid #ff8c42;
+            animation: pulseWin 1s infinite;
+            display: none;
+        }
+        
+        @keyframes pulseWin {
+            0% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 140, 66, 0.5); }
+            50% { transform: scale(1.05); box-shadow: 0 0 30px rgba(255, 140, 66, 0.8); }
+            100% { transform: scale(1); box-shadow: 0 0 20px rgba(255, 140, 66, 0.5); }
+        }
+        
+        .won-item-image {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            margin: 0 auto 10px;
+        }
+        
+        .won-item-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .close-case-button {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .close-case-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        /* Остальные стили... */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            z-index: 999;
+            animation: fadeIn 0.3s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
         
         .inventory-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
@@ -535,17 +931,6 @@
             z-index: 1000;
             width: 90%;
             max-width: 350px;
-        }
-        
-        @keyframes slideInUp {
-            0% {
-                transform: translate(-50%, 100%);
-                opacity: 0;
-            }
-            100% {
-                transform: translate(-50%, -50%);
-                opacity: 1;
-            }
         }
         
         .inventory-title {
@@ -570,17 +955,6 @@
             text-align: center;
             border: 2px solid rgba(255, 255, 255, 0.2);
             animation: itemAppear 0.5s ease-out;
-        }
-        
-        @keyframes itemAppear {
-            0% {
-                transform: scale(0.8);
-                opacity: 0;
-            }
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
         }
         
         .inventory-item img {
@@ -613,29 +987,6 @@
             background: rgba(255, 255, 255, 0.3);
             transform: scale(1.05);
         }
-        
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            display: none;
-            z-index: 999;
-            animation: fadeIn 0.3s ease-out;
-        }
-        
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        
-        .cost-info {
-            font-size: 14px;
-            opacity: 0.8;
-            margin-top: 5px;
-        }
 
         .payment-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.98), rgba(255, 140, 66, 0.98));
@@ -655,24 +1006,6 @@
             backdrop-filter: blur(10px);
         }
 
-        @keyframes bounceIn {
-            0% { 
-                transform: translate(-50%, -50%) scale(0.3);
-                opacity: 0;
-            }
-            50% { 
-                transform: translate(-50%, -50%) scale(1.05);
-                opacity: 0.8;
-            }
-            70% { 
-                transform: translate(-50%, -50%) scale(0.95);
-            }
-            100% { 
-                transform: translate(-50%, -50%) scale(1);
-                opacity: 1;
-            }
-        }
-
         .payment-title {
             font-size: 26px;
             font-weight: bold;
@@ -690,11 +1023,6 @@
             margin: 20px 0;
             text-align: center;
             animation: pulseGlow 2s infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
-            100% { box-shadow: 0 0 30px rgba(255, 255, 255, 0.3); }
         }
 
         .payment-text {
@@ -763,11 +1091,6 @@
             max-width: 400px;
         }
 
-        @keyframes popIn {
-            0% { transform: scale(0.5); opacity: 0; }
-           100% { transform: scale(1); opacity: 1; }
-        }
-
         .admin-title {
             font-size: 24px;
             font-weight: bold;
@@ -786,10 +1109,6 @@
             font-size: 16px;
             margin-bottom: 15px;
             text-align: center;
-        }
-
-        .admin-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
         }
 
         .admin-buttons {
@@ -816,22 +1135,6 @@
             transform: scale(1.05);
         }
 
-        .user-id-input {
-            width: 100%;
-            padding: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .user-id-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
         .copy-notification {
             position: fixed;
             top: 20px;
@@ -853,234 +1156,6 @@
             100% { transform: translateX(-50%) translateY(0); opacity: 1; }
         }
 
-        .admin-status {
-            color: white;
-            font-size: 14px;
-            margin: 10px 0;
-            padding: 10px;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-        }
-
-        .admin-success {
-            background: linear-gradient(135deg, #228b22, #32cd32);
-        }
-
-        .admin-error {
-            background: linear-gradient(135deg, #ff4444, #ff8c42);
-        }
-
-        /* Стили для вывода подарков */
-        .withdraw-section {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            border: 2px solid rgba(255, 140, 66, 0.3);
-        }
-
-        .withdraw-input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 14px;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .withdraw-input::placeholder {
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .withdraw-button {
-            background: linear-gradient(135deg, #ff8c42, #9d4edd);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            font-size: 14px;
-            font-weight: bold;
-            border-radius: 15px;
-            cursor: pointer;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-            width: 100%;
-        }
-
-        .withdraw-button:hover {
-            transform: scale(1.05);
-        }
-
-        .withdraw-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .withdrawals-section {
-            margin-top: 20px;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .withdrawals-title {
-            font-size: 18px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .withdrawal-item {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-            color: white;
-            font-size: 12px;
-        }
-
-        .withdrawal-user {
-            font-weight: bold;
-            color: #ff8c42;
-            margin-bottom: 5px;
-        }
-
-        .withdrawal-details {
-            display: flex;
-            justify-content: space-between;
-            font-size: 11px;
-            opacity: 0.8;
-        }
-
-        .withdrawal-status {
-            padding: 3px 8px;
-            border-radius: 8px;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .status-pending {
-            background: rgba(255, 193, 7, 0.3);
-            color: #ffc107;
-        }
-
-        .status-completed {
-            background: rgba(40, 167, 69, 0.3);
-            color: #28a745;
-        }
-
-        .status-rejected {
-            background: rgba(220, 53, 69, 0.3);
-            color: #dc3545;
-        }
-
-        .withdrawal-actions {
-            display: flex;
-            gap: 5px;
-            margin-top: 8px;
-        }
-
-        .action-btn {
-            padding: 4px 8px;
-            border: none;
-            border-radius: 5px;
-            font-size: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .approve-btn {
-            background: #28a745;
-            color: white;
-        }
-
-        .reject-btn {
-            background: #dc3545;
-            color: white;
-        }
-
-        .action-btn:hover {
-            transform: scale(1.05);
-        }
-
-        .no-withdrawals {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-style: italic;
-            padding: 20px;
-        }
-
-        /* Стили для выбора подарков */
-        .gift-selection {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin: 15px 0;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-
-        .gift-item {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .gift-item:hover {
-            background: rgba(255, 140, 66, 0.2);
-            transform: scale(1.05);
-        }
-
-        .gift-item.selected {
-            background: rgba(255, 140, 66, 0.4);
-            border-color: #ff8c42;
-        }
-
-        .gift-item img {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-            margin-bottom: 5px;
-        }
-
-        .gift-item-name {
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-        }
-
-        .no-gifts-message {
-            text-align: center;
-            color: rgba(255, 255, 255, 0.6);
-            font-style: italic;
-            padding: 20px;
-            grid-column: 1 / -1;
-        }
-
-        /* Стили для админ-панели с фотографиями */
-        .withdrawal-gift-images {
-            display: flex;
-            gap: 10px;
-            margin: 10px 0;
-            flex-wrap: wrap;
-        }
-
-        .withdrawal-gift-image {
-            width: 50px;
-            height: 50px;
-            object-fit: contain;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 8px;
-        }
     </style>
 </head>
 <body>
@@ -1095,11 +1170,10 @@
     </div>
     
     <div class="container">
-        <!-- ОСНОВНАЯ СТРАНИЦА С РУЛЕТКОЙ (БЕЗ ID И БАЛАНСА) -->
+        <!-- ОСНОВНАЯ СТРАНИЦА С РУЛЕТКОЙ -->
         <div class="wheel-section" id="mainPage">
             <div class="header">
                 <h1 class="title">🎃 HALLOWEEN WHEEL 🎃</h1>
-                <!-- УБРАЛ БЛОКИ С ID И БАЛАНСОМ ОТСЮДА -->
             </div>
             
             <div class="wheel-container">
@@ -1113,7 +1187,7 @@
             <div class="cost-info">Одно вращение = 50 звезд</div>
         </div>
         
-        <!-- СТРАНИЦА ПРОФИЛЯ (ЗДЕСЬ ВСЯ ИНФОРМАЦИЯ) -->
+        <!-- СТРАНИЦА ПРОФИЛЯ -->
         <div class="profile-section" id="profilePage">
             <div class="profile-card">
                 <div class="profile-title">👤 ВАШ ПРОФИЛЬ</div>
@@ -1132,6 +1206,21 @@
                     <div class="profile-item">
                         <div class="profile-label">В ИНВЕНТАРЕ:</div>
                         <div class="profile-value" id="profileInventory">0 предметов</div>
+                    </div>
+                </div>
+                
+                <!-- СЕКЦИЯ ПРОМОКОДОВ -->
+                <div class="promo-section">
+                    <div class="promo-input-container">
+                        <input type="text" class="promo-input" id="promoCodeInput" placeholder="Введите промокод" maxlength="20">
+                        <button class="promo-button" onclick="activatePromoCode()">АКТИВИРОВАТЬ</button>
+                    </div>
+                    
+                    <div class="promo-history">
+                        <div class="promo-history-title">ИСТОРИЯ АКТИВАЦИЙ</div>
+                        <div id="promoHistoryList">
+                            <!-- История промокодов будет здесь -->
+                        </div>
                     </div>
                 </div>
                 
@@ -1167,6 +1256,28 @@
             </div>
         </div>
         
+        <!-- СТРАНИЦА КЕЙСОВ -->
+        <div class="cases-section" id="casesPage">
+            <div class="cases-title">🎁 МАГАЗИН КЕЙСОВ</div>
+            
+            <div class="case-card">
+                <!-- ОБНОВЛЕННЫЙ ПРЕВЬЮ КЕЙСА - ТОЛЬКО ФОТО -->
+                <div class="case-preview">
+                    <img src="https://i.ibb.co/hRf6YbV9/image.png" alt="Кейс Джедай" class="case-image">
+                </div>
+                <div class="case-name">⚡ КЕЙС ДЖЕДАЙ</div>
+                <!-- ОПИСАНИЕ УБРАНО -->
+                <div class="case-price">
+                    <span>300</span>
+                    <span>★</span>
+                </div>
+                <button class="open-case-button" id="openCaseButton" onclick="openCase()">
+                    🎁 ОТКРЫТЬ КЕЙС
+                </button>
+                <div class="cost-info">Для открытия нужно 300 звезд</div>
+            </div>
+        </div>
+        
         <!-- НАВИГАЦИЯ -->
         <div class="navigation">
             <button class="nav-btn" onclick="showProfilePage()">
@@ -1181,7 +1292,7 @@
                 <div class="nav-icon">🎡</div>
                 <div class="nav-text">РУЛЕТКА</div>
             </button>
-            <button class="nav-btn" onclick="showCases()">
+            <button class="nav-btn" onclick="showCasesPage()">
                 <div class="nav-icon">🎁</div>
                 <div class="nav-text">КЕЙСЫ</div>
                 <div class="inventory-badge" id="casesBadge">1</div>
@@ -1193,7 +1304,35 @@
         </div>
     </div>
 
-    <!-- Остальные попапы остаются без изменений -->
+    <!-- ОБНОВЛЕННОЕ ОКНО ОТКРЫТИЯ КЕЙСА -->
+    <div class="case-opening-overlay" id="caseOpeningOverlay">
+        <div class="case-opening-container">
+            <div class="case-opening-title">🎁 ОТКРЫТИЕ КЕЙСА</div>
+            <img src="https://i.ibb.co/hRf6YbV9/image.png" alt="Кейс Джедай" class="case-opening-image">
+            
+            <div class="rewards-animation" id="rewardsAnimation">
+                <div class="rewards-pointer"></div>
+                <div class="rewards-track" id="rewardsTrack">
+                    <!-- Награды будут добавлены через JavaScript -->
+                </div>
+            </div>
+            
+            <div class="won-item" id="wonItem">
+                <img src="" alt="Выигранный предмет" class="won-item-image" id="wonItemImage">
+                <div class="won-item-name" id="wonItemName"></div>
+            </div>
+            
+            <button class="open-case-button" id="confirmOpenCaseButton" onclick="startCaseAnimation()">
+                🎰 НАЧАТЬ ВРАЩЕНИЕ
+            </button>
+            
+            <button class="close-case-button" onclick="closeCaseOpening()">
+                ❌ ЗАКРЫТЬ
+            </button>
+        </div>
+    </div>
+
+    <!-- Остальные попапы -->
     <div class="overlay" id="overlay"></div>
     
     <div class="inventory-popup" id="inventoryPopup">
@@ -1264,6 +1403,16 @@
     </div>
 
     <script>
+        // БАЗА ДАННЫХ ПРОМОКОДОВ
+        const promoDatabase = {
+            "MSRTSS12SG": { stars: 3000, uses: 1, used: 0 },
+            "YTFDRRG342": { stars: 200, uses: 1, used: 0 },
+            "JGGHNNKL": { stars: 50, uses: 1, used: 0 },
+            "PTEST": { stars: 10000, uses: 1, used: 0 },
+            "PTEST2": { stars: 10000, uses: 1, used: 0 },
+            "PTEST3": { stars: 10000, uses: 1, used: 0 }
+        };
+
         // УПРОЩЕННАЯ ВЕРСИЯ С LOCALSTORAGE (РАБОЧАЯ)
         console.log('🎮 Запуск рабочей версии (localStorage)');
         
@@ -1320,14 +1469,54 @@
             }
         ];
 
+        // НАГРАДЫ ДЛЯ КЕЙСА С ШАНСАМИ
+        const caseRewards = [
+            { 
+                name: "Ракета", 
+                image: "https://i.ibb.co/dsDK5qqP/image.png",
+                chance: 50,
+                type: "item"
+            },
+            { 
+                name: "Алмаз", 
+                image: "https://i.ibb.co/5xL42fJq/image.png", 
+                chance: 30,
+                type: "item"
+            },
+            { 
+                name: "Эскимо", 
+                image: "https://i.ibb.co/W4JRbR9G/image.png",
+                chance: 15,
+                type: "item"
+            },
+            { 
+                name: "Носки", 
+                image: "https://i.ibb.co/9HZJQzhT/image.png",
+                chance: 10,
+                type: "item"
+            },
+            { 
+                name: "Печенька", 
+                image: "https://i.ibb.co/Xf4YrFTt/image.png",
+                chance: 7,
+                type: "item"
+            },
+            { 
+                name: "Световой меч", 
+                image: "https://i.ibb.co/gF66LM94/image.png",
+                chance: 5,
+                type: "item"
+            }
+        ];
+
         let isSpinning = false;
         let currentUserId = '';
         let userBalance = 100;
         let userInventory = [];
         let withdrawals = [];
         let selectedGifts = [];
+        let usedPromoCodes = [];
         
-        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ СТАТИСТИКИ
         let userStats = {
             wheelSpins: 0,
             casesOpened: 0,
@@ -1353,6 +1542,258 @@
             });
         }
 
+        // ФУНКЦИЯ ДЛЯ АКТИВАЦИИ ПРОМОКОДА
+        function activatePromoCode() {
+            const promoInput = document.getElementById('promoCodeInput');
+            const promoCode = promoInput.value.trim().toUpperCase();
+            
+            if (!promoCode) {
+                showPromoNotification('❌ Введите промокод!', 'error');
+                return;
+            }
+            
+            if (usedPromoCodes.includes(promoCode)) {
+                showPromoNotification('❌ Этот промокод уже использован!', 'error');
+                promoInput.value = '';
+                return;
+            }
+            
+            const promoData = promoDatabase[promoCode];
+            if (!promoData) {
+                showPromoNotification('❌ Неверный промокод!', 'error');
+                promoInput.value = '';
+                return;
+            }
+            
+            if (promoData.used >= promoData.uses) {
+                showPromoNotification('❌ Лимит использований промокода исчерпан!', 'error');
+                promoInput.value = '';
+                return;
+            }
+            
+            promoData.used += 1;
+            usedPromoCodes.push(promoCode);
+            
+            const starsEarned = promoData.stars;
+            updateBalance(userBalance + starsEarned);
+            
+            showPromoNotification(`✅ Промокод активирован! +${starsEarned} звезд!`, 'success');
+            createConfetti();
+            updatePromoHistory();
+            promoInput.value = '';
+            saveUserData();
+            
+            console.log(`🎁 Активирован промокод: ${promoCode} (+${starsEarned} звезд)`);
+        }
+
+        // ФУНКЦИЯ ДЛЯ ОБНОВЛЕНИЯ ИСТОРИИ ПРОМОКОДОВ
+        function updatePromoHistory() {
+            const historyList = document.getElementById('promoHistoryList');
+            if (!historyList) return;
+            
+            if (usedPromoCodes.length === 0) {
+                historyList.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Вы еще не активировали ни одного промокода</div>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            
+            usedPromoCodes.forEach(promoCode => {
+                const promoData = promoDatabase[promoCode];
+                if (!promoData) return;
+                
+                const historyItem = document.createElement('div');
+                historyItem.className = 'promo-history-item';
+                
+                historyItem.innerHTML = `
+                    <div>
+                        <span class="promo-code">${promoCode}</span>
+                        <div class="promo-status">Активирован</div>
+                    </div>
+                    <div class="promo-reward">+${promoData.stars} ★</div>
+                `;
+                
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // ФУНКЦИЯ ДЛЯ ПОКАЗА УВЕДОМЛЕНИЙ ПРОМОКОДОВ
+        function showPromoNotification(message, type) {
+            const notification = document.createElement('div');
+            notification.className = 'copy-notification';
+            notification.textContent = message;
+            notification.style.background = type === 'success' 
+                ? 'linear-gradient(135deg, #228b22, #32cd32)' 
+                : 'linear-gradient(135deg, #ff4444, #ff8c42)';
+            
+            document.body.appendChild(notification);
+            notification.style.display = 'block';
+            
+            setTimeout(() => {
+                notification.style.display = 'none';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 3000);
+        }
+
+        // ФУНКЦИЯ ДЛЯ СОЗДАНИЯ АНИМАЦИИ ВРАЩЕНИЯ
+        function createRewardsAnimation() {
+            const rewardsTrack = document.getElementById('rewardsTrack');
+            if (!rewardsTrack) return;
+            
+            rewardsTrack.innerHTML = '';
+            
+            // СОЗДАЕМ БОЛЬШЕ ПРЕДМЕТОВ ДЛЯ БОЛЕЕ ДЛИННОЙ ДОРОЖКИ
+            for (let i = 0; i < 15; i++) {
+                caseRewards.forEach(reward => {
+                    const rewardElement = document.createElement('div');
+                    rewardElement.className = 'reward-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = reward.image;
+                    img.alt = reward.name;
+                    img.className = 'reward-image';
+                    
+                    const name = document.createElement('div');
+                    name.className = 'reward-name';
+                    name.textContent = reward.name;
+                    
+                    rewardElement.appendChild(img);
+                    rewardElement.appendChild(name);
+                    rewardsTrack.appendChild(rewardElement);
+                });
+            }
+        }
+
+        // ФУНКЦИЯ ОТКРЫТИЯ КЕЙСА
+        function openCase() {
+            if (userBalance < 300) {
+                alert("❌ Недостаточно звезд для открытия кейса!\n\nНужно: 300 звезд\nВаш баланс: " + userBalance + " звезд");
+                return;
+            }
+
+            document.getElementById('caseOpeningOverlay').style.display = 'flex';
+            createRewardsAnimation();
+            document.getElementById('confirmOpenCaseButton').style.display = 'block';
+            document.getElementById('wonItem').style.display = 'none';
+            
+            const rewardsTrack = document.getElementById('rewardsTrack');
+            rewardsTrack.style.transition = 'none';
+            rewardsTrack.style.transform = 'translateX(0)';
+        }
+
+        // ФУНКЦИЯ ДЛЯ ЗАПУСКА АНИМАЦИИ ВРАЩЕНИЯ
+        function startCaseAnimation() {
+            if (userBalance < 300) {
+                alert("❌ Недостаточно звезд!");
+                return;
+            }
+
+            updateBalance(userBalance - 300);
+            userStats.totalSpent += 300;
+            userStats.casesOpened++;
+            
+            document.getElementById('confirmOpenCaseButton').style.display = 'none';
+            
+            // ВЫБИРАЕМ СЛУЧАЙНЫЙ ПРИЗ (НО РЕАЛЬНЫЙ ВЫИГРЫШ ОПРЕДЕЛИТСЯ ПОЗЖЕ)
+            const initialReward = getRandomReward();
+            const rewardIndex = caseRewards.findIndex(reward => reward.name === initialReward.name);
+            animateCaseOpening(rewardIndex, initialReward);
+        }
+
+        // ОБНОВЛЕННАЯ ФУНКЦИЯ ДЛЯ АНИМАЦИИ ВРАЩЕНИЯ
+        function animateCaseOpening(rewardIndex, wonReward) {
+            const rewardsTrack = document.getElementById('rewardsTrack');
+            const rewardItems = rewardsTrack.querySelectorAll('.reward-item');
+            const itemWidth = 120; // Ширина одного элемента
+            
+            // ВЫЧИСЛЯЕМ ЦЕНТРАЛЬНУЮ ПОЗИЦИЮ (ПОД СТРЕЛКОЙ)
+            const centerPosition = Math.floor(rewardsTrack.offsetWidth / 2) - itemWidth / 2;
+            
+            // ВЫЧИСЛЯЕМ ЦЕЛЕВУЮ ПОЗИЦИЮ, ЧТОБЫ ВЫИГРАННЫЙ ПРЕДМЕТ БЫЛ ПО ЦЕНТРУ ПОД СТРЕЛКОЙ
+            // Добавляем смещение, чтобы выигранный предмет оказался точно по центру
+            const targetPosition = -(rewardIndex * itemWidth + 10 * caseRewards.length * itemWidth) + centerPosition;
+            
+            // ЗАПУСКАЕМ АНИМАЦИЮ НА 8 СЕКУНД (ЕЩЕ ДОЛЬШЕ)
+            rewardsTrack.style.transition = 'transform 8s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
+            
+            // По завершении анимации показываем выигранный предмет
+            setTimeout(() => {
+                // НАХОДИМ И ПОДСВЕЧИВАЕМ ЭЛЕМЕНТ, КОТОРЫЙ СЕЙЧАС НАХОДИТСЯ ПОД СТРЕЛКОЙ
+                highlightWonItem(wonReward);
+                
+                // Показываем выигранный предмет через секунду
+                setTimeout(() => {
+                    showWonItem(wonReward);
+                }, 1000);
+                
+            }, 8000); // УВЕЛИЧИВАЕМ ВРЕМЯ ДО 8 СЕКУНД
+        }
+
+        // ФУНКЦИЯ ДЛЯ ПОДСВЕТКИ ВЫИГРАННОГО ПРЕДМЕТА ПОД СТРЕЛКОЙ
+        function highlightWonItem(wonReward) {
+            const rewardsTrack = document.getElementById('rewardsTrack');
+            const rewardItems = rewardsTrack.querySelectorAll('.reward-item');
+            const trackRect = rewardsTrack.getBoundingClientRect();
+            const pointerCenter = trackRect.left + trackRect.width / 2;
+            
+            // НАХОДИМ ЭЛЕМЕНТ, КОТОРЫЙ СЕЙЧАС НАХОДИТСЯ ПОД СТРЕЛКОЙ
+            let centerItem = null;
+            let minDistance = Infinity;
+            
+            rewardItems.forEach(item => {
+                const itemRect = item.getBoundingClientRect();
+                const itemCenter = itemRect.left + itemRect.width / 2;
+                const distance = Math.abs(pointerCenter - itemCenter);
+                
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    centerItem = item;
+                }
+            });
+            
+            // ПОДСВЕЧИВАЕМ ЦЕНТРАЛЬНЫЙ ЭЛЕМЕНТ
+            if (centerItem) {
+                // Сбрасываем все подсветки
+                rewardItems.forEach(item => {
+                    item.classList.remove('highlighted', 'won');
+                });
+                
+                // Подсвечиваем центральный элемент
+                centerItem.classList.add('won');
+                
+                // Обновляем выигранный предмет на тот, что действительно под стрелкой
+                const actualWonName = centerItem.querySelector('.reward-name').textContent;
+                const actualWonReward = caseRewards.find(reward => reward.name === actualWonName);
+                
+                if (actualWonReward) {
+                    // Обновляем выигранный предмет
+                    document.getElementById('wonItemImage').src = actualWonReward.image;
+                    document.getElementById('wonItemName').textContent = actualWonReward.name;
+                    
+                    // Добавляем в инвентарь реальный выигранный предмет
+                    addToInventory(actualWonReward);
+                    console.log('🎁 Открыт кейс, выиграно:', actualWonReward.name);
+                }
+            }
+        }
+
+        // ФУНКЦИЯ ДЛЯ ПОКАЗА ВЫИГРАННОГО ПРЕДМЕТА
+        function showWonItem(wonReward) {
+            document.getElementById('wonItem').style.display = 'block';
+            createConfetti();
+            updateProfileStats();
+        }
+
+        // ФУНКЦИЯ ЗАКРЫТИЯ ОКНА КЕЙСА
+        function closeCaseOpening() {
+            document.getElementById('caseOpeningOverlay').style.display = 'none';
+        }
+
         // Загрузка данных
         function loadUserData() {
             const localData = localStorage.getItem('halloweenWheelData');
@@ -1364,6 +1805,7 @@
                     userBalance = userData.balance || 100;
                     userInventory = userData.inventory || [];
                     withdrawals = userData.withdrawals || [];
+                    usedPromoCodes = userData.usedPromoCodes || [];
                     userStats = userData.stats || {
                         wheelSpins: 0,
                         casesOpened: 0,
@@ -1375,6 +1817,7 @@
                     userBalance = 100;
                     userInventory = [];
                     withdrawals = [];
+                    usedPromoCodes = [];
                     userStats = {
                         wheelSpins: 0,
                         casesOpened: 0,
@@ -1387,6 +1830,7 @@
                 userBalance = 100;
                 userInventory = [];
                 withdrawals = [];
+                usedPromoCodes = [];
                 userStats = {
                     wheelSpins: 0,
                     casesOpened: 0,
@@ -1397,6 +1841,7 @@
             
             updateUI();
             updateProfileStats();
+            updatePromoHistory();
             console.log('✅ Данные загружены из localStorage');
         }
 
@@ -1407,13 +1852,14 @@
                 balance: userBalance,
                 inventory: userInventory,
                 withdrawals: withdrawals,
+                usedPromoCodes: usedPromoCodes,
                 stats: userStats
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
             console.log('💾 Данные сохранены в localStorage');
         }
 
-        // Обновление интерфейса (ТЕПЕРЬ ТОЛЬКО ДЛЯ АДМИН-ПАНЕЛИ)
+        // Обновление интерфейса
         function updateUI() {
             document.getElementById('currentUserId').textContent = currentUserId;
             updateBalance(userBalance);
@@ -1436,10 +1882,11 @@
             document.getElementById('itemsWon').textContent = userStats.itemsWon;
         }
 
-        // Обновление баланса (теперь только для внутренней логики)
+        // Обновление баланса
         function updateBalance(newBalance) {
             userBalance = newBalance;
             document.getElementById('spinButton').disabled = userBalance < 50 || isSpinning;
+            document.getElementById('openCaseButton').disabled = userBalance < 300;
             saveUserData();
         }
 
@@ -1457,6 +1904,7 @@
         function showProfilePage() {
             document.getElementById('mainPage').style.display = 'none';
             document.getElementById('profilePage').style.display = 'block';
+            document.getElementById('casesPage').style.display = 'none';
             updateProfileStats();
             setActiveNavButton(0);
         }
@@ -1465,7 +1913,16 @@
         function showMainPage() {
             document.getElementById('mainPage').style.display = 'block';
             document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('casesPage').style.display = 'none';
             setActiveNavButton(2);
+        }
+
+        // ПОКАЗАТЬ СТРАНИЦУ КЕЙСОВ
+        function showCasesPage() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('casesPage').style.display = 'block';
+            setActiveNavButton(3);
         }
 
         // Установка активной кнопки навигации
@@ -1480,224 +1937,21 @@
             }
         }
 
-        // Остальные функции остаются без изменений...
-        function showGiftWithdraw() {
-            if (userInventory.length === 0) {
-                alert("🎒 Ваш инвентарь пуст!");
-                return;
-            }
-
-            selectedGifts = [];
-            updateGiftSelection();
+        function getRandomReward() {
+            const random = Math.random() * 100;
+            let currentChance = 0;
             
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('giftWithdrawPopup').style.display = 'block';
-            document.getElementById('withdrawContact').value = '';
-            document.getElementById('withdrawGiftButton').disabled = true;
-        }
-
-        function updateGiftSelection() {
-            const giftSelection = document.getElementById('giftSelection');
-            if (!giftSelection) return;
-
-            giftSelection.innerHTML = '';
-
-            if (userInventory.length === 0) {
-                giftSelection.innerHTML = '<div class="no-gifts-message">Нет подарков для вывода</div>';
-                return;
-            }
-
-            userInventory.forEach((gift, index) => {
-                const giftElement = document.createElement('div');
-                giftElement.className = 'gift-item';
-                giftElement.onclick = () => toggleGiftSelection(index);
-                
-                const img = document.createElement('img');
-                img.src = gift.image;
-                img.alt = gift.name;
-                img.onerror = function() {
-                    this.style.display = 'none';
-                };
-                
-                const name = document.createElement('div');
-                name.className = 'gift-item-name';
-                name.textContent = gift.name;
-                
-                giftElement.appendChild(img);
-                giftElement.appendChild(name);
-                giftSelection.appendChild(giftElement);
-            });
-        }
-
-        function toggleGiftSelection(index) {
-            const giftElement = document.getElementById('giftSelection').children[index];
-            
-            if (selectedGifts.includes(index)) {
-                selectedGifts = selectedGifts.filter(i => i !== index);
-                giftElement.classList.remove('selected');
-            } else {
-                selectedGifts.push(index);
-                giftElement.classList.add('selected');
+            for (const reward of caseRewards) {
+                currentChance += reward.chance;
+                if (random <= currentChance) {
+                    return reward;
+                }
             }
             
-            document.getElementById('withdrawGiftButton').disabled = 
-                selectedGifts.length === 0 || !document.getElementById('withdrawContact').value.trim();
+            return caseRewards[0];
         }
 
-        function createGiftWithdrawal() {
-            const contact = document.getElementById('withdrawContact').value.trim();
-
-            if (selectedGifts.length === 0) {
-                alert("❌ Выберите хотя бы один подарок для вывода!");
-                return;
-            }
-
-            if (!contact) {
-                alert("❌ Укажите ваш контакт (Telegram)!");
-                return;
-            }
-
-            const selectedGiftItems = selectedGifts.map(index => userInventory[index]);
-            const giftImages = selectedGiftItems.map(gift => gift.image);
-            const giftNames = selectedGiftItems.map(gift => gift.name);
-
-            const withdrawal = {
-                id: Date.now().toString(),
-                user_id: currentUserId,
-                amount: selectedGifts.length,
-                user_contact: contact,
-                status: 'pending',
-                gift_images: giftImages,
-                gift_names: giftNames,
-                notes: `Вывод ${selectedGifts.length} подарков: ${giftNames.join(', ')}`,
-                created_at: new Date().toISOString()
-            };
-
-            withdrawals.unshift(withdrawal);
-
-            selectedGifts.sort((a, b) => b - a);
-            selectedGifts.forEach(index => {
-                userInventory.splice(index, 1);
-            });
-
-            userStats.itemsWon = userInventory.length;
-            updateInventoryBadge();
-            updateProfileStats();
-            saveUserData();
-            
-            alert("✅ Заявка на вывод отправлена! Ожидайте одобрения.");
-            closeAllPopups();
-        }
-
-        document.getElementById('withdrawContact').addEventListener('input', function() {
-            document.getElementById('withdrawGiftButton').disabled = 
-                selectedGifts.length === 0 || !this.value.trim();
-        });
-
-        function showGiftWithdrawals() {
-            if (currentUserId !== ADMIN_USER_ID) return;
-
-            const withdrawalsPopup = document.createElement('div');
-            withdrawalsPopup.className = 'admin-popup';
-            withdrawalsPopup.style.maxWidth = '500px';
-            withdrawalsPopup.style.maxHeight = '80vh';
-            withdrawalsPopup.style.overflowY = 'auto';
-
-            withdrawalsPopup.innerHTML = `
-                <div class="admin-title">🎁 ЗАЯВКИ НА ВЫВОД ПОДАРКОВ</div>
-                <div class="withdrawals-section" id="withdrawalsList">
-                    ${withdrawals && withdrawals.length > 0 ? 
-                        withdrawals.map(withdrawal => `
-                            <div class="withdrawal-item">
-                                <div class="withdrawal-user">ID: ${withdrawal.user_id}</div>
-                                <div class="withdrawal-details">
-                                    <span>Подарков: ${withdrawal.amount} шт.</span>
-                                    <span class="withdrawal-status status-${withdrawal.status}">
-                                        ${getStatusText(withdrawal.status)}
-                                    </span>
-                                </div>
-                                <div class="withdrawal-details">
-                                    <span>Контакт: ${withdrawal.user_contact}</span>
-                                    <span>Дата: ${new Date(withdrawal.created_at).toLocaleDateString()}</span>
-                                </div>
-                                ${withdrawal.gift_images && withdrawal.gift_images.length > 0 ? `
-                                    <div class="withdrawal-gift-images">
-                                        ${withdrawal.gift_images.map((img, idx) => `
-                                            <img src="${img}" alt="${withdrawal.gift_names ? withdrawal.gift_names[idx] : 'Подарок'}" class="withdrawal-gift-image" title="${withdrawal.gift_names ? withdrawal.gift_names[idx] : 'Подарок'}">
-                                        `).join('')}
-                                    </div>
-                                ` : ''}
-                                ${withdrawal.notes ? `
-                                    <div class="withdrawal-details">
-                                        <span>Примечание: ${withdrawal.notes}</span>
-                                    </div>
-                                ` : ''}
-                                ${withdrawal.status === 'pending' ? `
-                                    <div class="withdrawal-actions">
-                                        <button class="action-btn approve-btn" onclick="processWithdrawal('${withdrawal.id}')">
-                                            ✅ Одобрить
-                                        </button>
-                                        <button class="action-btn reject-btn" onclick="rejectWithdrawal('${withdrawal.id}')">
-                                            ❌ Отклонить
-                                        </button>
-                                    </div>
-                                ` : ''}
-                                ${withdrawal.processed_by ? `
-                                    <div class="withdrawal-details">
-                                        <span>Обработал: ${withdrawal.processed_by}</span>
-                                    </div>
-                                ` : ''}
-                            </div>
-                        `).join('') : 
-                        '<div class="no-withdrawals">Нет заявок на вывод</div>'
-                    }
-                </div>
-                <button class="close-button" onclick="this.closest('.admin-popup').remove(); document.getElementById('overlay').style.display='none';">ЗАКРЫТЬ</button>
-            `;
-
-            document.body.appendChild(withdrawalsPopup);
-            document.getElementById('overlay').style.display = 'block';
-        }
-
-        function getStatusText(status) {
-            const statusMap = {
-                'pending': 'Ожидание',
-                'completed': 'Выполнено',
-                'rejected': 'Отклонено'
-            };
-            return statusMap[status] || status;
-        }
-
-        function processWithdrawal(withdrawalId) {
-            if (currentUserId !== ADMIN_USER_ID) return;
-            
-            const withdrawal = withdrawals.find(w => w.id === withdrawalId);
-            if (withdrawal) {
-                withdrawal.status = 'completed';
-                withdrawal.processed_by = currentUserId;
-                withdrawal.processed_at = new Date().toISOString();
-                saveUserData();
-                
-                document.querySelector('.admin-popup')?.remove();
-                showGiftWithdrawals();
-            }
-        }
-
-        function rejectWithdrawal(withdrawalId) {
-            if (currentUserId !== ADMIN_USER_ID) return;
-            
-            const withdrawal = withdrawals.find(w => w.id === withdrawalId);
-            if (withdrawal) {
-                withdrawal.status = 'rejected';
-                withdrawal.processed_by = currentUserId;
-                withdrawal.processed_at = new Date().toISOString();
-                saveUserData();
-                
-                document.querySelector('.admin-popup')?.remove();
-                showGiftWithdrawals();
-            }
-        }
-
+        // Остальной JavaScript код...
         function createWheel() {
             const wheel = document.getElementById('wheel');
             if (!wheel) return;
@@ -1795,7 +2049,6 @@
                     wheel.style.transform = `rotate(${totalRotation}deg)`;
                     
                     setTimeout(() => {
-                        // ОБНОВЛЯЕМ СТАТИСТИКУ
                         userStats.wheelSpins++;
                         userStats.totalSpent += 50;
                         
@@ -1965,9 +2218,112 @@
         }
         
         // ФУНКЦИИ ДЛЯ ДРУГИХ РАЗДЕЛОВ
-        function showCases() {
-            alert("🎁 Раздел КЕЙСЫ в разработке\n\nЗдесь будут:\n• Разные типы кейсов\n• Редкие предметы\n• Специальные награды");
-            setActiveNavButton(3);
+        function showGiftWithdraw() {
+            if (userInventory.length === 0) {
+                alert("🎒 Ваш инвентарь пуст!");
+                return;
+            }
+
+            selectedGifts = [];
+            updateGiftSelection();
+            
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('giftWithdrawPopup').style.display = 'block';
+            document.getElementById('withdrawContact').value = '';
+            document.getElementById('withdrawGiftButton').disabled = true;
+        }
+
+        function updateGiftSelection() {
+            const giftSelection = document.getElementById('giftSelection');
+            if (!giftSelection) return;
+
+            giftSelection.innerHTML = '';
+
+            if (userInventory.length === 0) {
+                giftSelection.innerHTML = '<div class="no-gifts-message">Нет подарков для вывода</div>';
+                return;
+            }
+
+            userInventory.forEach((gift, index) => {
+                const giftElement = document.createElement('div');
+                giftElement.className = 'gift-item';
+                giftElement.onclick = () => toggleGiftSelection(index);
+                
+                const img = document.createElement('img');
+                img.src = gift.image;
+                img.alt = gift.name;
+                img.onerror = function() {
+                    this.style.display = 'none';
+                };
+                
+                const name = document.createElement('div');
+                name.className = 'gift-item-name';
+                name.textContent = gift.name;
+                
+                giftElement.appendChild(img);
+                giftElement.appendChild(name);
+                giftSelection.appendChild(giftElement);
+            });
+        }
+
+        function toggleGiftSelection(index) {
+            const giftElement = document.getElementById('giftSelection').children[index];
+            
+            if (selectedGifts.includes(index)) {
+                selectedGifts = selectedGifts.filter(i => i !== index);
+                giftElement.classList.remove('selected');
+            } else {
+                selectedGifts.push(index);
+                giftElement.classList.add('selected');
+            }
+            
+            document.getElementById('withdrawGiftButton').disabled = 
+                selectedGifts.length === 0 || !document.getElementById('withdrawContact').value.trim();
+        }
+
+        function createGiftWithdrawal() {
+            const contact = document.getElementById('withdrawContact').value.trim();
+
+            if (selectedGifts.length === 0) {
+                alert("❌ Выберите хотя бы один подарок для вывода!");
+                return;
+            }
+
+            if (!contact) {
+                alert("❌ Укажите ваш контакт (Telegram)!");
+                return;
+            }
+
+            const selectedGiftItems = selectedGifts.map(index => userInventory[index]);
+            const giftImages = selectedGiftItems.map(gift => gift.image);
+            const giftNames = selectedGiftItems.map(gift => gift.name);
+
+            const withdrawal = {
+                id: Date.now().toString(),
+                user_id: currentUserId,
+                amount: selectedGifts.length,
+                user_contact: contact,
+                status: 'pending',
+                gift_images: giftImages,
+                gift_names: giftNames,
+                notes: `Вывод ${selectedGifts.length} подарков: ${giftNames.join(', ')}`,
+                created_at: new Date().toISOString()
+            };
+
+            withdrawals.unshift(withdrawal);
+
+            selectedGifts.sort((a, b) => b - a);
+            selectedGifts.forEach(index => {
+                userInventory.splice(index, 1);
+            });
+
+            userStats.itemsWon = userInventory.length;
+            updateInventoryBadge();
+            updateProfileStats();
+            saveUserData();
+            
+            alert("✅ Заявка на вывод отправлена! Ожидайте одобрения.");
+            closeAllPopups();
         }
 
         function showShop() {
@@ -1988,6 +2344,10 @@
         });
 
         document.getElementById('overlay').addEventListener('click', closeAllPopups);
+        document.getElementById('withdrawContact').addEventListener('input', function() {
+            document.getElementById('withdrawGiftButton').disabled = 
+                selectedGifts.length === 0 || !this.value.trim();
+        });
 
         // Глобальные функции
         window.copyUserId = copyUserId;
@@ -2009,9 +2369,14 @@
         window.toggleGiftSelection = toggleGiftSelection;
         window.showProfilePage = showProfilePage;
         window.showMainPage = showMainPage;
-        window.showCases = showCases;
+        window.showCasesPage = showCasesPage;
+        window.showCases = showCasesPage;
         window.showShop = showShop;
         window.setActiveNavButton = setActiveNavButton;
+        window.openCase = openCase;
+        window.startCaseAnimation = startCaseAnimation;
+        window.closeCaseOpening = closeCaseOpening;
+        window.activatePromoCode = activatePromoCode;
     </script>
 </body>
 </html>
