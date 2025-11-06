@@ -356,7 +356,7 @@
         /* НАВИГАЦИЯ */
         .navigation {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 8px;
             margin-top: 30px;
             padding: 0 5px;
@@ -1503,6 +1503,196 @@
             margin-top: 20px;
         }
 
+        /* СТИЛИ ДЛЯ PvP АРЕНЫ */
+        .pvp-section {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .pvp-card {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .pvp-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .pvp-modes {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .pvp-mode {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 140, 66, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pvp-mode:hover {
+            transform: translateY(-3px);
+            border-color: #ff8c42;
+        }
+        
+        .pvp-mode.selected {
+            background: rgba(255, 140, 66, 0.2);
+            border-color: #ff8c42;
+            box-shadow: 0 0 15px rgba(255, 140, 66, 0.4);
+        }
+        
+        .mode-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .mode-name {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 5px;
+        }
+        
+        .mode-description {
+            font-size: 12px;
+            opacity: 0.8;
+            margin-bottom: 10px;
+        }
+        
+        .mode-reward {
+            font-size: 14px;
+            color: #32cd32;
+            font-weight: bold;
+        }
+        
+        .pvp-items {
+            margin: 20px 0;
+        }
+        
+        .pvp-items-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .pvp-items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+        }
+        
+        .pvp-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 140, 66, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .pvp-item:hover {
+            border-color: #ff8c42;
+            transform: scale(1.05);
+        }
+        
+        .pvp-item.selected {
+            background: rgba(255, 140, 66, 0.2);
+            border-color: #ff8c42;
+            box-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
+        }
+        
+        .pvp-item-image {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+        
+        .pvp-item-name {
+            font-size: 10px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 3px;
+        }
+        
+        .pvp-item-value {
+            font-size: 9px;
+            color: #32cd32;
+            font-weight: bold;
+        }
+        
+        .start-pvp-button {
+            background: linear-gradient(135deg, #ff4444, #ff8c42);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+        
+        .start-pvp-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .start-pvp-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .pvp-stats {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .pvp-stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 8px 0;
+            font-size: 14px;
+        }
+        
+        .pvp-stat-label {
+            opacity: 0.8;
+        }
+        
+        .pvp-stat-value {
+            font-weight: bold;
+            color: #ff8c42;
+        }
+
     </style>
 </head>
 <body>
@@ -1766,6 +1956,63 @@
                 </button>
             </div>
         </div>
+
+        <!-- СТРАНИЦА PvP АРЕНЫ -->
+        <div class="pvp-section" id="pvpPage">
+            <div class="pvp-card">
+                <div class="pvp-title">⚔️ PvP АРЕНА</div>
+                
+                <div class="pvp-modes">
+                    <div class="pvp-mode" onclick="selectPvpMode('duel')">
+                        <div class="mode-icon">⚔️</div>
+                        <div class="mode-name">ДУЭЛЬ 1x1</div>
+                        <div class="mode-description">Победитель забирает предметы противника</div>
+                        <div class="mode-reward">Комиссия: 10%</div>
+                    </div>
+                    
+                    <div class="pvp-mode" onclick="selectPvpMode('tournament')">
+                        <div class="mode-icon">🏆</div>
+                        <div class="mode-name">ТУРНИР 4 ИГРОКА</div>
+                        <div class="mode-description">Победитель забирает все предметы</div>
+                        <div class="mode-reward">Комиссия: 15%</div>
+                    </div>
+                </div>
+                
+                <div class="pvp-items">
+                    <div class="pvp-items-title">ВЫБЕРИТЕ ПРЕДМЕТЫ ДЛЯ СТАВКИ</div>
+                    <div class="pvp-items-grid" id="pvpItemsGrid">
+                        <!-- Предметы будут добавлены через JavaScript -->
+                    </div>
+                </div>
+                
+                <div class="pvp-stats">
+                    <div class="pvp-stat-item">
+                        <div class="pvp-stat-label">Выбрано предметов:</div>
+                        <div class="pvp-stat-value" id="selectedItemsCount">0</div>
+                    </div>
+                    <div class="pvp-stat-item">
+                        <div class="pvp-stat-label">Общая стоимость:</div>
+                        <div class="pvp-stat-value" id="totalBetValue">0 ★</div>
+                    </div>
+                    <div class="pvp-stat-item">
+                        <div class="pvp-stat-label">Комиссия арены:</div>
+                        <div class="pvp-stat-value" id="arenaCommission">0 ★</div>
+                    </div>
+                    <div class="pvp-stat-item">
+                        <div class="pvp-stat-label">Возможный выигрыш:</div>
+                        <div class="pvp-stat-value" id="potentialWin">0 ★</div>
+                    </div>
+                </div>
+                
+                <button class="start-pvp-button" id="startPvpButton" onclick="startPvpBattle()">
+                    ⚔️ НАЧАТЬ БИТВУ
+                </button>
+                
+                <button class="back-button" onclick="showMainPage()">
+                    🔙 НАЗАД К РУЛЕТКЕ
+                </button>
+            </div>
+        </div>
         
         <!-- НАВИГАЦИЯ -->
         <div class="navigation">
@@ -1788,6 +2035,10 @@
             <button class="nav-btn" onclick="showBettingPage()">
                 <div class="nav-icon">🎲</div>
                 <div class="nav-text">СТАВКИ</div>
+            </button>
+            <button class="nav-btn" onclick="showPvpPage()">
+                <div class="nav-icon">⚔️</div>
+                <div class="nav-text">PvP</div>
             </button>
         </div>
     </div>
@@ -1945,6 +2196,21 @@
             { name: "purple", angle: 315, multiplier: 5 }
         ];
 
+        // ЦЕНЫ ДЛЯ PvP ПРЕДМЕТОВ
+        const pvpItemPrices = {
+            "Календарик": 250,
+            "Эскимо": 195,
+            "Носки": 265,
+            "Печенька": 270,
+            "Световой меч": 450,
+            "Какашка": 250,
+            "Ракета": 290,
+            "Яйцо": 340,
+            "Двухклинковый световой меч": 530,
+            "Разряженный световой меч": 580,
+            "Лавовый световой меч": 600
+        };
+
         // ПЕРЕМЕННЫЕ
         let isSpinning = false;
         let currentUserId = '';
@@ -1958,6 +2224,9 @@
         let selectedBetAmount = 0;
         let isBetSpinning = false;
         let userClan = null;
+        let currentWheelRotation = 0;
+        let selectedPvpMode = null;
+        let selectedPvpItems = [];
 
         let userStats = {
             wheelSpins: 0,
@@ -1965,7 +2234,9 @@
             totalSpent: 0,
             itemsWon: 0,
             betsWon: 0,
-            betsLost: 0
+            betsLost: 0,
+            pvpWins: 0,
+            pvpLosses: 0
         };
 
         // ФУНКЦИИ
@@ -2062,6 +2333,7 @@
                     usedPromoCodes = data.usedPromoCodes || [];
                     userStats = data.stats || userStats;
                     userClan = data.clan || null;
+                    currentWheelRotation = data.currentWheelRotation || 0;
                 } else {
                     // Если данные принадлежат другому пользователю, создаем новые
                     currentUserId = authData.userId;
@@ -2069,6 +2341,7 @@
                     userInventory = [];
                     usedPromoCodes = [];
                     userClan = null;
+                    currentWheelRotation = 0;
                 }
             } else {
                 currentUserId = authData.userId;
@@ -2076,6 +2349,7 @@
                 userInventory = [];
                 usedPromoCodes = [];
                 userClan = null;
+                currentWheelRotation = 0;
             }
         }
 
@@ -2086,7 +2360,8 @@
                 inventory: userInventory,
                 usedPromoCodes: usedPromoCodes,
                 stats: userStats,
-                clan: userClan
+                clan: userClan,
+                currentWheelRotation: currentWheelRotation
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(data));
         }
@@ -2109,6 +2384,7 @@
             document.getElementById('placeBetButton').disabled = selectedBetAmount === 0 || userBalance < selectedBetAmount || isBetSpinning;
             
             updateClanInfo();
+            updatePvpUI();
         }
 
         function updateClanInfo() {
@@ -2154,6 +2430,9 @@
                 segment.appendChild(content);
                 wheel.appendChild(segment);
             });
+            
+            // Устанавливаем начальное положение рулетки
+            wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
         }
 
         function spinWheel() {
@@ -2170,10 +2449,22 @@
             const prizeIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[prizeIndex];
             
-            const totalRotation = 360 * 5 + (360 - (prizeIndex * (360 / prizes.length)));
+            // ИСПРАВЛЕНИЕ: учитываем текущее положение рулетки
+            const segmentAngle = 360 / prizes.length;
+            const targetSegmentAngle = prizeIndex * segmentAngle;
+            
+            // Вычисляем полный оборот (5 полных оборотов + смещение до целевого сегмента)
+            const fullRotations = 5 * 360;
+            const targetRotation = fullRotations + (360 - (targetSegmentAngle % 360));
+            
+            // Общая цель вращения = текущее положение + целевое вращение
+            const totalRotation = currentWheelRotation + targetRotation;
             
             wheel.style.transition = 'transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
             wheel.style.transform = `rotate(${totalRotation}deg)`;
+            
+            // Сохраняем новое положение рулетки
+            currentWheelRotation = totalRotation % 360;
             
             setTimeout(() => {
                 userInventory.push(prize);
@@ -2537,6 +2828,181 @@
             alert('🤝 Для вступления в клан свяжитесь с его лидером или создайте свой собственный клан!');
         }
 
+        // PvP ФУНКЦИИ
+        function showPvpPage() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('casesPage').style.display = 'none';
+            document.getElementById('bettingPage').style.display = 'none';
+            document.getElementById('clanPage').style.display = 'none';
+            document.getElementById('pvpPage').style.display = 'block';
+            setActiveNavButton(5);
+            updatePvpItems();
+        }
+
+        function selectPvpMode(mode) {
+            selectedPvpMode = mode;
+            
+            document.querySelectorAll('.pvp-mode').forEach(modeElement => {
+                modeElement.classList.remove('selected');
+            });
+            
+            event.target.closest('.pvp-mode').classList.add('selected');
+            updatePvpUI();
+        }
+
+        function updatePvpItems() {
+            const pvpItemsGrid = document.getElementById('pvpItemsGrid');
+            pvpItemsGrid.innerHTML = '';
+            
+            // Фильтруем предметы, которые можно использовать в PvP
+            const availablePvpItems = userInventory.filter(item => 
+                pvpItemPrices.hasOwnProperty(item.name)
+            );
+            
+            if (availablePvpItems.length === 0) {
+                pvpItemsGrid.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">У вас нет предметов для PvP</div>';
+                return;
+            }
+            
+            availablePvpItems.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'pvp-item';
+                itemElement.onclick = () => togglePvpItem(item, index);
+                
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name;
+                img.className = 'pvp-item-image';
+                
+                const name = document.createElement('div');
+                name.className = 'pvp-item-name';
+                name.textContent = item.name;
+                
+                const value = document.createElement('div');
+                value.className = 'pvp-item-value';
+                value.textContent = pvpItemPrices[item.name] + ' ★';
+                
+                itemElement.appendChild(img);
+                itemElement.appendChild(name);
+                itemElement.appendChild(value);
+                pvpItemsGrid.appendChild(itemElement);
+            });
+        }
+
+        function togglePvpItem(item, index) {
+            const itemIndex = selectedPvpItems.findIndex(selected => 
+                selected.name === item.name && selected.index === index
+            );
+            
+            if (itemIndex === -1) {
+                // Добавляем предмет с уникальным индексом
+                selectedPvpItems.push({...item, index: index});
+            } else {
+                // Удаляем предмет
+                selectedPvpItems.splice(itemIndex, 1);
+            }
+            
+            updatePvpUI();
+        }
+
+        function updatePvpUI() {
+            // Обновляем внешний вид выбранных предметов
+            const pvpItems = document.querySelectorAll('.pvp-item');
+            pvpItems.forEach((itemElement, index) => {
+                const itemName = itemElement.querySelector('.pvp-item-name').textContent;
+                const isSelected = selectedPvpItems.some(selected => 
+                    selected.name === itemName && selected.index === index
+                );
+                
+                if (isSelected) {
+                    itemElement.classList.add('selected');
+                } else {
+                    itemElement.classList.remove('selected');
+                }
+            });
+            
+            // Обновляем статистику
+            const totalValue = selectedPvpItems.reduce((sum, item) => {
+                return sum + (pvpItemPrices[item.name] || 0);
+            }, 0);
+            
+            const commissionRate = selectedPvpMode === 'duel' ? 0.1 : 0.15;
+            const commission = Math.floor(totalValue * commissionRate);
+            const potentialWin = totalValue * 2 - commission;
+            
+            document.getElementById('selectedItemsCount').textContent = selectedPvpItems.length;
+            document.getElementById('totalBetValue').textContent = totalValue + ' ★';
+            document.getElementById('arenaCommission').textContent = commission + ' ★';
+            document.getElementById('potentialWin').textContent = potentialWin + ' ★';
+            
+            // Обновляем состояние кнопки
+            const startButton = document.getElementById('startPvpButton');
+            startButton.disabled = selectedPvpMode === null || selectedPvpItems.length === 0;
+        }
+
+        function startPvpBattle() {
+            if (selectedPvpMode === null || selectedPvpItems.length === 0) return;
+            
+            // Симуляция PvP битвы
+            const totalValue = selectedPvpItems.reduce((sum, item) => {
+                return sum + (pvpItemPrices[item.name] || 0);
+            }, 0);
+            
+            const commissionRate = selectedPvpMode === 'duel' ? 0.1 : 0.15;
+            const commission = Math.floor(totalValue * commissionRate);
+            
+            // Шанс победы 50/50
+            const won = Math.random() > 0.5;
+            
+            if (won) {
+                // Победа - получаем предметы противника
+                const winAmount = totalValue * 2 - commission;
+                userBalance += winAmount;
+                userStats.pvpWins++;
+                
+                // Удаляем использованные предметы из инвентаря
+                selectedPvpItems.forEach(item => {
+                    const itemIndex = userInventory.findIndex(invItem => 
+                        invItem.name === item.name
+                    );
+                    if (itemIndex !== -1) {
+                        userInventory.splice(itemIndex, 1);
+                    }
+                });
+                
+                createConfetti();
+                alert(`🎉 ПОБЕДА! Вы выиграли PvP битву и получаете ${winAmount} звезд!`);
+            } else {
+                // Поражение - теряем предметы
+                userStats.pvpLosses++;
+                
+                // Удаляем использованные предметы из инвентаря
+                selectedPvpItems.forEach(item => {
+                    const itemIndex = userInventory.findIndex(invItem => 
+                        invItem.name === item.name
+                    );
+                    if (itemIndex !== -1) {
+                        userInventory.splice(itemIndex, 1);
+                    }
+                });
+                
+                alert(`💔 ПОРАЖЕНИЕ! Вы проиграли PvP битву и теряете поставленные предметы.`);
+            }
+            
+            // Сбрасываем выбор
+            selectedPvpMode = null;
+            selectedPvpItems = [];
+            
+            saveUserData();
+            updateUI();
+            updatePvpItems();
+            
+            document.querySelectorAll('.pvp-mode').forEach(mode => {
+                mode.classList.remove('selected');
+            });
+        }
+
         function showInventory() {
             const inventoryItems = document.getElementById('inventoryItems');
             inventoryItems.innerHTML = '';
@@ -2600,6 +3066,7 @@
             document.getElementById('casesPage').style.display = 'none';
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'none';
+            document.getElementById('pvpPage').style.display = 'none';
             setActiveNavButton(2);
         }
 
@@ -2609,6 +3076,7 @@
             document.getElementById('casesPage').style.display = 'none';
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'none';
+            document.getElementById('pvpPage').style.display = 'none';
             setActiveNavButton(0);
             updatePromoHistory();
         }
@@ -2619,6 +3087,7 @@
             document.getElementById('casesPage').style.display = 'block';
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'none';
+            document.getElementById('pvpPage').style.display = 'none';
             setActiveNavButton(3);
         }
 
@@ -2628,6 +3097,7 @@
             document.getElementById('casesPage').style.display = 'none';
             document.getElementById('bettingPage').style.display = 'block';
             document.getElementById('clanPage').style.display = 'none';
+            document.getElementById('pvpPage').style.display = 'none';
             setActiveNavButton(4);
         }
 
@@ -2637,6 +3107,7 @@
             document.getElementById('casesPage').style.display = 'none';
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'block';
+            document.getElementById('pvpPage').style.display = 'none';
             setActiveNavButton(1);
         }
 
