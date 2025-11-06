@@ -716,8 +716,8 @@
             font-weight: bold;
             color: #ff8c42;
             margin-bottom: 10px;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
             text-align: center;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
         }
         
         .case-description {
@@ -1517,15 +1517,13 @@
     <div class="auth-overlay" id="authOverlay">
         <div class="auth-container">
             <div class="auth-title">🎃 HALLOWEEN WHEEL 🎃</div>
-            <div class="auth-subtitle">Введите код доступа для входа в игру</div>
+            <div class="auth-subtitle">Введите ваш уникальный ID для входа</div>
             
-            <input type="text" class="auth-input" id="authCodeInput" placeholder="Введите код доступа" maxlength="20">
+            <input type="text" class="auth-input" id="authCodeInput" placeholder="Введите ваш ID" maxlength="20">
             <button class="auth-button" onclick="checkAuthCode()">🔐 ВОЙТИ В ИГРУ</button>
             
             <div class="auth-note">
-                Доступные коды:<br>
-                • Hrtydz - постоянный доступ<br>
-                • TESTBOT1H - доступ на 1 час
+                Доступ только для авторизованных пользователей
             </div>
         </div>
     </div>
@@ -1856,16 +1854,15 @@
     <script>
         // БАЗА ДАННЫХ ПРОМОКОДОВ
         const promoDatabase = {
-            "HALLOWEEN2025": { stars: 500, uses: 1, used: 0 },
-            "SPOOKY": { stars: 300, uses: 1, used: 0 },
-            "GHOST": { stars: 200, uses: 1, used: 0 },
-            "Ptest1": { stars: 1, uses: 1, used: 0 }
+            "PTESTEN1": { stars: 10000, uses: 1, used: 0 },
+            "PTESTEN2": { stars: 5000, uses: 1, used: 0 }
         };
 
-        // КОДЫ ДОСТУПА
-        const accessCodes = {
-            "TESTBOT1H": { type: "temporary", used: false, duration: 3600000 }
-        };
+        // РАЗРЕШЕННЫЕ ПОЛЬЗОВАТЕЛИ
+        const allowedUsers = [
+            "user_neesrtpoa",
+            "user_fsgwgpvll"
+        ];
 
         // ПРИЗЫ ДЛЯ РУЛЕТКИ
         const prizes = [
@@ -1995,38 +1992,26 @@
 
         function checkAuthCode() {
             const codeInput = document.getElementById('authCodeInput');
-            const code = codeInput.value.trim().toUpperCase();
+            const userId = codeInput.value.trim().toLowerCase();
             
-            if (!code) {
-                alert('❌ Введите код доступа!');
+            if (!userId) {
+                alert('❌ Введите ваш ID!');
                 return;
             }
             
-            const accessCode = accessCodes[code];
-            if (!accessCode) {
-                alert('❌ Неверный код доступа!');
+            if (!allowedUsers.includes(userId)) {
+                alert('❌ Доступ запрещен! Ваш ID не авторизован для входа в игру.');
                 codeInput.value = '';
                 return;
             }
             
-            if (accessCode.used && code !== "HRTYDZ") {
-                alert('❌ Этот код уже использован!');
-                codeInput.value = '';
-                return;
-            }
-            
+            // Сохраняем информацию о пользователе
             const authData = {
-                code: code,
-                timestamp: Date.now(),
-                type: accessCode.type
+                userId: userId,
+                timestamp: Date.now()
             };
             
-            if (accessCode.type === "temporary") {
-                authData.expires = Date.now() + accessCode.duration;
-            }
-            
             localStorage.setItem('halloweenAuth', JSON.stringify(authData));
-            accessCode.used = true;
             
             document.getElementById('authOverlay').style.display = 'none';
             init();
@@ -2034,16 +2019,19 @@
 
         function checkAuthentication() {
             const authData = localStorage.getItem('halloweenAuth');
+            
             if (!authData) {
                 document.getElementById('authOverlay').style.display = 'flex';
                 return false;
             }
             
             const auth = JSON.parse(authData);
-            if (auth.type === "temporary" && Date.now() > auth.expires) {
+            
+            // Проверяем авторизован ли пользователь
+            if (!allowedUsers.includes(auth.userId)) {
                 localStorage.removeItem('halloweenAuth');
                 document.getElementById('authOverlay').style.display = 'flex';
-                alert('⏰ Время доступа истекло! Введите код снова.');
+                alert('❌ Доступ запрещен! Ваш ID не авторизован.');
                 return false;
             }
             
@@ -2062,16 +2050,28 @@
 
         function loadUserData() {
             const savedData = localStorage.getItem('halloweenWheelData');
+            const authData = JSON.parse(localStorage.getItem('halloweenAuth'));
+            
             if (savedData) {
                 const data = JSON.parse(savedData);
-                currentUserId = data.userId || generateUserId();
-                userBalance = data.balance || 100;
-                userInventory = data.inventory || [];
-                usedPromoCodes = data.usedPromoCodes || [];
-                userStats = data.stats || userStats;
-                userClan = data.clan || null;
+                // Проверяем, что данные принадлежат текущему пользователю
+                if (data.userId === authData.userId) {
+                    currentUserId = data.userId;
+                    userBalance = data.balance || 100;
+                    userInventory = data.inventory || [];
+                    usedPromoCodes = data.usedPromoCodes || [];
+                    userStats = data.stats || userStats;
+                    userClan = data.clan || null;
+                } else {
+                    // Если данные принадлежат другому пользователю, создаем новые
+                    currentUserId = authData.userId;
+                    userBalance = 100;
+                    userInventory = [];
+                    usedPromoCodes = [];
+                    userClan = null;
+                }
             } else {
-                currentUserId = generateUserId();
+                currentUserId = authData.userId;
                 userBalance = 100;
                 userInventory = [];
                 usedPromoCodes = [];
@@ -2089,10 +2089,6 @@
                 clan: userClan
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(data));
-        }
-
-        function generateUserId() {
-            return 'user_' + Math.random().toString(36).substr(2, 9);
         }
 
         function updateUI() {
@@ -2681,5 +2677,3 @@
     </script>
 </body>
 </html>
-
-
