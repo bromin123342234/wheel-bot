@@ -1877,8 +1877,8 @@
             overflow: hidden;
             background: conic-gradient(
                 from 0deg,
-                #ff4444 0deg 180deg,
-                #ff8c42 180deg 360deg
+                #ff8c42 0deg 180deg,
+                #8a2be2 180deg 360deg
             );
         }
         
@@ -3387,17 +3387,53 @@
             }
         }
 
+        function startCritWheel() {
+            document.getElementById('critWheelOverlay').style.display = 'flex';
+            document.getElementById('critResult').style.display = 'none';
+            
+            const wheel = document.getElementById('critWheel');
+            const result = Math.random() > 0.6; // 40% шанс крита
+            
+            // Сбрасываем вращение перед началом анимации
+            wheel.style.transition = 'none';
+            wheel.style.transform = 'rotate(0deg)';
+            
+            // Даем время для сброса
+            setTimeout(() => {
+                const totalRotation = 360 * 3 + (result ? 0 : 180);
+                
+                wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
+                wheel.style.transform = `rotate(${totalRotation}deg)`;
+                
+                setTimeout(() => {
+                    document.getElementById('critResult').style.display = 'block';
+                    document.getElementById('critResult').textContent = result ? "КРИТ!" : "ПРОМАХ";
+                    document.getElementById('critResult').style.color = result ? "#ff8c42" : "#ff4444";
+                    
+                    setTimeout(() => {
+                        document.getElementById('critWheelOverlay').style.display = 'none';
+                        playerAttack(result);
+                    }, 2000);
+                }, 3000);
+            }, 50);
+        }
+
         function playerAttack(isCrit) {
             let damage = pvpBattleState.playerDamage;
             let message = `⚔️ Вы атакуете противника и наносите ${damage} урона!`;
             
+            // ИСПРАВЛЕНИЕ: если промах - не наносим урон
             if (isCrit) {
                 damage = Math.floor(damage * 2);
                 message = `🔥 КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона!`;
+            } else {
+                // ПРОМАХ - не наносим урон
+                message = `💫 Вы промахнулись! Урон не нанесен.`;
+                damage = 0;
             }
             
-            // Проверяем блок противника
-            if (pvpBattleState.opponentIsBlocking) {
+            // Проверяем блок противника только если есть урон
+            if (damage > 0 && pvpBattleState.opponentIsBlocking) {
                 const blockChance = Math.random();
                 if (blockChance < 0.5) { // 50% шанс блока
                     damage = Math.floor(damage * 0.3); // Блокирует 70% урона
@@ -3406,11 +3442,15 @@
                 pvpBattleState.opponentIsBlocking = false;
             }
             
-            pvpBattleState.opponentHp -= damage;
+            // Наносим урон только если damage > 0
+            if (damage > 0) {
+                pvpBattleState.opponentHp -= damage;
+            }
+            
             addBattleMessage(message);
             
-            // Проверяем победу
-            if (pvpBattleState.opponentHp <= 0) {
+            // Проверяем победу только если был нанесен урон
+            if (damage > 0 && pvpBattleState.opponentHp <= 0) {
                 pvpBattleState.opponentHp = 0;
                 endBattle(true);
                 return;
@@ -3419,30 +3459,6 @@
             updateHpBars();
             pvpBattleState.isPlayerTurn = false;
             updateTurnIndicator();
-        }
-
-        function startCritWheel() {
-            document.getElementById('critWheelOverlay').style.display = 'flex';
-            document.getElementById('critResult').style.display = 'none';
-            
-            const wheel = document.getElementById('critWheel');
-            const result = Math.random() > 0.6; // 40% шанс крита
-            
-            const totalRotation = 360 * 3 + (result ? 0 : 180);
-            
-            wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
-            wheel.style.transform = `rotate(${totalRotation}deg)`;
-            
-            setTimeout(() => {
-                document.getElementById('critResult').style.display = 'block';
-                document.getElementById('critResult').textContent = result ? "КРИТ!" : "ПРОМАХ";
-                document.getElementById('critResult').style.color = result ? "#ff8c42" : "#ff4444";
-                
-                setTimeout(() => {
-                    document.getElementById('critWheelOverlay').style.display = 'none';
-                    playerAttack(result);
-                }, 2000);
-            }, 3000);
         }
 
         function playerHeal() {
