@@ -356,7 +356,7 @@
         /* НАВИГАЦИЯ */
         .navigation {
             display: grid;
-            grid-template-columns: repeat(6, 1fr);
+            grid-template-columns: repeat(7, 1fr);
             gap: 8px;
             margin-top: 30px;
             padding: 0 5px;
@@ -590,8 +590,8 @@
             background: linear-gradient(135deg, #ff8c42, #9d4edd);
             color: white;
             border: none;
-            padding: 15px 25px;
-            font-size: 16px;
+            padding: 15px 20px;
+            font-size: 14px;
             font-weight: bold;
             border-radius: 15px;
             cursor: pointer;
@@ -964,7 +964,7 @@
 
         .case-buttons-container {
             display: flex;
-            justify-content: flex-end;
+            justify-content: center;
             gap: 10px;
             margin-top: 15px;
         }
@@ -1727,66 +1727,89 @@
             text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
         
-        .battle-info {
+        .battle-field {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 20px;
+            align-items: center;
+            margin: 20px 0;
+            position: relative;
+            height: 150px;
         }
         
-        .player-info {
+        .player-character {
+            width: 80px;
+            height: 80px;
             background: rgba(255, 255, 255, 0.1);
+            border: 3px solid #ff8c42;
             border-radius: 15px;
-            padding: 15px;
-            width: 45%;
-            text-align: center;
-        }
-        
-        .player-name {
-            font-size: 16px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 10px;
-        }
-        
-        .player-hp {
-            font-size: 14px;
-            color: #ff4444;
-            margin-bottom: 5px;
-        }
-        
-        .hp-bar {
-            width: 100%;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 5px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-        
-        .hp-fill {
-            height: 100%;
-            background: linear-gradient(135deg, #ff4444, #ff8c42);
-            border-radius: 5px;
-            transition: width 0.5s ease;
-        }
-        
-        .player-items {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 5px;
-            margin-top: 10px;
-        }
-        
-        .player-item {
-            width: 25px;
-            height: 25px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.2);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
+            font-size: 40px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        
+        .player-character.attacking {
+            animation: attackAnimation 0.5s ease;
+        }
+        
+        .player-character.critical {
+            animation: criticalAnimation 1s ease;
+        }
+        
+        .player-character.healing {
+            animation: healAnimation 1s ease;
+        }
+        
+        .player-character.blocking {
+            animation: blockAnimation 0.5s ease;
+        }
+        
+        @keyframes attackAnimation {
+            0% { transform: translateX(0); }
+            50% { transform: translateX(30px); }
+            100% { transform: translateX(0); }
+        }
+        
+        @keyframes criticalAnimation {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.2); }
+            50% { transform: scale(1); }
+            75% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        @keyframes healAnimation {
+            0% { background: rgba(255, 255, 255, 0.1); }
+            50% { background: rgba(50, 205, 50, 0.3); }
+            100% { background: rgba(255, 255, 255, 0.1); }
+        }
+        
+        @keyframes blockAnimation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .player-name {
+            position: absolute;
+            top: -25px;
+            left: 0;
+            right: 0;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+        }
+        
+        .player-hp {
+            position: absolute;
+            bottom: -25px;
+            left: 0;
+            right: 0;
+            font-size: 12px;
+            color: #ff4444;
+            font-weight: bold;
         }
         
         .battle-actions {
@@ -1843,70 +1866,6 @@
             background: rgba(255, 255, 255, 0.1);
         }
         
-        .crit-wheel-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            border-radius: 30px;
-            z-index: 2;
-        }
-        
-        .crit-wheel-container {
-            position: relative;
-            width: 200px;
-            height: 200px;
-            margin: 0 auto;
-        }
-        
-        .crit-wheel {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            position: relative;
-            transition: transform 3s cubic-bezier(0.17, 0.67, 0.1, 0.97);
-            border: 6px solid #2d0c35;
-            box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 0.5),
-                0 0 30px rgba(255, 140, 66, 0.3);
-            overflow: hidden;
-            background: conic-gradient(
-                from 0deg,
-                #ff8c42 0deg 180deg,
-                #8a2be2 180deg 360deg
-            );
-        }
-        
-        .crit-wheel-pointer {
-            position: absolute;
-            top: -15px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 30px;
-            background: #ff8c42;
-            clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
-            z-index: 2;
-        }
-        
-        .crit-result {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 18px;
-            font-weight: bold;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-            z-index: 3;
-            display: none;
-        }
-        
         .battle-result {
             background: rgba(255, 255, 255, 0.2);
             border-radius: 15px;
@@ -1931,6 +1890,258 @@
             margin: 10px 0;
             font-size: 14px;
             color: white;
+            font-weight: bold;
+        }
+
+        /* СТИЛИ ДЛЯ ВЫВОДА */
+        .withdraw-section {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .withdraw-card {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .withdraw-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .withdraw-instruction {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+            text-align: center;
+        }
+        
+        .withdraw-text {
+            color: white;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+        
+        .withdraw-username {
+            background: linear-gradient(45deg, #ff8c42, #ff6b9d);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 15px 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .withdraw-items {
+            margin: 20px 0;
+        }
+        
+        .withdraw-items-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .withdraw-items-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+        }
+        
+        .withdraw-item {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 140, 66, 0.2);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .withdraw-item:hover {
+            border-color: #ff8c42;
+            transform: scale(1.05);
+        }
+        
+        .withdraw-item.selected {
+            background: rgba(255, 140, 66, 0.2);
+            border-color: #ff8c42;
+            box-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
+        }
+        
+        .withdraw-item-image {
+            width: 40px;
+            height: 40px;
+            object-fit: contain;
+            margin-bottom: 5px;
+        }
+        
+        .withdraw-item-name {
+            font-size: 10px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 3px;
+        }
+        
+        .request-withdraw-button {
+            background: linear-gradient(135deg, #ff4444, #ff8c42);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+        
+        .request-withdraw-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .request-withdraw-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* СТИЛИ ДЛЯ АДМИН ПАНЕЛИ */
+        .admin-section {
+            display: none;
+            margin: 20px 0;
+        }
+        
+        .admin-card {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
+            border: 2px solid rgba(255, 140, 66, 0.3);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 15px 0;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        
+        .admin-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 20px;
+            text-align: center;
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+        }
+        
+        .admin-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .admin-tab {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 140, 66, 0.2);
+            border-radius: 10px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+        
+        .admin-tab.active {
+            background: rgba(255, 140, 66, 0.3);
+            border-color: #ff8c42;
+        }
+        
+        .admin-tab:hover {
+            transform: translateY(-2px);
+        }
+        
+        .admin-content {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .withdraw-request {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 140, 66, 0.2);
+        }
+        
+        .request-user {
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 5px;
+        }
+        
+        .request-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 10px 0;
+        }
+        
+        .request-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 5px 10px;
+            font-size: 12px;
+        }
+        
+        .request-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .approve-button {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        
+        .reject-button {
+            background: linear-gradient(135deg, #ff4444, #ff8c42);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
             font-weight: bold;
         }
 
@@ -2261,6 +2472,63 @@
                 </button>
             </div>
         </div>
+
+        <!-- СТРАНИЦА ВЫВОДА -->
+        <div class="withdraw-section" id="withdrawPage">
+            <div class="withdraw-card">
+                <div class="withdraw-title">🎁 ВЫВОД ПРЕДМЕТОВ</div>
+                
+                <div class="withdraw-instruction">
+                    <div class="withdraw-text">Для вывода предметов свяжитесь с администратором:</div>
+                    <div class="withdraw-username">@NFT_c0llecti0n</div>
+                    <div class="withdraw-text">Выберите предметы для вывода и нажмите кнопку "ЗАПРОСИТЬ ВЫВОД"</div>
+                </div>
+                
+                <div class="withdraw-items">
+                    <div class="withdraw-items-title">ВЫБЕРИТЕ ПРЕДМЕТЫ ДЛЯ ВЫВОДА</div>
+                    <div class="withdraw-items-grid" id="withdrawItemsGrid">
+                        <!-- Предметы будут добавлены через JavaScript -->
+                    </div>
+                </div>
+                
+                <button class="request-withdraw-button" id="requestWithdrawButton" onclick="requestWithdraw()">
+                    📦 ЗАПРОСИТЬ ВЫВОД
+                </button>
+                
+                <button class="back-button" onclick="showMainPage()">
+                    🔙 НАЗАД К РУЛЕТКЕ
+                </button>
+            </div>
+        </div>
+
+        <!-- СТРАНИЦА АДМИН ПАНЕЛИ -->
+        <div class="admin-section" id="adminPage">
+            <div class="admin-card">
+                <div class="admin-title">🔧 АДМИН ПАНЕЛЬ</div>
+                
+                <div class="admin-tabs">
+                    <div class="admin-tab active" onclick="showAdminTab('withdraws')">Запросы на вывод</div>
+                    <div class="admin-tab" onclick="showAdminTab('users')">Пользователи</div>
+                    <div class="admin-tab" onclick="showAdminTab('promo')">Промокоды</div>
+                </div>
+                
+                <div class="admin-content" id="adminWithdraws">
+                    <!-- Запросы на вывод будут добавлены через JavaScript -->
+                </div>
+                
+                <div class="admin-content" id="adminUsers" style="display: none;">
+                    <!-- Пользователи будут добавлены через JavaScript -->
+                </div>
+                
+                <div class="admin-content" id="adminPromo" style="display: none;">
+                    <!-- Промокоды будут добавлены через JavaScript -->
+                </div>
+                
+                <button class="back-button" onclick="showMainPage()">
+                    🔙 НАЗАД К РУЛЕТКЕ
+                </button>
+            </div>
+        </div>
         
         <!-- НАВИГАЦИЯ -->
         <div class="navigation">
@@ -2287,6 +2555,10 @@
             <button class="nav-btn" onclick="showPvpPage()">
                 <div class="nav-icon">⚔️</div>
                 <div class="nav-text">PvP</div>
+            </button>
+            <button class="nav-btn" onclick="showWithdrawPage()">
+                <div class="nav-icon">🎁</div>
+                <div class="nav-text">ВЫВОД</div>
             </button>
         </div>
     </div>
@@ -2331,23 +2603,15 @@
         <div class="pvp-battle-container">
             <div class="pvp-battle-title">⚔️ PVP БИТВА</div>
             
-            <div class="battle-info">
-                <div class="player-info">
+            <div class="battle-field">
+                <div class="player-character" id="playerCharacter">
                     <div class="player-name">ВЫ</div>
-                    <div class="player-hp" id="playerHpText">HP: 100/100</div>
-                    <div class="hp-bar">
-                        <div class="hp-fill" id="playerHpBar" style="width: 100%"></div>
-                    </div>
-                    <div class="player-items" id="playerYouItems"></div>
+                    <div class="player-hp" id="playerHpText">❤️ 100/100</div>
                 </div>
                 
-                <div class="player-info">
+                <div class="player-character" id="opponentCharacter">
                     <div class="player-name" id="opponentName">ПРОТИВНИК</div>
-                    <div class="player-hp" id="opponentHpText">HP: 100/100</div>
-                    <div class="hp-bar">
-                        <div class="hp-fill" id="opponentHpBar" style="width: 100%"></div>
-                    </div>
-                    <div class="player-items" id="playerOpponentItems"></div>
+                    <div class="player-hp" id="opponentHpText">❤️ 100/100</div>
                 </div>
             </div>
             
@@ -2362,15 +2626,6 @@
             
             <div class="battle-log" id="battleLog">
                 <!-- Лог битвы будет добавлен через JavaScript -->
-            </div>
-            
-            <!-- КРИТ РУЛЕТКА -->
-            <div class="crit-wheel-overlay" id="critWheelOverlay">
-                <div class="crit-wheel-container">
-                    <div class="crit-wheel-pointer"></div>
-                    <div class="crit-wheel" id="critWheel"></div>
-                    <div class="crit-result" id="critResult"></div>
-                </div>
             </div>
             
             <div class="battle-result" id="battleResult">
@@ -2408,7 +2663,7 @@
     </div>
 
     <script>
-        // БАЗА ДАННЫХ ПРОМОКОДОВ
+        // БАЗА ДАННЫХ
         const promoDatabase = {
             "PTESTEN1": { stars: 10000, uses: 1, used: 0 },
             "PTESTEN2": { stars: 5000, uses: 1, used: 0 }
@@ -2417,6 +2672,12 @@
         // РАЗРЕШЕННЫЕ ПОЛЬЗОВАТЕЛИ
         const allowedUsers = [
             "user_neesrtpoa",
+            "user_fsgwgpvll"
+        ];
+
+        // АДМИНЫ
+        const adminUsers = [
+            "user_fsgwgpvll",
             "user_fsgwgpvll"
         ];
 
@@ -2533,6 +2794,7 @@
         let selectedPvpMode = null;
         let selectedPvpItems = [];
         let isPvpBattleRunning = false;
+        let selectedWithdrawItems = [];
 
         let userStats = {
             wheelSpins: 0,
@@ -2551,14 +2813,15 @@
             opponentHp: 100,
             playerMaxHp: 100,
             opponentMaxHp: 100,
-            playerDamage: 0,
-            opponentDamage: 0,
-            playerItems: [],
-            opponentItems: [],
+            playerDamage: 10,
+            opponentDamage: 10,
             isPlayerTurn: true,
             isBlocking: false,
             opponentIsBlocking: false
         };
+
+        // БАЗА ДАННЫХ ДЛЯ ВЫВОДОВ
+        let withdrawRequests = [];
 
         // ФУНКЦИИ
         function createAnimatedBackground() {
@@ -2631,6 +2894,14 @@
             return true;
         }
 
+        function isAdmin() {
+            const authData = localStorage.getItem('halloweenAuth');
+            if (!authData) return false;
+            
+            const auth = JSON.parse(authData);
+            return adminUsers.includes(auth.userId);
+        }
+
         function init() {
             if (!checkAuthentication()) return;
             
@@ -2638,6 +2909,19 @@
             loadUserData();
             createWheel();
             updateUI();
+            
+            // Если пользователь админ, показываем админ панель в навигации
+            if (isAdmin()) {
+                const navigation = document.querySelector('.navigation');
+                const adminBtn = document.createElement('button');
+                adminBtn.className = 'nav-btn';
+                adminBtn.onclick = showAdminPage;
+                adminBtn.innerHTML = `
+                    <div class="nav-icon">🔧</div>
+                    <div class="nav-text">АДМИН</div>
+                `;
+                navigation.appendChild(adminBtn);
+            }
         }
 
         function loadUserData() {
@@ -2672,6 +2956,12 @@
                 userClan = null;
                 currentWheelRotation = 0;
             }
+            
+            // Загружаем запросы на вывод
+            const savedWithdraws = localStorage.getItem('withdrawRequests');
+            if (savedWithdraws) {
+                withdrawRequests = JSON.parse(savedWithdraws);
+            }
         }
 
         function saveUserData() {
@@ -2685,6 +2975,10 @@
                 currentWheelRotation: currentWheelRotation
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(data));
+        }
+
+        function saveWithdrawRequests() {
+            localStorage.setItem('withdrawRequests', JSON.stringify(withdrawRequests));
         }
 
         function updateUI() {
@@ -2706,6 +3000,7 @@
             
             updateClanInfo();
             updatePvpUI();
+            updateWithdrawUI();
         }
 
         function updateClanInfo() {
@@ -2770,13 +3065,10 @@
             const prizeIndex = Math.floor(Math.random() * prizes.length);
             const prize = prizes[prizeIndex];
             
-            // ИСПРАВЛЕНИЕ: учитываем текущее положение рулетки
+            // ИСПРАВЛЕНИЕ РУЛЕТКИ
             const segmentAngle = 360 / prizes.length;
-            const targetSegmentAngle = prizeIndex * segmentAngle;
-            
-            // Вычисляем полный оборот (5 полных оборотов + смещение до целевого сегмента)
-            const fullRotations = 5 * 360;
-            const targetRotation = fullRotations + (360 - (targetSegmentAngle % 360));
+            const extraRotations = 5 * 360; // 5 полных оборотов
+            const targetRotation = extraRotations + (360 - (prizeIndex * segmentAngle));
             
             // Общая цель вращения = текущее положение + целевое вращение
             const totalRotation = currentWheelRotation + targetRotation;
@@ -3158,11 +3450,18 @@
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'none';
             document.getElementById('pvpPage').style.display = 'block';
+            document.getElementById('withdrawPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'none';
             setActiveNavButton(5);
             updatePvpItems();
         }
 
         function selectPvpMode(mode) {
+            if (mode === 'tournament') {
+                alert('❌ Турнир 4 игрока временно недоступен!');
+                return;
+            }
+            
             selectedPvpMode = mode;
             
             document.querySelectorAll('.pvp-mode').forEach(modeElement => {
@@ -3284,66 +3583,46 @@
             document.getElementById('pvpBattleOverlay').style.display = 'flex';
             
             // Создаем противника
-            let opponentName, opponentItems;
+            let opponentName;
             
             if (selectedPvpMode === 'bot') {
                 opponentName = "🤖 БОТ";
-                opponentItems = generateBotItems();
             } else {
                 opponentName = "ИГРОК #" + Math.floor(Math.random() * 1000);
-                opponentItems = generateOpponentItems(selectedPvpItems);
             }
             
             // Обновляем имена игроков
             document.getElementById('opponentName').textContent = opponentName;
             
-            // Рассчитываем характеристики игроков
-            const playerTotalValue = selectedPvpItems.reduce((sum, item) => sum + (pvpItemPrices[item.name] || 0), 0);
-            const opponentTotalValue = opponentItems.reduce((sum, item) => sum + item.value, 0);
-            
-            // Базовые характеристики
+            // Устанавливаем начальные характеристики
             pvpBattleState = {
-                playerHp: 100 + Math.floor(playerTotalValue / 50),
-                opponentHp: 100 + Math.floor(opponentTotalValue / 50),
-                playerMaxHp: 100 + Math.floor(playerTotalValue / 50),
-                opponentMaxHp: 100 + Math.floor(opponentTotalValue / 50),
-                playerDamage: 10 + Math.floor(playerTotalValue / 100),
-                opponentDamage: 10 + Math.floor(opponentTotalValue / 100),
-                playerItems: selectedPvpItems,
-                opponentItems: opponentItems,
+                playerHp: 100,
+                opponentHp: 100,
+                playerMaxHp: 100,
+                opponentMaxHp: 100,
+                playerDamage: 10,
+                opponentDamage: 10,
                 isPlayerTurn: true,
                 isBlocking: false,
                 opponentIsBlocking: false
             };
             
-            // Отображаем предметы игроков
-            displayPlayerItems(selectedPvpItems, 'playerYouItems');
-            displayPlayerItems(opponentItems, 'playerOpponentItems');
-            
-            // Обновляем HP бары
-            updateHpBars();
+            // Обновляем HP тексты
+            updatePvpHpTexts();
             
             // Очищаем лог
             document.getElementById('battleLog').innerHTML = '';
             
             // Добавляем начальное сообщение
             addBattleMessage("⚔️ Битва начинается!");
-            addBattleMessage(`Ваша сила: ${pvpBattleState.playerDamage} урона, ${pvpBattleState.playerMaxHp} HP`);
-            addBattleMessage(`Сила противника: ${pvpBattleState.opponentDamage} урона, ${pvpBattleState.opponentMaxHp} HP`);
             
             // Обновляем индикатор хода
             updateTurnIndicator();
         }
 
-        function updateHpBars() {
-            const playerHpPercent = (pvpBattleState.playerHp / pvpBattleState.playerMaxHp) * 100;
-            const opponentHpPercent = (pvpBattleState.opponentHp / pvpBattleState.opponentMaxHp) * 100;
-            
-            document.getElementById('playerHpBar').style.width = playerHpPercent + '%';
-            document.getElementById('opponentHpBar').style.width = opponentHpPercent + '%';
-            
-            document.getElementById('playerHpText').textContent = `HP: ${pvpBattleState.playerHp}/${pvpBattleState.playerMaxHp}`;
-            document.getElementById('opponentHpText').textContent = `HP: ${pvpBattleState.opponentHp}/${pvpBattleState.opponentMaxHp}`;
+        function updatePvpHpTexts() {
+            document.getElementById('playerHpText').textContent = `❤️ ${pvpBattleState.playerHp}/${pvpBattleState.playerMaxHp}`;
+            document.getElementById('opponentHpText').textContent = `❤️ ${pvpBattleState.opponentHp}/${pvpBattleState.opponentMaxHp}`;
         }
 
         function updateTurnIndicator() {
@@ -3371,69 +3650,41 @@
         function performAction(action) {
             if (!pvpBattleState.isPlayerTurn) return;
             
+            // Анимация персонажа
+            const playerChar = document.getElementById('playerCharacter');
+            playerChar.classList.remove('attacking', 'critical', 'healing', 'blocking');
+            
             switch (action) {
                 case 'attack':
+                    playerChar.classList.add('attacking');
                     playerAttack(false);
                     break;
                 case 'crit':
-                    startCritWheel();
+                    playerChar.classList.add('critical');
+                    playerCritAttack();
                     break;
                 case 'heal':
+                    playerChar.classList.add('healing');
                     playerHeal();
                     break;
                 case 'block':
+                    playerChar.classList.add('blocking');
                     playerBlock();
                     break;
             }
-        }
-
-        function startCritWheel() {
-            document.getElementById('critWheelOverlay').style.display = 'flex';
-            document.getElementById('critResult').style.display = 'none';
-            
-            const wheel = document.getElementById('critWheel');
-            const result = Math.random() > 0.6; // 40% шанс крита
-            
-            // Сбрасываем вращение перед началом анимации
-            wheel.style.transition = 'none';
-            wheel.style.transform = 'rotate(0deg)';
-            
-            // Даем время для сброса
-            setTimeout(() => {
-                const totalRotation = 360 * 3 + (result ? 0 : 180);
-                
-                wheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
-                wheel.style.transform = `rotate(${totalRotation}deg)`;
-                
-                setTimeout(() => {
-                    document.getElementById('critResult').style.display = 'block';
-                    document.getElementById('critResult').textContent = result ? "КРИТ!" : "ПРОМАХ";
-                    document.getElementById('critResult').style.color = result ? "#ff8c42" : "#ff4444";
-                    
-                    setTimeout(() => {
-                        document.getElementById('critWheelOverlay').style.display = 'none';
-                        playerAttack(result);
-                    }, 2000);
-                }, 3000);
-            }, 50);
         }
 
         function playerAttack(isCrit) {
             let damage = pvpBattleState.playerDamage;
             let message = `⚔️ Вы атакуете противника и наносите ${damage} урона!`;
             
-            // ИСПРАВЛЕНИЕ: если промах - не наносим урон
             if (isCrit) {
                 damage = Math.floor(damage * 2);
                 message = `🔥 КРИТИЧЕСКИЙ УДАР! Вы наносите ${damage} урона!`;
-            } else {
-                // ПРОМАХ - не наносим урон
-                message = `💫 Вы промахнулись! Урон не нанесен.`;
-                damage = 0;
             }
             
-            // Проверяем блок противника только если есть урон
-            if (damage > 0 && pvpBattleState.opponentIsBlocking) {
+            // Проверяем блок противника
+            if (pvpBattleState.opponentIsBlocking) {
                 const blockChance = Math.random();
                 if (blockChance < 0.5) { // 50% шанс блока
                     damage = Math.floor(damage * 0.3); // Блокирует 70% урона
@@ -3442,57 +3693,79 @@
                 pvpBattleState.opponentIsBlocking = false;
             }
             
-            // Наносим урон только если damage > 0
-            if (damage > 0) {
-                pvpBattleState.opponentHp -= damage;
-            }
-            
+            pvpBattleState.opponentHp -= damage;
             addBattleMessage(message);
             
-            // Проверяем победу только если был нанесен урон
-            if (damage > 0 && pvpBattleState.opponentHp <= 0) {
+            // Проверяем победу
+            if (pvpBattleState.opponentHp <= 0) {
                 pvpBattleState.opponentHp = 0;
                 endBattle(true);
                 return;
             }
             
-            updateHpBars();
+            updatePvpHpTexts();
             pvpBattleState.isPlayerTurn = false;
             updateTurnIndicator();
         }
 
+        function playerCritAttack() {
+            const critChance = Math.random();
+            if (critChance < 0.4) { // 40% шанс крита
+                playerAttack(true);
+            } else {
+                addBattleMessage(`💫 Крит промахнулся! Вы наносите обычный урон.`);
+                playerAttack(false);
+            }
+        }
+
         function playerHeal() {
-            const healAmount = Math.floor(pvpBattleState.playerMaxHp * 0.2); // 20% от макс HP
-            pvpBattleState.playerHp = Math.min(pvpBattleState.playerHp + healAmount, pvpBattleState.playerMaxHp);
+            const healChance = Math.random();
+            if (healChance < 0.6) { // 60% шанс лечения
+                const healAmount = Math.floor(pvpBattleState.playerMaxHp * 0.2); // 20% от макс HP
+                pvpBattleState.playerHp = Math.min(pvpBattleState.playerHp + healAmount, pvpBattleState.playerMaxHp);
+                addBattleMessage(`💚 Вы лечитесь на ${healAmount} HP!`);
+            } else {
+                addBattleMessage(`💔 Лечение не сработало!`);
+            }
             
-            addBattleMessage(`💚 Вы лечитесь на ${healAmount} HP!`);
-            updateHpBars();
-            
+            updatePvpHpTexts();
             pvpBattleState.isPlayerTurn = false;
             updateTurnIndicator();
         }
 
         function playerBlock() {
-            pvpBattleState.isBlocking = true;
-            addBattleMessage(`🛡️ Вы готовитесь к блокированию следующей атаки!`);
+            const blockChance = Math.random();
+            if (blockChance < 0.7) { // 70% шанс блока
+                pvpBattleState.isBlocking = true;
+                addBattleMessage(`🛡️ Вы готовитесь к блокированию следующей атаки!`);
+            } else {
+                addBattleMessage(`💔 Блок не сработал!`);
+            }
             
             pvpBattleState.isPlayerTurn = false;
             updateTurnIndicator();
         }
 
         function opponentTurn() {
+            // Анимация противника
+            const opponentChar = document.getElementById('opponentCharacter');
+            opponentChar.classList.remove('attacking', 'critical', 'healing', 'blocking');
+            
             // Противник выбирает случайное действие
             const actions = ['attack', 'attack', 'heal', 'block']; // Чаще атакует
             const randomAction = actions[Math.floor(Math.random() * actions.length)];
             
             switch (randomAction) {
                 case 'attack':
+                    opponentChar.classList.add('attacking');
                     opponentAttack();
                     break;
                 case 'heal':
+                    opponentChar.classList.add('healing');
                     opponentHeal();
                     break;
                 case 'block':
+                    opponentChar.classList.add('blocking');
                     opponentBlock();
                     break;
             }
@@ -3522,25 +3795,34 @@
                 return;
             }
             
-            updateHpBars();
+            updatePvpHpTexts();
             pvpBattleState.isPlayerTurn = true;
             updateTurnIndicator();
         }
 
         function opponentHeal() {
-            const healAmount = Math.floor(pvpBattleState.opponentMaxHp * 0.15); // 15% от макс HP
-            pvpBattleState.opponentHp = Math.min(pvpBattleState.opponentHp + healAmount, pvpBattleState.opponentMaxHp);
+            const healChance = Math.random();
+            if (healChance < 0.6) { // 60% шанс лечения
+                const healAmount = Math.floor(pvpBattleState.opponentMaxHp * 0.15); // 15% от макс HP
+                pvpBattleState.opponentHp = Math.min(pvpBattleState.opponentHp + healAmount, pvpBattleState.opponentMaxHp);
+                addBattleMessage(`💚 Противник лечится на ${healAmount} HP!`);
+            } else {
+                addBattleMessage(`💔 Противник не смог вылечиться!`);
+            }
             
-            addBattleMessage(`💚 Противник лечится на ${healAmount} HP!`);
-            updateHpBars();
-            
+            updatePvpHpTexts();
             pvpBattleState.isPlayerTurn = true;
             updateTurnIndicator();
         }
 
         function opponentBlock() {
-            pvpBattleState.opponentIsBlocking = true;
-            addBattleMessage(`🛡️ Противник готовится к блокированию!`);
+            const blockChance = Math.random();
+            if (blockChance < 0.7) { // 70% шанс блока
+                pvpBattleState.opponentIsBlocking = true;
+                addBattleMessage(`🛡️ Противник готовится к блокированию!`);
+            } else {
+                addBattleMessage(`💔 Противник не смог заблокироваться!`);
+            }
             
             pvpBattleState.isPlayerTurn = true;
             updateTurnIndicator();
@@ -3569,7 +3851,7 @@
                 commissionRate = 0.05;
             }
             
-            const playerTotalValue = pvpBattleState.playerItems.reduce((sum, item) => 
+            const playerTotalValue = selectedPvpItems.reduce((sum, item) => 
                 sum + (pvpItemPrices[item.name] || 0), 0
             );
             const commission = Math.floor(playerTotalValue * commissionRate);
@@ -3587,7 +3869,7 @@
                 userStats.pvpLosses++;
                 
                 // Удаляем использованные предметы из инвентаря
-                pvpBattleState.playerItems.forEach(item => {
+                selectedPvpItems.forEach(item => {
                     const itemIndex = userInventory.findIndex(invItem => 
                         invItem.name === item.name
                     );
@@ -3632,58 +3914,254 @@
             selectedPvpItems = [];
         }
 
-        // Вспомогательные функции для генерации противника
-        function generateBotItems() {
-            const availableItems = Object.keys(pvpItemPrices);
-            const botItems = [];
-            let totalValue = 0;
-            
-            const itemCount = Math.floor(Math.random() * 3) + 1;
-            
-            for (let i = 0; i < itemCount; i++) {
-                const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
-                botItems.push({ name: randomItem, value: pvpItemPrices[randomItem] });
-                totalValue += pvpItemPrices[randomItem];
-            }
-            
-            return botItems;
+        // ФУНКЦИИ ДЛЯ ВЫВОДА
+        function showWithdrawPage() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('casesPage').style.display = 'none';
+            document.getElementById('bettingPage').style.display = 'none';
+            document.getElementById('clanPage').style.display = 'none';
+            document.getElementById('pvpPage').style.display = 'none';
+            document.getElementById('withdrawPage').style.display = 'block';
+            document.getElementById('adminPage').style.display = 'none';
+            setActiveNavButton(6);
+            updateWithdrawItems();
         }
 
-        function generateOpponentItems(playerItems) {
-            const playerTotalValue = playerItems.reduce((sum, item) => 
-                sum + (pvpItemPrices[item.name] || 0), 0
+        function updateWithdrawUI() {
+            const requestButton = document.getElementById('requestWithdrawButton');
+            requestButton.disabled = selectedWithdrawItems.length === 0;
+        }
+
+        function updateWithdrawItems() {
+            const withdrawItemsGrid = document.getElementById('withdrawItemsGrid');
+            withdrawItemsGrid.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                withdrawItemsGrid.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">У вас нет предметов для вывода</div>';
+                return;
+            }
+            
+            userInventory.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'withdraw-item';
+                itemElement.onclick = () => toggleWithdrawItem(item, index);
+                
+                const img = document.createElement('img');
+                img.src = item.image;
+                img.alt = item.name;
+                img.className = 'withdraw-item-image';
+                
+                const name = document.createElement('div');
+                name.className = 'withdraw-item-name';
+                name.textContent = item.name;
+                
+                itemElement.appendChild(img);
+                itemElement.appendChild(name);
+                withdrawItemsGrid.appendChild(itemElement);
+            });
+        }
+
+        function toggleWithdrawItem(item, index) {
+            const itemIndex = selectedWithdrawItems.findIndex(selected => 
+                selected.name === item.name && selected.index === index
             );
             
-            const availableItems = Object.keys(pvpItemPrices);
-            const opponentItems = [];
-            let totalValue = 0;
+            if (itemIndex === -1) {
+                // Добавляем предмет с уникальным индексом
+                selectedWithdrawItems.push({...item, index: index});
+            } else {
+                // Удаляем предмет
+                selectedWithdrawItems.splice(itemIndex, 1);
+            }
             
-            const itemCount = Math.floor(Math.random() * 4) + 1;
-            
-            for (let i = 0; i < itemCount && totalValue < playerTotalValue * 1.2; i++) {
-                const randomItem = availableItems[Math.floor(Math.random() * availableItems.length)];
-                const itemValue = pvpItemPrices[randomItem];
+            // Обновляем внешний вид выбранных предметов
+            const withdrawItems = document.querySelectorAll('.withdraw-item');
+            withdrawItems.forEach((itemElement, index) => {
+                const itemName = itemElement.querySelector('.withdraw-item-name').textContent;
+                const isSelected = selectedWithdrawItems.some(selected => 
+                    selected.name === itemName && selected.index === index
+                );
                 
-                if (totalValue + itemValue <= playerTotalValue * 1.2) {
-                    opponentItems.push({ name: randomItem, value: itemValue });
-                    totalValue += itemValue;
+                if (isSelected) {
+                    itemElement.classList.add('selected');
+                } else {
+                    itemElement.classList.remove('selected');
+                }
+            });
+            
+            updateWithdrawUI();
+        }
+
+        function requestWithdraw() {
+            if (selectedWithdrawItems.length === 0) return;
+            
+            // Создаем запрос на вывод
+            const request = {
+                userId: currentUserId,
+                items: [...selectedWithdrawItems],
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+            
+            withdrawRequests.push(request);
+            saveWithdrawRequests();
+            
+            // Удаляем предметы из инвентаря
+            selectedWithdrawItems.forEach(item => {
+                const itemIndex = userInventory.findIndex(invItem => 
+                    invItem.name === item.name
+                );
+                if (itemIndex !== -1) {
+                    userInventory.splice(itemIndex, 1);
+                }
+            });
+            
+            saveUserData();
+            updateUI();
+            updateWithdrawItems();
+            
+            alert('✅ Запрос на вывод отправлен! Администратор рассмотрит его в ближайшее время.');
+            selectedWithdrawItems = [];
+            updateWithdrawUI();
+        }
+
+        // ФУНКЦИИ ДЛЯ АДМИН ПАНЕЛИ
+        function showAdminPage() {
+            if (!isAdmin()) {
+                alert('❌ У вас нет доступа к админ панели!');
+                return;
+            }
+            
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('profilePage').style.display = 'none';
+            document.getElementById('casesPage').style.display = 'none';
+            document.getElementById('bettingPage').style.display = 'none';
+            document.getElementById('clanPage').style.display = 'none';
+            document.getElementById('pvpPage').style.display = 'none';
+            document.getElementById('withdrawPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'block';
+            setActiveNavButton(7);
+            
+            showAdminTab('withdraws');
+        }
+
+        function showAdminTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.admin-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Убираем активный класс со всех вкладок
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Показываем выбранную вкладку
+            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
+            
+            // Добавляем активный класс к выбранной вкладке
+            event.target.classList.add('active');
+            
+            // Обновляем содержимое вкладки
+            if (tabName === 'withdraws') {
+                updateWithdrawRequests();
+            } else if (tabName === 'users') {
+                updateUsersList();
+            } else if (tabName === 'promo') {
+                updatePromoCodes();
+            }
+        }
+
+        function updateWithdrawRequests() {
+            const container = document.getElementById('adminWithdraws');
+            container.innerHTML = '';
+            
+            if (withdrawRequests.length === 0) {
+                container.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Нет запросов на вывод</div>';
+                return;
+            }
+            
+            withdrawRequests.forEach((request, index) => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'withdraw-request';
+                
+                const userInfo = document.createElement('div');
+                userInfo.className = 'request-user';
+                userInfo.textContent = `Пользователь: ${request.userId}`;
+                
+                const itemsContainer = document.createElement('div');
+                itemsContainer.className = 'request-items';
+                
+                request.items.forEach(item => {
+                    const itemElement = document.createElement('div');
+                    itemElement.className = 'request-item';
+                    itemElement.textContent = item.name;
+                    itemsContainer.appendChild(itemElement);
+                });
+                
+                const actions = document.createElement('div');
+                actions.className = 'request-actions';
+                
+                const approveButton = document.createElement('button');
+                approveButton.className = 'approve-button';
+                approveButton.textContent = '✅ Одобрить';
+                approveButton.onclick = () => approveWithdrawRequest(index);
+                
+                const rejectButton = document.createElement('button');
+                rejectButton.className = 'reject-button';
+                rejectButton.textContent = '❌ Отклонить';
+                rejectButton.onclick = () => rejectWithdrawRequest(index);
+                
+                actions.appendChild(approveButton);
+                actions.appendChild(rejectButton);
+                
+                requestElement.appendChild(userInfo);
+                requestElement.appendChild(itemsContainer);
+                requestElement.appendChild(actions);
+                
+                container.appendChild(requestElement);
+            });
+        }
+
+        function approveWithdrawRequest(index) {
+            withdrawRequests.splice(index, 1);
+            saveWithdrawRequests();
+            updateWithdrawRequests();
+            alert('✅ Запрос на вывод одобрен!');
+        }
+
+        function rejectWithdrawRequest(index) {
+            // Возвращаем предметы пользователю
+            const request = withdrawRequests[index];
+            
+            // Загружаем данные пользователя
+            let userData = localStorage.getItem('halloweenWheelData');
+            if (userData) {
+                userData = JSON.parse(userData);
+                if (userData.userId === request.userId) {
+                    // Добавляем предметы обратно в инвентарь
+                    request.items.forEach(item => {
+                        userData.inventory.push(item);
+                    });
+                    localStorage.setItem('halloweenWheelData', JSON.stringify(userData));
                 }
             }
             
-            return opponentItems;
+            withdrawRequests.splice(index, 1);
+            saveWithdrawRequests();
+            updateWithdrawRequests();
+            alert('❌ Запрос на вывод отклонен! Предметы возвращены пользователю.');
         }
 
-        function displayPlayerItems(items, containerId) {
-            const container = document.getElementById(containerId);
-            container.innerHTML = '';
-            
-            items.forEach(item => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'player-item';
-                itemElement.textContent = item.name.charAt(0);
-                itemElement.title = item.name + ' (' + (item.value || pvpItemPrices[item.name]) + ' ★)';
-                container.appendChild(itemElement);
-            });
+        function updateUsersList() {
+            const container = document.getElementById('adminUsers');
+            container.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Функция в разработке</div>';
+        }
+
+        function updatePromoCodes() {
+            const container = document.getElementById('adminPromo');
+            container.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Функция в разработке</div>';
         }
 
         // Остальные функции остаются без изменений
@@ -3721,14 +4199,6 @@
             document.getElementById('paymentPopup').style.display = 'block';
         }
 
-        function showGiftWithdraw() {
-            if (userInventory.length === 0) {
-                alert("🎒 Ваш инвентарь пуст!");
-                return;
-            }
-            alert("💰 Для вывода подарков свяжитесь с администратором @NFT_c0llecti0n");
-        }
-
         function copyUserId() {
             navigator.clipboard.writeText(currentUserId).then(() => {
                 document.getElementById('copyNotification').style.display = 'block';
@@ -3751,6 +4221,8 @@
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'none';
             document.getElementById('pvpPage').style.display = 'none';
+            document.getElementById('withdrawPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'none';
             setActiveNavButton(2);
         }
 
@@ -3761,6 +4233,8 @@
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'none';
             document.getElementById('pvpPage').style.display = 'none';
+            document.getElementById('withdrawPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'none';
             setActiveNavButton(0);
             updatePromoHistory();
         }
@@ -3772,6 +4246,8 @@
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'none';
             document.getElementById('pvpPage').style.display = 'none';
+            document.getElementById('withdrawPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'none';
             setActiveNavButton(3);
         }
 
@@ -3782,6 +4258,8 @@
             document.getElementById('bettingPage').style.display = 'block';
             document.getElementById('clanPage').style.display = 'none';
             document.getElementById('pvpPage').style.display = 'none';
+            document.getElementById('withdrawPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'none';
             setActiveNavButton(4);
         }
 
@@ -3792,6 +4270,8 @@
             document.getElementById('bettingPage').style.display = 'none';
             document.getElementById('clanPage').style.display = 'block';
             document.getElementById('pvpPage').style.display = 'none';
+            document.getElementById('withdrawPage').style.display = 'none';
+            document.getElementById('adminPage').style.display = 'none';
             setActiveNavButton(1);
         }
 
@@ -3829,19 +4309,6 @@
             }
             init();
         });
-
-        // Добавляем CSS анимацию для тряски
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes shake {
-                0% { transform: translateX(0); }
-                25% { transform: translateX(-5px); }
-                50% { transform: translateX(5px); }
-                75% { transform: translateX(-5px); }
-                100% { transform: translateX(0); }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
