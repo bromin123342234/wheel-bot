@@ -1441,9 +1441,7 @@
             width: 100%;
             height: 100%;
             background: linear-gradient(135deg, #0c0c0c, #1a1025, #2d0c35);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: none;
             z-index: 9999;
         }
         
@@ -2280,17 +2278,18 @@
     <div class="ghost">👻</div>
     <div class="ghost">👻</div>
 
-    <!-- ОКНО АВТОРИЗАЦИИ -->
-    <div class="auth-overlay" id="authOverlay">
+    <!-- ОКНО АВТОРИЗАЦИИ (СКРЫТО) -->
+    <div class="auth-overlay" id="authOverlay" style="display: none;">
         <div class="auth-container">
             <div class="auth-title">🎃 HALLOWEEN WHEEL 🎃</div>
-            <div class="auth-subtitle">Введите ваш уникальный ID для входа</div>
+            <div class="auth-subtitle">Добро пожаловать в игру!</div>
             
-            <input type="text" class="auth-input" id="authCodeInput" placeholder="Введите ваш ID" maxlength="20">
-            <button class="auth-button" onclick="checkAuthCode()">🔐 ВОЙТИ В ИГРУ</button>
+            <button class="auth-button" onclick="startGame()">
+                🎮 НАЧАТЬ ИГРУ
+            </button>
             
             <div class="auth-note">
-                Доступ только для авторизованных пользователей
+                Игра доступна для всех пользователей
             </div>
         </div>
     </div>
@@ -2839,15 +2838,11 @@
             "PTESTEN2": { stars: 5000, uses: 1, used: 0 }
         };
 
-        // РАЗРЕШЕННЫЕ ПОЛЬЗОВАТЕЛИ
-        const allowedUsers = [
-            "user_neesrtpoa",
-            "user_fsgwgpvll"
-        ];
+        // РАЗРЕШЕННЫЕ ПОЛЬЗОВАТЕЛИ (УБРАНА ПРОВЕРКА)
+        const allowedUsers = [];
 
         // АДМИНЫ
         const adminUsers = [
-            "user_fsgwgpvll",
             "user_fsgwgpvll"
         ];
 
@@ -3120,33 +3115,63 @@
             }
         }
 
-        // ОСТАЛЬНЫЕ ФУНКЦИИ ОСТАЮТСЯ ПРЕЖНИМИ, НО С ДОБАВЛЕНИЕМ Firebase
-        // ... (остальной код остается таким же, но с интеграцией Firebase в функции сохранения/загрузки)
+        // УБРАНА ПРОВЕРКА АВТОРИЗАЦИИ
+        function checkAuthentication() {
+            return true; // Всегда возвращает true - доступ для всех
+        }
 
-        // Пример обновленной функции инициализации
-        async function init() {
-            if (!checkAuthentication()) return;
+        function isAdmin() {
+            return adminUsers.includes(currentUserId);
+        }
+
+        function generateUserId() {
+            return 'user_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function startGame() {
+            // Скрываем окно авторизации
+            document.getElementById('authOverlay').style.display = 'none';
             
-            createAnimatedBackground();
-            await loadUserFromFirebase(); // Загружаем из Firebase
-            createWheel();
-            updateUI();
+            // Создаем уникальный ID для пользователя
+            currentUserId = generateUserId();
             
-            // Если пользователь админ, показываем админ панель в навигации
-            if (isAdmin()) {
-                const navigation = document.querySelector('.navigation');
-                const adminBtn = document.createElement('button');
-                adminBtn.className = 'nav-btn';
-                adminBtn.onclick = showAdminPage;
-                adminBtn.innerHTML = `
-                    <div class="nav-icon">🔧</div>
-                    <div class="nav-text">АДМИН</div>
-                `;
-                navigation.appendChild(adminBtn);
+            // Загружаем данные пользователя
+            loadUserData();
+            
+            // Инициализируем игру
+            init();
+        }
+
+        function loadUserData() {
+            const savedData = localStorage.getItem('halloweenWheelData');
+            if (savedData) {
+                const data = JSON.parse(savedData);
+                userBalance = data.balance || 100;
+                userInventory = data.inventory || [];
+                usedPromoCodes = data.usedPromoCodes || [];
+                userStats = data.stats || userStats;
+                userClan = data.clan || null;
+                currentWheelRotation = data.currentWheelRotation || 0;
+            } else {
+                // Создаем нового пользователя
+                userBalance = 100;
+                userInventory = [];
+                usedPromoCodes = [];
+                userStats = {
+                    wheelSpins: 0,
+                    casesOpened: 0,
+                    totalSpent: 0,
+                    itemsWon: 0,
+                    betsWon: 0,
+                    betsLost: 0,
+                    pvpWins: 0,
+                    pvpLosses: 0
+                };
+                userClan = null;
+                currentWheelRotation = 0;
             }
         }
 
-        // Обновленная функция сохранения
         function saveUserData() {
             const data = {
                 userId: currentUserId,
@@ -3159,6 +3184,572 @@
             };
             localStorage.setItem('halloweenWheelData', JSON.stringify(data));
             saveUserToFirebase(); // Сохраняем в Firebase
+        }
+
+        // ОСТАЛЬНЫЕ ФУНКЦИИ ОСТАЮТСЯ ПРЕЖНИМИ
+        function createAnimatedBackground() {
+            const animatedBg = document.getElementById('animatedBg');
+            for (let i = 0; i < 15; i++) {
+                const pumpkin = document.createElement('div');
+                pumpkin.className = 'bg-pumpkin';
+                pumpkin.innerHTML = '🎃';
+                pumpkin.style.left = Math.random() * 100 + '%';
+                pumpkin.style.animationDelay = Math.random() * 20 + 's';
+                animatedBg.appendChild(pumpkin);
+            }
+            
+            for (let i = 0; i < 10; i++) {
+                const bat = document.createElement('div');
+                bat.className = 'bg-bat';
+                bat.innerHTML = '🦇';
+                bat.style.left = Math.random() * 100 + '%';
+                bat.style.top = Math.random() * 100 + '%';
+                bat.style.animationDelay = Math.random() * 15 + 's';
+                animatedBg.appendChild(bat);
+            }
+        }
+
+        function createWheel() {
+            const wheel = document.getElementById('wheel');
+            wheel.innerHTML = '';
+            
+            const segmentAngle = 360 / prizes.length;
+            
+            prizes.forEach((prize, index) => {
+                const segment = document.createElement('div');
+                segment.className = 'wheel-segment';
+                segment.style.transform = `rotate(${index * segmentAngle}deg)`;
+                
+                const content = document.createElement('div');
+                content.className = 'segment-content';
+                
+                const image = document.createElement('img');
+                image.src = prize.image;
+                image.alt = prize.name;
+                image.className = 'segment-image';
+                
+                content.appendChild(image);
+                segment.appendChild(content);
+                wheel.appendChild(segment);
+            });
+            
+            // Восстанавливаем предыдущее вращение
+            wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
+        }
+
+        function updateUI() {
+            // Обновляем ID пользователя
+            document.getElementById('userId').textContent = currentUserId;
+            document.getElementById('profileUserId').textContent = currentUserId;
+            
+            // Обновляем баланс
+            document.getElementById('balanceAmount').textContent = userBalance + ' ★';
+            document.getElementById('starsCount').textContent = userBalance;
+            document.getElementById('profileBalance').textContent = userBalance + ' ★';
+            
+            // Обновляем статистику
+            document.getElementById('wheelSpins').textContent = userStats.wheelSpins;
+            document.getElementById('casesOpened').textContent = userStats.casesOpened;
+            document.getElementById('totalSpent').textContent = userStats.totalSpent;
+            document.getElementById('itemsWon').textContent = userStats.itemsWon;
+            
+            // Обновляем инвентарь
+            document.getElementById('profileInventory').textContent = userInventory.length + ' предметов';
+            
+            // Обновляем информацию о клане
+            updateClanInfo();
+            
+            // Обновляем кнопки в зависимости от баланса
+            updateButtons();
+        }
+
+        function updateClanInfo() {
+            if (userClan) {
+                document.getElementById('clanName').textContent = userClan.name;
+                document.getElementById('clanRole').textContent = userClan.role;
+                document.getElementById('clanRating').textContent = userClan.rating + ' ★';
+                // Здесь нужно обновить список участников клана
+            } else {
+                document.getElementById('clanName').textContent = 'Не в клане';
+                document.getElementById('clanRole').textContent = '-';
+                document.getElementById('clanRating').textContent = '0 ★';
+            }
+        }
+
+        function updateButtons() {
+            const spinButton = document.getElementById('spinButton');
+            const caseButton1 = document.getElementById('openCaseButton1');
+            const caseButton2 = document.getElementById('openCaseButton2');
+            
+            spinButton.disabled = userBalance < 50 || isSpinning;
+            caseButton1.disabled = userBalance < 300 || isCaseAnimationRunning;
+            caseButton2.disabled = userBalance < 450 || isCaseAnimationRunning;
+        }
+
+        function spinWheel() {
+            if (isSpinning || userBalance < 50) return;
+            
+            isSpinning = true;
+            userBalance -= 50;
+            userStats.wheelSpins++;
+            userStats.totalSpent += 50;
+            
+            updateUI();
+            saveUserData();
+            
+            const wheel = document.getElementById('wheel');
+            const spinButton = document.getElementById('spinButton');
+            
+            spinButton.disabled = true;
+            
+            // Вычисляем случайный приз
+            const prizeIndex = Math.floor(Math.random() * prizes.length);
+            const prize = prizes[prizeIndex];
+            
+            // Вычисляем угол вращения (несколько полных оборотов + приз)
+            const segmentAngle = 360 / prizes.length;
+            const extraSpins = 5; // Количество дополнительных полных оборотов
+            const targetAngle = 360 * extraSpins + (360 - prizeIndex * segmentAngle) + 360 / prizes.length / 2;
+            
+            // Сохраняем текущее вращение
+            currentWheelRotation = (currentWheelRotation + targetAngle) % 360;
+            
+            // Анимация вращения
+            wheel.style.transition = 'transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
+            wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
+            
+            // Создаем конфетти
+            createConfetti();
+            
+            // Показываем выигрыш
+            setTimeout(() => {
+                showPrize(prize);
+                isSpinning = false;
+                updateButtons();
+                saveUserData();
+            }, 5000);
+        }
+
+        function showPrize(prize) {
+            // Добавляем предмет в инвентарь
+            userInventory.push({
+                name: prize.name,
+                image: prize.image,
+                type: prize.type,
+                wonAt: Date.now()
+            });
+            
+            userStats.itemsWon++;
+            
+            // Показываем анимацию выигрыша
+            const flyingPrize = document.createElement('img');
+            flyingPrize.src = prize.image;
+            flyingPrize.className = 'flying-prize';
+            flyingPrize.style.left = '50%';
+            flyingPrize.style.top = '50%';
+            document.body.appendChild(flyingPrize);
+            
+            // Показываем сообщение
+            alert(prize.message);
+            
+            // Удаляем летящий предмет после анимации
+            setTimeout(() => {
+                flyingPrize.remove();
+            }, 2000);
+            
+            updateUI();
+        }
+
+        function createConfetti() {
+            const confettiCount = 50;
+            const container = document.querySelector('.container');
+            
+            for (let i = 0; i < confettiCount; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.background = getRandomColor();
+                confetti.style.animationDelay = Math.random() * 2 + 's';
+                container.appendChild(confetti);
+                
+                setTimeout(() => {
+                    confetti.remove();
+                }, 3000);
+            }
+        }
+
+        function getRandomColor() {
+            const colors = ['#ff8c42', '#9d4edd', '#228b22', '#ff4444', '#8a2be2'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+
+        function copyUserId() {
+            navigator.clipboard.writeText(currentUserId).then(() => {
+                const notification = document.getElementById('copyNotification');
+                notification.style.display = 'block';
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 2000);
+            });
+        }
+
+        function showPaymentPopup() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('paymentPopup').style.display = 'block';
+        }
+
+        function closeAllPopups() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('paymentPopup').style.display = 'none';
+            document.getElementById('inventoryPopup').style.display = 'none';
+        }
+
+        // НАВИГАЦИЯ
+        function showMainPage() {
+            hideAllPages();
+            document.getElementById('mainPage').style.display = 'block';
+            setActiveNavButton(2);
+        }
+
+        function showProfilePage() {
+            hideAllPages();
+            document.getElementById('profilePage').style.display = 'block';
+            setActiveNavButton(0);
+        }
+
+        function showCasesPage() {
+            hideAllPages();
+            document.getElementById('casesPage').style.display = 'block';
+            setActiveNavButton(3);
+        }
+
+        function showBettingPage() {
+            hideAllPages();
+            document.getElementById('bettingPage').style.display = 'block';
+            setActiveNavButton(4);
+        }
+
+        function showClanPage() {
+            hideAllPages();
+            document.getElementById('clanPage').style.display = 'block';
+            setActiveNavButton(1);
+        }
+
+        function showPvpPage() {
+            hideAllPages();
+            document.getElementById('pvpPage').style.display = 'block';
+            setActiveNavButton(5);
+        }
+
+        function showWithdrawPage() {
+            hideAllPages();
+            document.getElementById('withdrawPage').style.display = 'block';
+            setActiveNavButton(6);
+            updateWithdrawItems();
+        }
+
+        function showAdminPage() {
+            hideAllPages();
+            document.getElementById('adminPage').style.display = 'block';
+            // Здесь можно загрузить данные для админ панели
+        }
+
+        function hideAllPages() {
+            const pages = document.querySelectorAll('[id$="Page"]');
+            pages.forEach(page => {
+                page.style.display = 'none';
+            });
+        }
+
+        function setActiveNavButton(index) {
+            const navButtons = document.querySelectorAll('.nav-btn');
+            navButtons.forEach((button, i) => {
+                if (i === index) {
+                    button.classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                }
+            });
+        }
+
+        // ПРОМОКОДЫ
+        function activatePromoCode() {
+            const promoInput = document.getElementById('promoCodeInput');
+            const promoCode = promoInput.value.trim().toUpperCase();
+            
+            if (!promoCode) {
+                alert('❌ Введите промокод!');
+                return;
+            }
+            
+            if (usedPromoCodes.includes(promoCode)) {
+                alert('❌ Этот промокод уже использован!');
+                return;
+            }
+            
+            const promo = promoDatabase[promoCode];
+            if (promo && promo.used < promo.uses) {
+                // Активируем промокод
+                userBalance += promo.stars;
+                promo.used++;
+                usedPromoCodes.push(promoCode);
+                
+                // Обновляем UI
+                updateUI();
+                saveUserData();
+                
+                // Показываем историю
+                updatePromoHistory();
+                
+                alert(`✅ Промокод активирован! Получено ${promo.stars} звезд!`);
+                promoInput.value = '';
+            } else {
+                alert('❌ Неверный или неактивный промокод!');
+            }
+        }
+
+        function updatePromoHistory() {
+            const historyList = document.getElementById('promoHistoryList');
+            
+            if (usedPromoCodes.length === 0) {
+                historyList.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Вы еще не активировали ни одного промокода</div>';
+                return;
+            }
+            
+            historyList.innerHTML = '';
+            usedPromoCodes.forEach(promoCode => {
+                const promo = promoDatabase[promoCode];
+                if (promo) {
+                    const historyItem = document.createElement('div');
+                    historyItem.className = 'promo-history-item';
+                    historyItem.innerHTML = `
+                        <div class="promo-code">${promoCode}</div>
+                        <div class="promo-reward">+${promo.stars} ★</div>
+                        <div class="promo-status">✅ Активирован</div>
+                    `;
+                    historyList.appendChild(historyItem);
+                }
+            });
+        }
+
+        // КЕЙСЫ
+        function openCase(caseType) {
+            if (isCaseAnimationRunning) return;
+            
+            currentCaseType = caseType;
+            currentCaseCost = caseType === 1 ? 300 : 450;
+            
+            if (userBalance < currentCaseCost) {
+                alert('❌ Недостаточно звезд для открытия кейса!');
+                return;
+            }
+            
+            // Показываем окно открытия кейса
+            document.getElementById('caseOpeningOverlay').style.display = 'flex';
+            document.getElementById('caseOpeningImage').src = caseType === 1 ? 
+                'https://i.ibb.co/hRf6YbV9/image.png' : 
+                'https://i.ibb.co/VcT5Prm5/image.png';
+            
+            // Заполняем трек наград
+            fillRewardsTrack(caseType);
+            
+            // Сбрасываем состояние
+            document.getElementById('wonItem').style.display = 'none';
+            document.getElementById('confirmOpenCaseButton').style.display = 'block';
+            document.getElementById('spinAgainButton').style.display = 'none';
+        }
+
+        function fillRewardsTrack(caseType) {
+            const rewardsTrack = document.getElementById('rewardsTrack');
+            rewardsTrack.innerHTML = '';
+            rewardsTrack.style.transform = 'translateX(0)';
+            
+            const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
+            
+            // Создаем много копий наград для бесконечного трека
+            for (let i = 0; i < 5; i++) {
+                rewards.forEach(reward => {
+                    const rewardItem = document.createElement('div');
+                    rewardItem.className = 'reward-item';
+                    rewardItem.innerHTML = `
+                        <img src="${reward.image}" alt="${reward.name}" class="reward-image">
+                        <div class="reward-name">${reward.name}</div>
+                    `;
+                    rewardsTrack.appendChild(rewardItem);
+                });
+            }
+        }
+
+        function startCaseAnimation() {
+            if (isCaseAnimationRunning) return;
+            
+            isCaseAnimationRunning = true;
+            userBalance -= currentCaseCost;
+            userStats.casesOpened++;
+            userStats.totalSpent += currentCaseCost;
+            
+            updateUI();
+            saveUserData();
+            
+            const rewardsTrack = document.getElementById('rewardsTrack');
+            const spinCounter = document.getElementById('spinCounter');
+            const confirmButton = document.getElementById('confirmOpenCaseButton');
+            
+            confirmButton.style.display = 'none';
+            spinCounter.textContent = 'Крутим...';
+            
+            // Выбираем случайную награду
+            const rewards = currentCaseType === 1 ? caseRewards1 : caseRewards2;
+            const totalChance = rewards.reduce((sum, reward) => sum + reward.chance, 0);
+            let random = Math.random() * totalChance;
+            let selectedReward = null;
+            
+            for (const reward of rewards) {
+                random -= reward.chance;
+                if (random <= 0) {
+                    selectedReward = reward;
+                    break;
+                }
+            }
+            
+            // Анимация вращения
+            const itemWidth = 120; // Ширина элемента + отступ
+            const targetPosition = -(itemWidth * 10 + Math.random() * itemWidth * rewards.length);
+            
+            rewardsTrack.style.transition = 'transform 5s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
+            
+            setTimeout(() => {
+                // Показываем выигранный предмет
+                showWonItem(selectedReward);
+                isCaseAnimationRunning = false;
+                spinCounter.textContent = 'Готово!';
+                document.getElementById('spinAgainButton').style.display = 'block';
+            }, 5000);
+        }
+
+        function showWonItem(reward) {
+            const wonItem = document.getElementById('wonItem');
+            const wonItemImage = document.getElementById('wonItemImage');
+            const wonItemName = document.getElementById('wonItemName');
+            
+            wonItemImage.src = reward.image;
+            wonItemName.textContent = reward.name;
+            wonItem.style.display = 'block';
+            
+            // Добавляем предмет в инвентарь
+            userInventory.push({
+                name: reward.name,
+                image: reward.image,
+                type: 'case',
+                wonAt: Date.now()
+            });
+            
+            userStats.itemsWon++;
+            updateUI();
+            saveUserData();
+        }
+
+        function spinAgain() {
+            if (userBalance < currentCaseCost) {
+                alert('❌ Недостаточно звезд для открытия кейса!');
+                closeCaseOpening();
+                return;
+            }
+            
+            // Сбрасываем анимацию
+            document.getElementById('wonItem').style.display = 'none';
+            document.getElementById('spinAgainButton').style.display = 'none';
+            document.getElementById('confirmOpenCaseButton').style.display = 'block';
+            document.getElementById('spinCounter').textContent = 'Готов к вращению';
+            
+            fillRewardsTrack(currentCaseType);
+        }
+
+        function closeCaseOpening() {
+            document.getElementById('caseOpeningOverlay').style.display = 'none';
+            isCaseAnimationRunning = false;
+        }
+
+        // СТАВКИ
+        function selectBetColor(color, amount) {
+            selectedBetColor = color;
+            selectedBetAmount = amount;
+            
+            // Сбрасываем выделение
+            const betOptions = document.querySelectorAll('.bet-option');
+            betOptions.forEach(option => {
+                option.classList.remove('selected');
+            });
+            
+            // Выделяем выбранный вариант
+            event.currentTarget.classList.add('selected');
+            
+            document.getElementById('placeBetButton').disabled = false;
+        }
+
+        function placeBet() {
+            if (!selectedBetColor || isBetSpinning || userBalance < selectedBetAmount) return;
+            
+            isBetSpinning = true;
+            userBalance -= selectedBetAmount;
+            userStats.totalSpent += selectedBetAmount;
+            
+            updateUI();
+            saveUserData();
+            
+            const betWheel = document.getElementById('betWheel');
+            const placeBetButton = document.getElementById('placeBetButton');
+            const betResult = document.getElementById('betResult');
+            
+            placeBetButton.disabled = true;
+            betResult.textContent = 'Крутим колесо...';
+            
+            // Вращаем колесо
+            const extraSpins = 3;
+            const targetAngle = 360 * extraSpins + Math.random() * 360;
+            
+            betWheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
+            betWheel.style.transform = `rotate(${targetAngle}deg)`;
+            
+            setTimeout(() => {
+                // Определяем результат
+                const finalAngle = targetAngle % 360;
+                let winningColor = '';
+                
+                if (finalAngle >= 0 && finalAngle < 90) winningColor = 'red';
+                else if (finalAngle >= 90 && finalAngle < 180) winningColor = 'green';
+                else if (finalAngle >= 180 && finalAngle < 270) winningColor = 'orange';
+                else winningColor = 'purple';
+                
+                const betMultiplier = betColors.find(color => color.name === selectedBetColor).multiplier;
+                
+                if (winningColor === selectedBetColor) {
+                    // Выигрыш
+                    const winAmount = Math.floor(selectedBetAmount * betMultiplier);
+                    userBalance += winAmount;
+                    userStats.betsWon++;
+                    betResult.innerHTML = `🎉 ВЫИГРЫШ! +${winAmount} ★<br>Цвет: ${selectedBetColor}`;
+                    createConfetti();
+                } else {
+                    // Проигрыш
+                    userStats.betsLost++;
+                    betResult.innerHTML = `❌ ПРОИГРЫШ<br>Выпал цвет: ${winningColor}`;
+                }
+                
+                updateUI();
+                saveUserData();
+                isBetSpinning = false;
+                placeBetButton.disabled = false;
+                
+                // Сбрасываем выбор
+                selectedBetColor = null;
+                selectedBetAmount = 0;
+                const betOptions = document.querySelectorAll('.bet-option');
+                betOptions.forEach(option => {
+                    option.classList.remove('selected');
+                });
+            }, 3000);
         }
 
         // НОВЫЕ ФУНКЦИИ ДЛЯ КЛАНОВ
@@ -3261,6 +3852,77 @@
         }
 
         // НОВЫЕ ФУНКЦИИ ДЛЯ PvP
+        function selectPvpMode(mode) {
+            selectedPvpMode = mode;
+            
+            // Сбрасываем выделение
+            const pvpModes = document.querySelectorAll('.pvp-mode');
+            pvpModes.forEach(modeElement => {
+                modeElement.classList.remove('selected');
+            });
+            
+            // Выделяем выбранный режим
+            event.currentTarget.classList.add('selected');
+            
+            updatePvpItems();
+        }
+
+        function updatePvpItems() {
+            const pvpItemsGrid = document.getElementById('pvpItemsGrid');
+            pvpItemsGrid.innerHTML = '';
+            
+            userInventory.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'pvp-item';
+                itemElement.onclick = () => togglePvpItemSelection(index);
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="pvp-item-image">
+                    <div class="pvp-item-name">${item.name}</div>
+                    <div class="pvp-item-value">${pvpItemPrices[item.name] || 100} ★</div>
+                `;
+                pvpItemsGrid.appendChild(itemElement);
+            });
+            
+            updatePvpStats();
+        }
+
+        function togglePvpItemSelection(index) {
+            const item = userInventory[index];
+            const itemIndex = selectedPvpItems.findIndex(selected => selected.name === item.name);
+            
+            if (itemIndex === -1) {
+                selectedPvpItems.push(item);
+            } else {
+                selectedPvpItems.splice(itemIndex, 1);
+            }
+            
+            updatePvpStats();
+            
+            // Обновляем выделение
+            const pvpItems = document.querySelectorAll('.pvp-item');
+            pvpItems.forEach((itemElement, i) => {
+                const currentItem = userInventory[i];
+                const isSelected = selectedPvpItems.some(selected => selected.name === currentItem.name);
+                itemElement.classList.toggle('selected', isSelected);
+            });
+        }
+
+        function updatePvpStats() {
+            const totalValue = selectedPvpItems.reduce((sum, item) => {
+                return sum + (pvpItemPrices[item.name] || 100);
+            }, 0);
+            
+            const commission = Math.floor(totalValue * 0.1); // 10% комиссия
+            const potentialWin = totalValue - commission;
+            
+            document.getElementById('selectedItemsCount').textContent = selectedPvpItems.length;
+            document.getElementById('totalBetValue').textContent = totalValue + ' ★';
+            document.getElementById('arenaCommission').textContent = commission + ' ★';
+            document.getElementById('potentialWin').textContent = potentialWin + ' ★';
+            
+            document.getElementById('startPvpButton').disabled = selectedPvpItems.length === 0;
+        }
+
         function enterPvpQueue() {
             if (selectedPvpMode === null || selectedPvpItems.length === 0) {
                 alert('❌ Выберите режим и предметы для ставки!');
@@ -3305,7 +3967,260 @@
             document.getElementById('startPvpButton').style.display = 'block';
         }
 
-        // ОБНОВЛЕННАЯ ФУНКЦИЯ ВЫВОДА
+        function startPvpBattle() {
+            document.getElementById('pvpBattleOverlay').style.display = 'flex';
+            resetPvpBattle();
+        }
+
+        function resetPvpBattle() {
+            pvpBattleState = {
+                playerHp: 100,
+                opponentHp: 100,
+                playerMaxHp: 100,
+                opponentMaxHp: 100,
+                playerDamage: 10,
+                opponentDamage: 10,
+                isPlayerTurn: true,
+                isBlocking: false,
+                opponentIsBlocking: false
+            };
+            
+            updatePvpBattleUI();
+            document.getElementById('battleResult').style.display = 'none';
+            document.getElementById('battleLog').innerHTML = '<div class="battle-message">Битва началась!</div>';
+        }
+
+        function updatePvpBattleUI() {
+            document.getElementById('playerHpText').textContent = `❤️ ${pvpBattleState.playerHp}/${pvpBattleState.playerMaxHp}`;
+            document.getElementById('opponentHpText').textContent = `❤️ ${pvpBattleState.opponentHp}/${pvpBattleState.opponentMaxHp}`;
+            document.getElementById('turnIndicator').textContent = pvpBattleState.isPlayerTurn ? 'Ваш ход!' : 'Ход противника...';
+            
+            // Блокируем кнопки во время хода противника
+            const actionButtons = document.querySelectorAll('.battle-action-btn');
+            actionButtons.forEach(button => {
+                button.disabled = !pvpBattleState.isPlayerTurn;
+            });
+        }
+
+        function performAction(action) {
+            if (!pvpBattleState.isPlayerTurn) return;
+            
+            const battleLog = document.getElementById('battleLog');
+            
+            switch (action) {
+                case 'attack':
+                    let damage = pvpBattleState.playerDamage;
+                    if (pvpBattleState.opponentIsBlocking) {
+                        damage = Math.floor(damage * 0.3);
+                        battleLog.innerHTML += `<div class="battle-message">⚔️ Вы атаковали, но противник блокировал часть урона! Нанесено ${damage} урона</div>`;
+                    } else {
+                        battleLog.innerHTML += `<div class="battle-message">⚔️ Вы атаковали и нанесли ${damage} урона</div>`;
+                    }
+                    pvpBattleState.opponentHp -= damage;
+                    break;
+                    
+                case 'crit':
+                    const critChance = Math.random();
+                    if (critChance > 0.7) {
+                        const critDamage = Math.floor(pvpBattleState.playerDamage * 2.5);
+                        pvpBattleState.opponentHp -= critDamage;
+                        battleLog.innerHTML += `<div class="battle-message">🔥 КРИТИЧЕСКИЙ УДАР! Нанесено ${critDamage} урона!</div>`;
+                        document.getElementById('playerCharacter').classList.add('critical');
+                        setTimeout(() => {
+                            document.getElementById('playerCharacter').classList.remove('critical');
+                        }, 1000);
+                    } else {
+                        battleLog.innerHTML += `<div class="battle-message">❌ Критический удар не сработал!</div>`;
+                    }
+                    break;
+                    
+                case 'heal':
+                    const healAmount = Math.floor(pvpBattleState.playerMaxHp * 0.3);
+                    pvpBattleState.playerHp = Math.min(pvpBattleState.playerMaxHp, pvpBattleState.playerHp + healAmount);
+                    battleLog.innerHTML += `<div class="battle-message">💚 Вы восстановили ${healAmount} здоровья</div>`;
+                    document.getElementById('playerCharacter').classList.add('healing');
+                    setTimeout(() => {
+                        document.getElementById('playerCharacter').classList.remove('healing');
+                    }, 1000);
+                    break;
+                    
+                case 'block':
+                    pvpBattleState.isBlocking = true;
+                    battleLog.innerHTML += `<div class="battle-message">🛡️ Вы приготовились блокировать следующую атаку</div>`;
+                    document.getElementById('playerCharacter').classList.add('blocking');
+                    setTimeout(() => {
+                        document.getElementById('playerCharacter').classList.remove('blocking');
+                    }, 500);
+                    break;
+            }
+            
+            // Прокрутка лога вниз
+            battleLog.scrollTop = battleLog.scrollHeight;
+            
+            // Проверяем конец битвы
+            if (checkBattleEnd()) return;
+            
+            // Передаем ход противнику
+            pvpBattleState.isPlayerTurn = false;
+            updatePvpBattleUI();
+            
+            // Ход противника
+            setTimeout(opponentTurn, 1500);
+        }
+
+        function opponentTurn() {
+            const battleLog = document.getElementById('battleLog');
+            const actions = ['attack', 'crit', 'heal', 'block'];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            
+            switch (action) {
+                case 'attack':
+                    let damage = pvpBattleState.opponentDamage;
+                    if (pvpBattleState.isBlocking) {
+                        damage = Math.floor(damage * 0.3);
+                        battleLog.innerHTML += `<div class="battle-message">⚔️ Противник атаковал, но вы блокировали часть урона! Получено ${damage} урона</div>`;
+                    } else {
+                        battleLog.innerHTML += `<div class="battle-message">⚔️ Противник атаковал и нанес ${damage} урона</div>`;
+                    }
+                    pvpBattleState.playerHp -= damage;
+                    document.getElementById('opponentCharacter').classList.add('attacking');
+                    setTimeout(() => {
+                        document.getElementById('opponentCharacter').classList.remove('attacking');
+                    }, 500);
+                    break;
+                    
+                case 'crit':
+                    const critChance = Math.random();
+                    if (critChance > 0.6) {
+                        const critDamage = Math.floor(pvpBattleState.opponentDamage * 2);
+                        pvpBattleState.playerHp -= critDamage;
+                        battleLog.innerHTML += `<div class="battle-message">🔥 Противник нанес критический удар! Получено ${critDamage} урона!</div>`;
+                        document.getElementById('opponentCharacter').classList.add('critical');
+                        setTimeout(() => {
+                            document.getElementById('opponentCharacter').classList.remove('critical');
+                        }, 1000);
+                    } else {
+                        battleLog.innerHTML += `<div class="battle-message">❌ Критический удар противника не сработал!</div>`;
+                    }
+                    break;
+                    
+                case 'heal':
+                    const healAmount = Math.floor(pvpBattleState.opponentMaxHp * 0.25);
+                    pvpBattleState.opponentHp = Math.min(pvpBattleState.opponentMaxHp, pvpBattleState.opponentHp + healAmount);
+                    battleLog.innerHTML += `<div class="battle-message">💚 Противник восстановил ${healAmount} здоровья</div>`;
+                    document.getElementById('opponentCharacter').classList.add('healing');
+                    setTimeout(() => {
+                        document.getElementById('opponentCharacter').classList.remove('healing');
+                    }, 1000);
+                    break;
+                    
+                case 'block':
+                    pvpBattleState.opponentIsBlocking = true;
+                    battleLog.innerHTML += `<div class="battle-message">🛡️ Противник приготовился блокировать</div>`;
+                    document.getElementById('opponentCharacter').classList.add('blocking');
+                    setTimeout(() => {
+                        document.getElementById('opponentCharacter').classList.remove('blocking');
+                    }, 500);
+                    break;
+            }
+            
+            // Сбрасываем блок игрока
+            pvpBattleState.isBlocking = false;
+            
+            // Прокрутка лога вниз
+            battleLog.scrollTop = battleLog.scrollHeight;
+            
+            // Проверяем конец битвы
+            if (checkBattleEnd()) return;
+            
+            // Возвращаем ход игроку
+            pvpBattleState.isPlayerTurn = true;
+            updatePvpBattleUI();
+        }
+
+        function checkBattleEnd() {
+            const battleResult = document.getElementById('battleResult');
+            const battleResultText = document.getElementById('battleResultText');
+            
+            if (pvpBattleState.playerHp <= 0) {
+                battleResultText.textContent = '❌ ВЫ ПРОИГРАЛИ';
+                battleResult.style.display = 'block';
+                userStats.pvpLosses++;
+                saveUserData();
+                return true;
+            }
+            
+            if (pvpBattleState.opponentHp <= 0) {
+                battleResultText.textContent = '🎉 ВЫ ПОБЕДИЛИ!';
+                battleResult.style.display = 'block';
+                userStats.pvpWins++;
+                
+                // Награда за победу
+                const totalValue = selectedPvpItems.reduce((sum, item) => {
+                    return sum + (pvpItemPrices[item.name] || 100);
+                }, 0);
+                const winAmount = Math.floor(totalValue * 0.9); // 90% от общей стоимости
+                userBalance += winAmount;
+                
+                battleResultText.textContent += `\n+${winAmount} ★`;
+                updateUI();
+                saveUserData();
+                return true;
+            }
+            
+            return false;
+        }
+
+        function closePvpBattle() {
+            document.getElementById('pvpBattleOverlay').style.display = 'none';
+            selectedPvpItems = [];
+            updatePvpStats();
+        }
+
+        // ВЫВОД ПРЕДМЕТОВ
+        function updateWithdrawItems() {
+            const withdrawItemsGrid = document.getElementById('withdrawItemsGrid');
+            withdrawItemsGrid.innerHTML = '';
+            
+            userInventory.forEach((item, index) => {
+                const itemElement = document.createElement('div');
+                itemElement.className = 'withdraw-item';
+                itemElement.onclick = () => toggleWithdrawItemSelection(index);
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="withdraw-item-image">
+                    <div class="withdraw-item-name">${item.name}</div>
+                `;
+                withdrawItemsGrid.appendChild(itemElement);
+            });
+            
+            updateWithdrawUI();
+        }
+
+        function toggleWithdrawItemSelection(index) {
+            const item = userInventory[index];
+            const itemIndex = selectedWithdrawItems.findIndex(selected => selected.name === item.name);
+            
+            if (itemIndex === -1) {
+                selectedWithdrawItems.push(item);
+            } else {
+                selectedWithdrawItems.splice(itemIndex, 1);
+            }
+            
+            updateWithdrawUI();
+            
+            // Обновляем выделение
+            const withdrawItems = document.querySelectorAll('.withdraw-item');
+            withdrawItems.forEach((itemElement, i) => {
+                const currentItem = userInventory[i];
+                const isSelected = selectedWithdrawItems.some(selected => selected.name === currentItem.name);
+                itemElement.classList.toggle('selected', isSelected);
+            });
+        }
+
+        function updateWithdrawUI() {
+            document.getElementById('requestWithdrawButton').disabled = selectedWithdrawItems.length === 0;
+        }
+
         function requestWithdraw() {
             if (selectedWithdrawItems.length === 0) {
                 alert('❌ Выберите предметы для вывода!');
@@ -3345,15 +4260,119 @@
             updateWithdrawUI();
         }
 
-        // ЗАПУСК ПРИ ЗАГРУЗКЕ
-        document.addEventListener('DOMContentLoaded', function() {
-            if (!checkAuthentication()) {
+        function saveWithdrawRequests() {
+            localStorage.setItem('withdrawRequests', JSON.stringify(withdrawRequests));
+        }
+
+        function loadWithdrawRequests() {
+            const saved = localStorage.getItem('withdrawRequests');
+            if (saved) {
+                withdrawRequests = JSON.parse(saved);
+            }
+        }
+
+        // АДМИН ПАНЕЛЬ
+        function showAdminTab(tabName) {
+            // Скрываем все вкладки
+            document.getElementById('adminWithdraws').style.display = 'none';
+            document.getElementById('adminUsers').style.display = 'none';
+            document.getElementById('adminPromo').style.display = 'none';
+            
+            // Показываем выбранную вкладку
+            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
+            
+            // Обновляем активную вкладку
+            const tabs = document.querySelectorAll('.admin-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+            
+            // Загружаем данные для вкладки
+            if (tabName === 'withdraws') {
+                loadWithdrawRequestsForAdmin();
+            }
+        }
+
+        function loadWithdrawRequestsForAdmin() {
+            const adminWithdraws = document.getElementById('adminWithdraws');
+            adminWithdraws.innerHTML = '';
+            
+            if (withdrawRequests.length === 0) {
+                adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
                 return;
             }
-            init();
-        });
+            
+            withdrawRequests.forEach((request, index) => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'withdraw-request';
+                requestElement.innerHTML = `
+                    <div class="request-user">Пользователь: ${request.userId}</div>
+                    <div class="request-items">
+                        ${request.items.map(item => `
+                            <div class="request-item">${item.name}</div>
+                        `).join('')}
+                    </div>
+                    <div>Статус: ${request.status}</div>
+                    <div class="request-actions">
+                        <button class="approve-button" onclick="approveWithdraw(${index})">✅ Одобрить</button>
+                        <button class="reject-button" onclick="rejectWithdraw(${index})">❌ Отклонить</button>
+                    </div>
+                `;
+                adminWithdraws.appendChild(requestElement);
+            });
+        }
 
-        // ... (остальной код остается прежним)
+        function approveWithdraw(index) {
+            withdrawRequests[index].status = 'approved';
+            saveWithdrawRequests();
+            loadWithdrawRequestsForAdmin();
+            alert('✅ Запрос на вывод одобрен!');
+        }
+
+        function rejectWithdraw(index) {
+            withdrawRequests[index].status = 'rejected';
+            
+            // Возвращаем предметы пользователю
+            const request = withdrawRequests[index];
+            request.items.forEach(item => {
+                userInventory.push(item);
+            });
+            
+            saveWithdrawRequests();
+            saveUserData();
+            loadWithdrawRequestsForAdmin();
+            alert('❌ Запрос на вывод отклонен! Предметы возвращены в инвентарь.');
+        }
+
+        // ИНИЦИАЛИЗАЦИЯ
+        async function init() {
+            createAnimatedBackground();
+            await loadUserFromFirebase(); // Загружаем из Firebase
+            createWheel();
+            updateUI();
+            updatePromoHistory();
+            loadWithdrawRequests();
+            
+            // Если пользователь админ, показываем админ панель в навигации
+            if (isAdmin()) {
+                const navigation = document.querySelector('.navigation');
+                const adminBtn = document.createElement('button');
+                adminBtn.className = 'nav-btn';
+                adminBtn.onclick = showAdminPage;
+                adminBtn.innerHTML = `
+                    <div class="nav-icon">🔧</div>
+                    <div class="nav-text">АДМИН</div>
+                `;
+                navigation.appendChild(adminBtn);
+            }
+        }
+
+        // ЗАПУСК ПРИ ЗАГРУЗКЕ
+        document.addEventListener('DOMContentLoaded', function() {
+            // Сразу начинаем игру без авторизации
+            startGame();
+        });
     </script>
 </body>
 </html>
