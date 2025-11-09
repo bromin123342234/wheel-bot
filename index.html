@@ -8,7 +8,6 @@
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     
     <style>
         * {
@@ -27,59 +26,18 @@
             overflow-x: hidden;
         }
         
-        /* АНИМИРОВАННЫЙ ФОН */
-        .animated-bg {
+        .background-pattern {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: -2;
-            overflow: hidden;
-        }
-        
-        .bg-pumpkin {
-            position: absolute;
-            font-size: 40px;
-            opacity: 0.1;
-            animation: floatBg 20s infinite linear;
-        }
-        
-        .bg-bat {
-            position: absolute;
-            font-size: 30px;
-            opacity: 0.08;
-            animation: floatBat 15s infinite linear;
-        }
-        
-        @keyframes floatBg {
-            0% { transform: translateY(100vh) rotate(0deg); }
-            100% { transform: translateY(-100px) rotate(360deg); }
-        }
-        
-        @keyframes floatBat {
-            0% { transform: translateX(-100px) translateY(-100px) rotate(0deg); }
-            50% { transform: translateX(100vw) translateY(50vh) rotate(180deg); }
-            100% { transform: translateX(-100px) translateY(100vh) rotate(360deg); }
-        }
-        
-        .ghost {
-            position: fixed;
-            font-size: 24px;
-            opacity: 0.1;
-            animation: float 15s infinite linear;
+            background: 
+                radial-gradient(circle at 20% 30%, rgba(255, 140, 66, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(157, 78, 221, 0.03) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(34, 139, 34, 0.02) 0%, transparent 50%);
             z-index: -1;
-        }
-        
-        .ghost:nth-child(1) { top: 10%; left: 5%; animation-delay: 0s; }
-        .ghost:nth-child(2) { top: 60%; left: 80%; animation-delay: -5s; }
-        .ghost:nth-child(3) { top: 30%; left: 90%; animation-delay: -10s; }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px) rotate(0deg); }
-            25% { transform: translateY(-20px) rotate(5deg); }
-            50% { transform: translateY(0px) rotate(0deg); }
-            75% { transform: translateY(20px) rotate(-5deg); }
+            pointer-events: none;
         }
         
         .container {
@@ -217,23 +175,12 @@
             height: 100%;
             border-radius: 50%;
             position: relative;
-            transition: transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97);
+            transition: transform 4s cubic-bezier(0.2, 0.8, 0.3, 1);
             border: 8px solid #2d0c35;
             box-shadow: 
                 inset 0 0 20px rgba(0, 0, 0, 0.5),
                 0 0 30px rgba(255, 140, 66, 0.3);
             overflow: hidden;
-            background: conic-gradient(
-                from 0deg,
-                #ff8c42 0deg 45deg,
-                #8a2be2 45deg 90deg,
-                #228b22 90deg 135deg,
-                #ff8c42 135deg 180deg,
-                #8a2be2 180deg 225deg,
-                #228b22 225deg 270deg,
-                #ff8c42 270deg 315deg,
-                #8a2be2 315deg 360deg
-            );
         }
 
         .wheel-segment {
@@ -243,6 +190,9 @@
             top: 0;
             left: 50%;
             transform-origin: 0% 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .segment-content {
@@ -264,18 +214,6 @@
             filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.5));
             transform: rotate(-90deg);
         }
-
-        .segment-text {
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px black;
-            text-align: center;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 3px 5px;
-            border-radius: 3px;
-            transform: rotate(-90deg);
-        }
         
         .wheel-pointer {
             position: absolute;
@@ -287,6 +225,7 @@
             background: #ff8c42;
             clip-path: polygon(50% 100%, 0% 0%, 100% 0%);
             z-index: 2;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
         }
         
         .spin-button {
@@ -352,6 +291,7 @@
             background: #ff8c42;
             border-radius: 50%;
             animation: confettiFall 3s ease-out forwards;
+            pointer-events: none;
         }
         
         @keyframes confettiFall {
@@ -362,7 +302,7 @@
         /* НАВИГАЦИЯ */
         .navigation {
             display: grid;
-            grid-template-columns: repeat(7, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 8px;
             margin-top: 30px;
             padding: 0 5px;
@@ -1152,27 +1092,6 @@
             margin-top: 15px;
         }
 
-        .copy-notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: linear-gradient(135deg, #228b22, #32cd32);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 10px;
-            font-size: 14px;
-            font-weight: bold;
-            z-index: 1001;
-            animation: slideDown 0.3s ease-out;
-            display: none;
-        }
-
-        @keyframes slideDown {
-            0% { transform: translateX(-50%) translateY(-20px); opacity: 0; }
-            100% { transform: translateX(-50%) translateY(0); opacity: 1; }
-        }
-
         /* СТИЛИ ДЛЯ СТАВОК С КОЛЕСОМ */
         .betting-section {
             display: none;
@@ -1327,189 +1246,6 @@
             text-align: center;
         }
 
-        /* СТИЛИ ДЛЯ КЛАНА */
-        .clan-section {
-            display: none;
-            margin: 20px 0;
-        }
-        
-        .clan-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
-            border-radius: 20px;
-            padding: 25px;
-            margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        }
-        
-        .clan-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: #ff8c42;
-            margin-bottom: 20px;
-            text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
-        }
-        
-        .clan-info {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 15px 0;
-            border: 1px solid rgba(255, 140, 66, 0.2);
-        }
-        
-        .clan-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 12px 0;
-            padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 140, 66, 0.2);
-        }
-        
-        .clan-label {
-            font-size: 14px;
-            opacity: 0.8;
-            font-weight: bold;
-        }
-        
-        .clan-value {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ff8c42;
-        }
-        
-        .clan-members {
-            margin: 20px 0;
-        }
-        
-        .member-item {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
-            padding: 10px 15px;
-            margin: 8px 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .member-name {
-            font-weight: bold;
-        }
-        
-        .member-role {
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        
-        .clan-buttons {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .clan-button {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            border-radius: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .create-clan {
-            background: linear-gradient(135deg, #ff8c42, #9d4edd);
-            color: white;
-        }
-        
-        .join-clan {
-            background: linear-gradient(135deg, #228b22, #32cd32);
-            color: white;
-        }
-        
-        .clan-button:hover {
-            transform: scale(1.05);
-        }
-
-        /* СТИЛИ ДЛЯ АВТОРИЗАЦИИ */
-        .auth-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #0c0c0c, #1a1025, #2d0c35);
-            display: none;
-            z-index: 9999;
-        }
-        
-        .auth-container {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            padding: 40px 30px;
-            max-width: 350px;
-            width: 90%;
-            text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-        
-        .auth-title {
-            font-size: 28px;
-            font-weight: bold;
-            color: white;
-            margin-bottom: 10px;
-            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-        }
-        
-        .auth-subtitle {
-            color: rgba(255, 255, 255, 0.8);
-            margin-bottom: 30px;
-            font-size: 14px;
-        }
-        
-        .auth-input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .auth-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        .auth-button {
-            background: linear-gradient(135deg, #228b22, #32cd32);
-            color: white;
-            border: none;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 15px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            margin-bottom: 15px;
-        }
-        
-        .auth-button:hover {
-            transform: scale(1.05);
-        }
-        
-        .auth-note {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 12px;
-            margin-top: 20px;
-        }
-
         /* СТИЛИ ДЛЯ PvP АРЕНЫ */
         .pvp-section {
             display: none;
@@ -1534,370 +1270,31 @@
             text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
         }
         
-        .pvp-modes {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .pvp-mode {
+        .pvp-content {
             background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 40px 20px;
+            text-align: center;
             border: 2px solid rgba(255, 140, 66, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
         }
         
-        .pvp-mode:hover {
-            transform: translateY(-3px);
-            border-color: #ff8c42;
-        }
-        
-        .pvp-mode.selected {
-            background: rgba(255, 140, 66, 0.2);
-            border-color: #ff8c42;
-            box-shadow: 0 0 15px rgba(255, 140, 66, 0.4);
-        }
-        
-        .mode-icon {
-            font-size: 30px;
-            margin-bottom: 10px;
-        }
-        
-        .mode-name {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ff8c42;
-            margin-bottom: 5px;
-        }
-        
-        .mode-description {
-            font-size: 12px;
-            opacity: 0.8;
-            margin-bottom: 10px;
-        }
-        
-        .mode-reward {
-            font-size: 14px;
-            color: #32cd32;
-            font-weight: bold;
-        }
-        
-        .pvp-items {
-            margin: 20px 0;
-        }
-        
-        .pvp-items-title {
-            font-size: 16px;
-            font-weight: bold;
-            color: #ff8c42;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .pvp-items-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 10px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
-            border: 1px solid rgba(255, 140, 66, 0.2);
-        }
-        
-        .pvp-item {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 140, 66, 0.2);
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .pvp-item:hover {
-            border-color: #ff8c42;
-            transform: scale(1.05);
-        }
-        
-        .pvp-item.selected {
-            background: rgba(255, 140, 66, 0.2);
-            border-color: #ff8c42;
-            box-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
-        }
-        
-        .pvp-item-image {
-            width: 40px;
-            height: 40px;
-            object-fit: contain;
-            margin-bottom: 5px;
-        }
-        
-        .pvp-item-name {
-            font-size: 10px;
-            font-weight: bold;
-            color: #ff8c42;
-            margin-bottom: 3px;
-        }
-        
-        .pvp-item-value {
-            font-size: 9px;
-            color: #32cd32;
-            font-weight: bold;
-        }
-        
-        .start-pvp-button {
-            background: linear-gradient(135deg, #ff4444, #ff8c42);
-            color: white;
-            border: none;
-            padding: 15px;
-            font-size: 16px;
-            font-weight: bold;
-            border-radius: 15px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s ease;
-            margin: 10px 0;
-        }
-        
-        .start-pvp-button:hover {
-            transform: scale(1.05);
-        }
-        
-        .start-pvp-button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .pvp-stats {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 15px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        .pvp-stat-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 8px 0;
-            font-size: 14px;
-        }
-        
-        .pvp-stat-label {
-            opacity: 0.8;
-        }
-        
-        .pvp-stat-value {
-            font-weight: bold;
-            color: #ff8c42;
-        }
-
-        /* СТИЛИ ДЛЯ НОВОЙ PvP СИСТЕМЫ */
-        .pvp-battle-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            display: none;
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .pvp-battle-container {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 4px solid rgba(255, 255, 255, 0.3);
-            border-radius: 30px;
-            padding: 30px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
-            position: relative;
-            animation: caseOpen 0.5s ease-out;
-        }
-        
-        .pvp-battle-title {
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
+        .pvp-icon {
+            font-size: 80px;
             margin-bottom: 20px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            opacity: 0.7;
         }
         
-        .battle-field {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin: 20px 0;
-            position: relative;
-            height: 150px;
-        }
-        
-        .player-character {
-            width: 80px;
-            height: 80px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 3px solid #ff8c42;
-            border-radius: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        
-        .player-character.attacking {
-            animation: attackAnimation 0.5s ease;
-        }
-        
-        .player-character.critical {
-            animation: criticalAnimation 1s ease;
-        }
-        
-        .player-character.healing {
-            animation: healAnimation 1s ease;
-        }
-        
-        .player-character.blocking {
-            animation: blockAnimation 0.5s ease;
-        }
-        
-        @keyframes attackAnimation {
-            0% { transform: translateX(0); }
-            50% { transform: translateX(30px); }
-            100% { transform: translateX(0); }
-        }
-        
-        @keyframes criticalAnimation {
-            0% { transform: scale(1); }
-            25% { transform: scale(1.2); }
-            50% { transform: scale(1); }
-            75% { transform: scale(1.2); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes healAnimation {
-            0% { background: rgba(255, 255, 255, 0.1); }
-            50% { background: rgba(50, 205, 50, 0.3); }
-            100% { background: rgba(255, 255, 255, 0.1); }
-        }
-        
-        @keyframes blockAnimation {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .player-name {
-            position: absolute;
-            top: -25px;
-            left: 0;
-            right: 0;
-            font-size: 14px;
-            font-weight: bold;
-            color: white;
-        }
-        
-        .player-hp {
-            position: absolute;
-            bottom: -25px;
-            left: 0;
-            right: 0;
-            font-size: 12px;
-            color: #ff4444;
-            font-weight: bold;
-        }
-        
-        .battle-actions {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        
-        .battle-action-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 15px;
-            color: white;
-            font-size: 14px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .battle-action-btn:hover {
-            background: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .battle-action-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .action-attack { border-color: #ff4444; }
-        .action-crit { border-color: #ff8c42; }
-        .action-heal { border-color: #32cd32; }
-        .action-block { border-color: #8a2be2; }
-        
-        .battle-log {
-            background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-            max-height: 150px;
-            overflow-y: auto;
-            text-align: left;
-            font-size: 12px;
-            color: white;
-        }
-        
-        .battle-message {
-            margin: 5px 0;
-            padding: 5px;
-            border-radius: 5px;
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .battle-result {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 3px solid #ff8c42;
-            animation: pulseWin 1s infinite;
-            display: none;
-        }
-        
-        .battle-result-text {
+        .pvp-message {
             font-size: 18px;
-            font-weight: bold;
             color: white;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 15px;
+            line-height: 1.5;
         }
-
-        .turn-indicator {
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 10px;
-            padding: 10px;
-            margin: 10px 0;
+        
+        .pvp-note {
             font-size: 14px;
-            color: white;
-            font-weight: bold;
+            color: rgba(255, 255, 255, 0.7);
+            margin-top: 20px;
         }
 
         /* СТИЛИ ДЛЯ ВЫВОДА */
@@ -2034,6 +1431,85 @@
             transform: none;
         }
 
+        /* СТИЛИ ДЛЯ ПОПАПА ВЫВОДА */
+        .withdraw-popup {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.98), rgba(255, 140, 66, 0.98));
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: none;
+            animation: bounceIn 0.6s ease-out;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 90%;
+            max-width: 380px;
+            backdrop-filter: blur(10px);
+        }
+
+        .withdraw-popup-title {
+            font-size: 26px;
+            font-weight: bold;
+            color: white;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .withdraw-popup-content {
+            background: rgba(255, 255, 255, 0.15);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .withdraw-popup-text {
+            color: white;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .username-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .username-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .confirm-withdraw-button {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin: 10px 0;
+        }
+
+        .confirm-withdraw-button:hover {
+            transform: scale(1.05);
+        }
+
         /* СТИЛИ ДЛЯ АДМИН ПАНЕЛИ */
         .admin-section {
             display: none;
@@ -2110,6 +1586,12 @@
             margin-bottom: 5px;
         }
         
+        .request-username {
+            color: #32cd32;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
         .request-items {
             display: flex;
             flex-wrap: wrap;
@@ -2122,6 +1604,15 @@
             border-radius: 5px;
             padding: 5px 10px;
             font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .request-item-image {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
         }
         
         .request-actions {
@@ -2152,134 +1643,93 @@
             font-weight: bold;
         }
 
-        /* НОВЫЕ СТИЛИ ДЛЯ КРАСИВЫХ КЛАНОВ */
-        .clans-list {
-            margin: 20px 0;
-        }
-        
-        .clan-list-item {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.1), rgba(255, 140, 66, 0.1));
-            border: 2px solid rgba(255, 140, 66, 0.2);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 10px 0;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .clan-list-item:hover {
-            transform: translateY(-3px);
-            border-color: #ff8c42;
-            box-shadow: 0 5px 15px rgba(255, 140, 66, 0.3);
-        }
-        
-        .clan-list-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .clan-list-name {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff8c42;
-        }
-        
-        .clan-list-rating {
-            background: rgba(255, 140, 66, 0.2);
-            padding: 5px 10px;
-            border-radius: 10px;
-            font-weight: bold;
-        }
-        
-        .clan-list-info {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            opacity: 0.8;
-        }
-        
-        .clan-list-members {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .join-clan-button {
-            background: linear-gradient(135deg, #228b22, #32cd32);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 12px;
-            font-weight: bold;
-            margin-top: 10px;
-            transition: all 0.3s ease;
-        }
-        
-        .join-clan-button:hover {
-            transform: scale(1.05);
-        }
-
-        /* УЛУЧШЕННЫЙ PvP */
-        .pvp-queue {
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 20px;
-            margin: 20px 0;
-            border: 2px solid rgba(255, 140, 66, 0.2);
-        }
-        
-        .queue-info {
-            text-align: center;
-            margin-bottom: 15px;
-        }
-        
-        .queue-timer {
-            font-size: 18px;
-            font-weight: bold;
-            color: #ff8c42;
-            margin: 10px 0;
-        }
-        
-        .queue-players {
-            display: flex;
-            justify-content: space-around;
-            margin: 15px 0;
-        }
-        
-        .queue-player {
-            text-align: center;
-        }
-        
-        .player-avatar {
-            width: 50px;
-            height: 50px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
+        /* СТИЛИ ДЛЯ АВТОРИЗАЦИИ */
+        .auth-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0c0c0c, #1a1025, #2d0c35);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 5px;
-            font-size: 20px;
+            z-index: 9999;
+        }
+        
+        .auth-container {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px;
+            padding: 40px 30px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+        
+        .auth-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: white;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+        }
+        
+        .auth-subtitle {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        
+        .auth-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .auth-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .auth-button {
+            background: linear-gradient(135deg, #228b22, #32cd32);
+            color: white;
+            border: none;
+            padding: 15px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 15px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+        
+        .auth-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .auth-note {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 12px;
+            margin-top: 20px;
         }
 
     </style>
 </head>
 <body>
-    <!-- АНИМИРОВАННЫЙ ФОН -->
-    <div class="animated-bg" id="animatedBg"></div>
+    <!-- УПРОЩЕННЫЙ ФОН -->
+    <div class="background-pattern"></div>
 
-    <div class="ghost">👻</div>
-    <div class="ghost">👻</div>
-    <div class="ghost">👻</div>
-
-    <!-- ОКНО АВТОРИЗАЦИИ (СКРЫТО) -->
-    <div class="auth-overlay" id="authOverlay" style="display: none;">
+    <!-- ОКНО АВТОРИЗАЦИИ -->
+    <div class="auth-overlay" id="authOverlay">
         <div class="auth-container">
             <div class="auth-title">🎃 HALLOWEEN WHEEL 🎃</div>
             <div class="auth-subtitle">Добро пожаловать в игру!</div>
@@ -2293,12 +1743,10 @@
             </div>
         </div>
     </div>
-
-    <div class="copy-notification" id="copyNotification">ID скопирован!</div>
     
     <div class="container">
         <!-- ОСНОВНАЯ СТРАНИЦА С РУЛЕТКОЙ -->
-        <div class="wheel-section" id="mainPage">
+        <div class="wheel-section" id="mainPage" style="display: none;">
             <div class="header">
                 <h1 class="title">🎃 HALLOWEEN WHEEL 🎃</h1>
             </div>
@@ -2310,10 +1758,10 @@
             
             <div class="balance-card">
                 <div class="balance-title">ВАШ БАЛАНС</div>
-                <div class="balance-amount" id="balanceAmount">100 ★</div>
+                <div class="balance-amount" id="balanceAmount">0 ★</div>
                 <div class="balance-stars">
                     <span>Звезды:</span>
-                    <span id="starsCount">100</span>
+                    <span id="starsCount">0</span>
                 </div>
                 <button class="top-up-button" onclick="showPaymentPopup()">
                     💰 ПОПОЛНИТЬ БАЛАНС
@@ -2325,8 +1773,9 @@
                 <div class="wheel" id="wheel"></div>
             </div>
             
-            <button class="spin-button" id="spinButton" onclick="spinWheel()">
-                🎡 КРУТИТЬ ЗА 50 ЗВЕЗД
+            <!-- ИЗМЕНЕНА КНОПКА ВРАЩЕНИЯ - СДЕЛАНА НЕАКТИВНОЙ -->
+            <button class="spin-button" id="spinButton" disabled>
+                ⚠️ РУЛЕТКА ВРЕМЕННО НЕДОСТУПНА
             </button>
             <div class="cost-info">Одно вращение = 50 звезд</div>
         </div>
@@ -2343,8 +1792,13 @@
                     </div>
                     
                     <div class="profile-item">
+                        <div class="profile-label">ВАШ ЮЗЕРНЕЙМ:</div>
+                        <div class="profile-value" id="userUsername">Не указан</div>
+                    </div>
+                    
+                    <div class="profile-item">
                         <div class="profile-label">БАЛАНС:</div>
-                        <div class="profile-value" id="profileBalance">100 ★</div>
+                        <div class="profile-value" id="profileBalance">0 ★</div>
                     </div>
                     
                     <div class="profile-item">
@@ -2486,137 +1940,22 @@
                 </button>
             </div>
         </div>
-        
-        <!-- СТРАНИЦА КЛАНА -->
-        <div class="clan-section" id="clanPage">
-            <div class="clan-card">
-                <div class="clan-title">🏰 СИСТЕМА КЛАНОВ</div>
-                
-                <div id="userClanInfo">
-                    <div class="clan-info">
-                        <div class="clan-item">
-                            <div class="clan-label">НАЗВАНИЕ КЛАНА:</div>
-                            <div class="clan-value" id="clanName">Не в клане</div>
-                        </div>
-                        
-                        <div class="clan-item">
-                            <div class="clan-label">ВАША РОЛЬ:</div>
-                            <div class="clan-value" id="clanRole">-</div>
-                        </div>
-                        
-                        <div class="clan-item">
-                            <div class="clan-label">УЧАСТНИКОВ:</div>
-                            <div class="clan-value" id="clanMembers">0/10</div>
-                        </div>
-                        
-                        <div class="clan-item">
-                            <div class="clan-label">РЕЙТИНГ КЛАНА:</div>
-                            <div class="clan-value" id="clanRating">0 ★</div>
-                        </div>
-                    </div>
-                    
-                    <div class="clan-members" id="clanMembersList">
-                        <div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Вы не состоите в клане</div>
-                    </div>
-                </div>
-                
-                <div id="availableClans" style="display: none;">
-                    <div class="clans-list" id="clansListContainer">
-                        <!-- Список кланов будет загружен из Firebase -->
-                    </div>
-                </div>
-                
-                <div class="clan-buttons">
-                    <button class="clan-button create-clan" onclick="showCreateClanForm()">
-                        🏰 СОЗДАТЬ КЛАН
-                    </button>
-                    <button class="clan-button join-clan" onclick="toggleClansList()">
-                        🤝 ПРИСОЕДИНИТЬСЯ
-                    </button>
-                </div>
-                
-                <button class="back-button" onclick="showMainPage()">
-                    🔙 НАЗАД К РУЛЕТКЕ
-                </button>
-            </div>
-        </div>
 
         <!-- СТРАНИЦА PvP АРЕНЫ -->
         <div class="pvp-section" id="pvpPage">
             <div class="pvp-card">
                 <div class="pvp-title">⚔️ PVP ARENA</div>
                 
-                <div class="pvp-modes">
-                    <div class="pvp-mode" onclick="selectPvpMode('duel')">
-                        <div class="mode-icon">⚔️</div>
-                        <div class="mode-name">ДУЭЛЬ 1x1</div>
-                        <div class="mode-description">Сразитесь с реальным игроком</div>
-                        <div class="mode-reward">Награда: предметы противника</div>
+                <div class="pvp-content">
+                    <div class="pvp-icon">🚧</div>
+                    <div class="pvp-message">
+                        PvP временно недоступен<br>
+                        Мы работаем над улучшением системы...
                     </div>
-                    
-                    <div class="pvp-mode" onclick="selectPvpMode('tournament')">
-                        <div class="mode-icon">🏆</div>
-                        <div class="mode-name">ТУРНИР 4 ИГРОКА</div>
-                        <div class="mode-description">Победитель забирает все</div>
-                        <div class="mode-reward">Награда: все предметы</div>
-                    </div>
-                    
-                    <div class="pvp-mode" onclick="selectPvpMode('bot')">
-                        <div class="mode-icon">🤖</div>
-                        <div class="mode-name">ТРЕНИРОВКА</div>
-                        <div class="mode-description">Сразитесь с ботом</div>
-                        <div class="mode-reward">Награда: опыт</div>
+                    <div class="pvp-note">
+                        Скоро вернемся с обновленной ареной!
                     </div>
                 </div>
-                
-                <div class="pvp-queue" id="pvpQueue" style="display: none;">
-                    <div class="queue-info">
-                        <div>🔍 Поиск противника...</div>
-                        <div class="queue-timer" id="queueTimer">00:30</div>
-                    </div>
-                    <div class="queue-players">
-                        <div class="queue-player">
-                            <div class="player-avatar">👤</div>
-                            <div>Вы</div>
-                        </div>
-                        <div style="font-size: 24px; margin: 0 10px;">VS</div>
-                        <div class="queue-player">
-                            <div class="player-avatar">?</div>
-                            <div>Поиск...</div>
-                        </div>
-                    </div>
-                    <button class="back-button" onclick="leaveQueue()">❌ Покинуть очередь</button>
-                </div>
-                
-                <div class="pvp-items">
-                    <div class="pvp-items-title">ВЫБЕРИТЕ ПРЕДМЕТЫ ДЛЯ СТАВКИ</div>
-                    <div class="pvp-items-grid" id="pvpItemsGrid">
-                        <!-- Предметы будут добавлены через JavaScript -->
-                    </div>
-                </div>
-                
-                <div class="pvp-stats">
-                    <div class="pvp-stat-item">
-                        <div class="pvp-stat-label">Выбрано предметов:</div>
-                        <div class="pvp-stat-value" id="selectedItemsCount">0</div>
-                    </div>
-                    <div class="pvp-stat-item">
-                        <div class="pvp-stat-label">Общая стоимость:</div>
-                        <div class="pvp-stat-value" id="totalBetValue">0 ★</div>
-                    </div>
-                    <div class="pvp-stat-item">
-                        <div class="pvp-stat-label">Комиссия PvP:</div>
-                        <div class="pvp-stat-value" id="arenaCommission">0 ★</div>
-                    </div>
-                    <div class="pvp-stat-item">
-                        <div class="pvp-stat-label">Возможный выигрыш:</div>
-                        <div class="pvp-stat-value" id="potentialWin">0 ★</div>
-                    </div>
-                </div>
-                
-                <button class="start-pvp-button" id="startPvpButton" onclick="enterPvpQueue()">
-                    ⚔️ НАЧАТЬ ПОИСК
-                </button>
                 
                 <button class="back-button" onclick="showMainPage()">
                     🔙 НАЗАД К РУЛЕТКЕ
@@ -2630,12 +1969,7 @@
                 <div class="withdraw-title">🎁 ВЫВОД ПРЕДМЕТОВ</div>
                 
                 <div class="withdraw-instruction">
-                    <div class="withdraw-text">Для вывода предметов отправьте точку (.) в ЛС:</div>
-                    <div class="withdraw-username">@NFT_c0llecti0n</div>
-                    <div class="withdraw-text">После этого выберите предметы и нажмите "ЗАПРОСИТЬ ВЫВОД"</div>
-                    <div class="withdraw-text" style="color: #ff8c42; font-weight: bold; margin-top: 10px;">
-                        ⚠️ Обязательно отправьте точку в ЛС, иначе вывод не будет обработан!
-                    </div>
+                    <div class="withdraw-text">Выберите предметы для вывода и нажмите кнопку "ЗАПРОСИТЬ ВЫВОД"</div>
                 </div>
                 
                 <div class="withdraw-items">
@@ -2645,7 +1979,7 @@
                     </div>
                 </div>
                 
-                <button class="request-withdraw-button" id="requestWithdrawButton" onclick="requestWithdraw()">
+                <button class="request-withdraw-button" id="requestWithdrawButton" onclick="showWithdrawPopup()">
                     📦 ЗАПРОСИТЬ ВЫВОД
                 </button>
                 
@@ -2662,20 +1996,10 @@
                 
                 <div class="admin-tabs">
                     <div class="admin-tab active" onclick="showAdminTab('withdraws')">Запросы на вывод</div>
-                    <div class="admin-tab" onclick="showAdminTab('users')">Пользователи</div>
-                    <div class="admin-tab" onclick="showAdminTab('promo')">Промокоды</div>
                 </div>
                 
                 <div class="admin-content" id="adminWithdraws">
                     <!-- Запросы на вывод будут добавлены через JavaScript -->
-                </div>
-                
-                <div class="admin-content" id="adminUsers" style="display: none;">
-                    <!-- Пользователи будут добавлены через JavaScript -->
-                </div>
-                
-                <div class="admin-content" id="adminPromo" style="display: none;">
-                    <!-- Промокоды будут добавлены через JavaScript -->
                 </div>
                 
                 <button class="back-button" onclick="showMainPage()">
@@ -2689,10 +2013,6 @@
             <button class="nav-btn" onclick="showProfilePage()">
                 <div class="nav-icon">👤</div>
                 <div class="nav-text">ПРОФИЛЬ</div>
-            </button>
-            <button class="nav-btn" onclick="showClanPage()">
-                <div class="nav-icon">🏰</div>
-                <div class="nav-text">КЛАН</div>
             </button>
             <button class="nav-btn active" onclick="showMainPage()">
                 <div class="nav-icon">🎡</div>
@@ -2752,44 +2072,28 @@
         </div>
     </div>
 
-    <!-- ОКНО PvP БИТВЫ -->
-    <div class="pvp-battle-overlay" id="pvpBattleOverlay">
-        <div class="pvp-battle-container">
-            <div class="pvp-battle-title">⚔️ PVP БИТВА</div>
-            
-            <div class="battle-field">
-                <div class="player-character" id="playerCharacter">
-                    <div class="player-name">ВЫ</div>
-                    <div class="player-hp" id="playerHpText">❤️ 100/100</div>
-                </div>
-                
-                <div class="player-character" id="opponentCharacter">
-                    <div class="player-name" id="opponentName">ПРОТИВНИК</div>
-                    <div class="player-hp" id="opponentHpText">❤️ 100/100</div>
-                </div>
+    <!-- ОКНО ВЫВОДА -->
+    <div class="withdraw-popup" id="withdrawPopup">
+        <div class="withdraw-popup-title">📦 ЗАПРОС ВЫВОДА</div>
+        
+        <div class="withdraw-popup-content">
+            <div class="withdraw-popup-text">Введите ваш юзернейм:</div>
+            <input type="text" class="username-input" id="usernameInput" placeholder="@ваш_юзернейм" maxlength="30">
+            <div class="withdraw-popup-text">
+                Свяжитесь с администратором и ждите свои подарки!
             </div>
-            
-            <div class="turn-indicator" id="turnIndicator">Ваш ход!</div>
-            
-            <div class="battle-actions" id="battleActions">
-                <button class="battle-action-btn action-attack" onclick="performAction('attack')">⚔️ АТАКА</button>
-                <button class="battle-action-btn action-crit" onclick="performAction('crit')">🔥 КРИТ УДАР</button>
-                <button class="battle-action-btn action-heal" onclick="performAction('heal')">💚 ЛЕЧЕНИЕ</button>
-                <button class="battle-action-btn action-block" onclick="performAction('block')">🛡️ БЛОК</button>
+            <div class="withdraw-popup-text" style="color: #ff8c42; font-weight: bold; margin-top: 10px;">
+                ⚠️ Заявка будет отправлена на обработку
             </div>
-            
-            <div class="battle-log" id="battleLog">
-                <!-- Лог битвы будет добавлен через JavaScript -->
-            </div>
-            
-            <div class="battle-result" id="battleResult">
-                <div class="battle-result-text" id="battleResultText"></div>
-            </div>
-            
-            <button class="close-case-button" onclick="closePvpBattle()">
-                ❌ ЗАКРЫТЬ
-            </button>
         </div>
+        
+        <button class="confirm-withdraw-button" onclick="confirmWithdraw()">
+            ✅ ПОДТВЕРДИТЬ ВЫВОД
+        </button>
+        
+        <button class="close-button" onclick="closeWithdrawPopup()">
+            ❌ ОТМЕНА
+        </button>
     </div>
 
     <!-- ОСТАЛЬНЫЕ ПОПАПЫ -->
@@ -2819,31 +2123,22 @@
     <script>
         // КОНФИГУРАЦИЯ FIREBASE
         const firebaseConfig = {
-            apiKey: "AIzaSyC4wG4jPYl2J6R3X4Q7X6b5b5b5b5b5b5b5b",
-            authDomain: "halloween-wheel.firebaseapp.com",
-            projectId: "halloween-wheel",
-            storageBucket: "halloween-wheel.firebasestorage.app",
-            messagingSenderId: "123456789",
-            appId: "1:123456789:web:abcdef123456"
+            apiKey: "AIzaSyAaXhwLzJFVOuAHI3c8LpUXWal0416Xdkc",
+            authDomain: "halloween-wheel-game.firebaseapp.com",
+            projectId: "halloween-wheel-game",
+            storageBucket: "halloween-wheel-game.firebasestorage.app",
+            messagingSenderId: "994979036087",
+            appId: "1:994979036087:web:e4e13001a8fc7f2a670632"
         };
 
         // ИНИЦИАЛИЗАЦИЯ FIREBASE
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
-        const auth = firebase.auth();
 
-        // БАЗА ДАННЫХ
-        const promoDatabase = {
-            "PTESTEN1": { stars: 10000, uses: 1, used: 0 },
-            "PTESTEN2": { stars: 5000, uses: 1, used: 0 }
-        };
-
-        // РАЗРЕШЕННЫЕ ПОЛЬЗОВАТЕЛИ (УБРАНА ПРОВЕРКА)
-        const allowedUsers = [];
-
-        // АДМИНЫ
+        // АДМИНЫ (ID пользователей, которые видят админ панели)
         const adminUsers = [
-            "user_fsgwgpvll"
+            "user_p7fk034lp",
+            "user_ouuniidck"
         ];
 
         // ПРИЗЫ ДЛЯ РУЛЕТКИ
@@ -2852,49 +2147,49 @@
                 name: "Подарок", 
                 type: "item", 
                 image: "https://i.ibb.co/q3xL5y2h/image.png",
-                message: "🎁 Вам выпал подарок!"
+                color: "#ff8c42"
             },
             { 
                 name: "Сердечко", 
                 type: "item", 
                 image: "https://i.ibb.co/5gkW5WjD/image.png",
-                message: "💖 Вам выпало сердечко!"
+                color: "#9d4edd"
             },
             { 
                 name: "Букет", 
                 type: "item", 
                 image: "https://i.ibb.co/N6CmQdcD/image.png",
-                message: "💐 Вам выпал букет!"
+                color: "#228b22"
             },
             { 
                 name: "Календарик", 
                 type: "item", 
                 image: "https://i.ibb.co/CprKQQW2/image.png",
-                message: "📅 Вам выпал календарик!"
+                color: "#ff8c42"
             },
             { 
                 name: "Подарок", 
                 type: "item", 
                 image: "https://i.ibb.co/LD05XPNV/image.png",
-                message: "🎁 Вам выпал подарок!"
+                color: "#9d4edd"
             },
             { 
                 name: "Подарок", 
                 type: "item", 
                 image: "https://i.ibb.co/7dyYVq4T/image.png",
-                message: "🎁 Вам выпал подарок!"
+                color: "#228b22"
             },
             { 
                 name: "Подарок", 
                 type: "item", 
                 image: "https://i.ibb.co/Y4cQLGqG/image.png",
-                message: "🎁 Вам выпал подарок!"
+                color: "#ff8c42"
             },
             { 
                 name: "Сюрприз", 
                 type: "item", 
                 image: "https://i.ibb.co/q3xL5y2h/image.png",
-                message: "🎉 Вам выпал сюрприз!"
+                color: "#9d4edd"
             }
         ];
 
@@ -2927,25 +2222,10 @@
             { name: "purple", angle: 270, multiplier: 5 }
         ];
 
-        // ЦЕНЫ ДЛЯ PvP ПРЕДМЕТОВ
-        const pvpItemPrices = {
-            "Календарик": 250,
-            "Эскимо": 195,
-            "Носки": 270,
-            "Печенька": 270,
-            "Световой меч": 500,
-            "Какашка": 250,
-            "Ракета": 290,
-            "Яйцо": 360,
-            "Двухклинковый световой меч": 570,
-            "Разряженный световой меч": 620,
-            "Лавовый световой меч": 700
-        };
-
         // ПЕРЕМЕННЫЕ
         let isSpinning = false;
         let currentUserId = '';
-        let userBalance = 100;
+        let userBalance = 0; // ИЗМЕНЕНО: начальный баланс 0
         let userInventory = [];
         let usedPromoCodes = [];
         let isCaseAnimationRunning = false;
@@ -2956,12 +2236,7 @@
         let isBetSpinning = false;
         let userClan = null;
         let currentWheelRotation = 0;
-        let selectedPvpMode = null;
-        let selectedPvpItems = [];
-        let isPvpBattleRunning = false;
         let selectedWithdrawItems = [];
-        let isInPvpQueue = false;
-        let queueTimer = null;
 
         let userStats = {
             wheelSpins: 0,
@@ -2969,26 +2244,11 @@
             totalSpent: 0,
             itemsWon: 0,
             betsWon: 0,
-            betsLost: 0,
-            pvpWins: 0,
-            pvpLosses: 0
+            betsLost: 0
         };
 
-        // НОВЫЕ ПЕРЕМЕННЫЕ ДЛЯ PvP
-        let pvpBattleState = {
-            playerHp: 100,
-            opponentHp: 100,
-            playerMaxHp: 100,
-            opponentMaxHp: 100,
-            playerDamage: 10,
-            opponentDamage: 10,
-            isPlayerTurn: true,
-            isBlocking: false,
-            opponentIsBlocking: false
-        };
-
-        // БАЗА ДАННЫХ ДЛЯ ВЫВОДОВ
-        let withdrawRequests = [];
+        // БАЗА ДАННЫХ ДЛЯ ПРОМОКОДОВ
+        let promoDatabase = {};
 
         // ФУНКЦИИ FIREBASE
         async function saveUserToFirebase() {
@@ -3017,7 +2277,7 @@
                 const doc = await db.collection('users').doc(currentUserId).get();
                 if (doc.exists) {
                     const data = doc.data();
-                    userBalance = data.balance || 100;
+                    userBalance = data.balance || 0; // ИЗМЕНЕНО: по умолчанию 0
                     userInventory = data.inventory || [];
                     usedPromoCodes = data.usedPromoCodes || [];
                     userStats = data.stats || userStats;
@@ -3031,97 +2291,47 @@
             return false;
         }
 
-        async function loadClansFromFirebase() {
+        async function loadPromoCodesFromFirebase() {
             try {
-                const snapshot = await db.collection('clans').orderBy('rating', 'desc').get();
-                const clans = [];
+                const snapshot = await db.collection('promoCodes').get();
+                promoDatabase = {};
                 snapshot.forEach(doc => {
-                    clans.push({ id: doc.id, ...doc.data() });
+                    promoDatabase[doc.id] = doc.data();
                 });
-                return clans;
             } catch (error) {
-                console.error('Ошибка загрузки кланов:', error);
-                return [];
+                console.error('Ошибка загрузки промокодов:', error);
             }
         }
 
-        async function joinClanInFirebase(clanId) {
+        async function saveWithdrawRequestToFirebase(request) {
             try {
-                const clanRef = db.collection('clans').doc(clanId);
-                const clanDoc = await clanRef.get();
-                
-                if (clanDoc.exists) {
-                    const clan = clanDoc.data();
-                    if (clan.members.length >= 10) {
-                        alert('❌ Клан уже заполнен!');
-                        return false;
-                    }
-                    
-                    // Добавляем пользователя в клан
-                    clan.members.push({
-                        userId: currentUserId,
-                        role: 'Участник',
-                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    await clanRef.update({
-                        members: clan.members
-                    });
-                    
-                    // Обновляем данные пользователя
-                    userClan = {
-                        id: clanId,
-                        name: clan.name,
-                        role: 'Участник',
-                        rating: clan.rating
-                    };
-                    
-                    await saveUserToFirebase();
-                    return true;
-                }
-            } catch (error) {
-                console.error('Ошибка вступления в клан:', error);
-            }
-            return false;
-        }
-
-        async function createClanInFirebase(clanName) {
-            try {
-                const clanData = {
-                    name: clanName,
-                    rating: 0,
-                    members: [{
-                        userId: currentUserId,
-                        role: 'Лидер',
-                        joinedAt: firebase.firestore.FieldValue.serverTimestamp()
-                    }],
+                await db.collection('withdrawRequests').add({
+                    ...request,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                };
-                
-                const docRef = await db.collection('clans').add(clanData);
-                
-                userClan = {
-                    id: docRef.id,
-                    name: clanName,
-                    role: 'Лидер',
-                    rating: 0
-                };
-                
-                await saveUserToFirebase();
+                });
                 return true;
             } catch (error) {
-                console.error('Ошибка создания клана:', error);
+                console.error('Ошибка сохранения заявки на вывод:', error);
                 return false;
             }
         }
 
-        // УБРАНА ПРОВЕРКА АВТОРИЗАЦИИ
-        function checkAuthentication() {
-            return true; // Всегда возвращает true - доступ для всех
-        }
-
-        function isAdmin() {
-            return adminUsers.includes(currentUserId);
+        async function loadWithdrawRequestsFromFirebase() {
+            try {
+                const snapshot = await db.collection('withdrawRequests')
+                    .orderBy('createdAt', 'desc')
+                    .limit(50)
+                    .get();
+                
+                const requests = [];
+                snapshot.forEach(doc => {
+                    requests.push({ id: doc.id, ...doc.data() });
+                });
+                return requests;
+            } catch (error) {
+                console.error('Ошибка загрузки заявок на вывод:', error);
+                return [];
+            }
         }
 
         function generateUserId() {
@@ -3131,9 +2341,16 @@
         function startGame() {
             // Скрываем окно авторизации
             document.getElementById('authOverlay').style.display = 'none';
+            document.getElementById('mainPage').style.display = 'block';
             
             // Создаем уникальный ID для пользователя
-            currentUserId = generateUserId();
+            const savedUserId = localStorage.getItem('halloweenWheelUserId');
+            if (savedUserId) {
+                currentUserId = savedUserId;
+            } else {
+                currentUserId = generateUserId();
+                localStorage.setItem('halloweenWheelUserId', currentUserId);
+            }
             
             // Загружаем данные пользователя
             loadUserData();
@@ -3142,19 +2359,13 @@
             init();
         }
 
-        function loadUserData() {
-            const savedData = localStorage.getItem('halloweenWheelData');
-            if (savedData) {
-                const data = JSON.parse(savedData);
-                userBalance = data.balance || 100;
-                userInventory = data.inventory || [];
-                usedPromoCodes = data.usedPromoCodes || [];
-                userStats = data.stats || userStats;
-                userClan = data.clan || null;
-                currentWheelRotation = data.currentWheelRotation || 0;
-            } else {
-                // Создаем нового пользователя
-                userBalance = 100;
+        async function loadUserData() {
+            // Сначала пробуем загрузить из Firebase
+            const loaded = await loadUserFromFirebase();
+            
+            if (!loaded) {
+                // Если нет в Firebase, создаем нового пользователя
+                userBalance = 0; // ИЗМЕНЕНО: начальный баланс 0
                 userInventory = [];
                 usedPromoCodes = [];
                 userStats = {
@@ -3163,58 +2374,40 @@
                     totalSpent: 0,
                     itemsWon: 0,
                     betsWon: 0,
-                    betsLost: 0,
-                    pvpWins: 0,
-                    pvpLosses: 0
+                    betsLost: 0
                 };
                 userClan = null;
                 currentWheelRotation = 0;
+                
+                // Сохраняем в Firebase
+                await saveUserToFirebase();
             }
         }
 
         function saveUserData() {
-            const data = {
-                userId: currentUserId,
-                balance: userBalance,
-                inventory: userInventory,
-                usedPromoCodes: usedPromoCodes,
-                stats: userStats,
-                clan: userClan,
-                currentWheelRotation: currentWheelRotation
-            };
-            localStorage.setItem('halloweenWheelData', JSON.stringify(data));
             saveUserToFirebase(); // Сохраняем в Firebase
         }
 
-        // ОСТАЛЬНЫЕ ФУНКЦИИ ОСТАЮТСЯ ПРЕЖНИМИ
-        function createAnimatedBackground() {
-            const animatedBg = document.getElementById('animatedBg');
-            for (let i = 0; i < 15; i++) {
-                const pumpkin = document.createElement('div');
-                pumpkin.className = 'bg-pumpkin';
-                pumpkin.innerHTML = '🎃';
-                pumpkin.style.left = Math.random() * 100 + '%';
-                pumpkin.style.animationDelay = Math.random() * 20 + 's';
-                animatedBg.appendChild(pumpkin);
-            }
-            
-            for (let i = 0; i < 10; i++) {
-                const bat = document.createElement('div');
-                bat.className = 'bg-bat';
-                bat.innerHTML = '🦇';
-                bat.style.left = Math.random() * 100 + '%';
-                bat.style.top = Math.random() * 100 + '%';
-                bat.style.animationDelay = Math.random() * 15 + 's';
-                animatedBg.appendChild(bat);
-            }
-        }
-
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КОЛЕСА
         function createWheel() {
             const wheel = document.getElementById('wheel');
             wheel.innerHTML = '';
             
             const segmentAngle = 360 / prizes.length;
             
+            // Создаем градиент для колеса
+            let gradientString = 'conic-gradient(';
+            prizes.forEach((prize, index) => {
+                const startAngle = index * segmentAngle;
+                const endAngle = (index + 1) * segmentAngle;
+                gradientString += `${prize.color} ${startAngle}deg ${endAngle}deg`;
+                if (index < prizes.length - 1) gradientString += ', ';
+            });
+            gradientString += ')';
+            
+            wheel.style.background = gradientString;
+            
+            // Добавляем изображения на сегменты
             prizes.forEach((prize, index) => {
                 const segment = document.createElement('div');
                 segment.className = 'wheel-segment';
@@ -3237,97 +2430,10 @@
             wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
         }
 
-        function updateUI() {
-            // Обновляем ID пользователя
-            document.getElementById('userId').textContent = currentUserId;
-            document.getElementById('profileUserId').textContent = currentUserId;
-            
-            // Обновляем баланс
-            document.getElementById('balanceAmount').textContent = userBalance + ' ★';
-            document.getElementById('starsCount').textContent = userBalance;
-            document.getElementById('profileBalance').textContent = userBalance + ' ★';
-            
-            // Обновляем статистику
-            document.getElementById('wheelSpins').textContent = userStats.wheelSpins;
-            document.getElementById('casesOpened').textContent = userStats.casesOpened;
-            document.getElementById('totalSpent').textContent = userStats.totalSpent;
-            document.getElementById('itemsWon').textContent = userStats.itemsWon;
-            
-            // Обновляем инвентарь
-            document.getElementById('profileInventory').textContent = userInventory.length + ' предметов';
-            
-            // Обновляем информацию о клане
-            updateClanInfo();
-            
-            // Обновляем кнопки в зависимости от баланса
-            updateButtons();
-        }
-
-        function updateClanInfo() {
-            if (userClan) {
-                document.getElementById('clanName').textContent = userClan.name;
-                document.getElementById('clanRole').textContent = userClan.role;
-                document.getElementById('clanRating').textContent = userClan.rating + ' ★';
-                // Здесь нужно обновить список участников клана
-            } else {
-                document.getElementById('clanName').textContent = 'Не в клане';
-                document.getElementById('clanRole').textContent = '-';
-                document.getElementById('clanRating').textContent = '0 ★';
-            }
-        }
-
-        function updateButtons() {
-            const spinButton = document.getElementById('spinButton');
-            const caseButton1 = document.getElementById('openCaseButton1');
-            const caseButton2 = document.getElementById('openCaseButton2');
-            
-            spinButton.disabled = userBalance < 50 || isSpinning;
-            caseButton1.disabled = userBalance < 300 || isCaseAnimationRunning;
-            caseButton2.disabled = userBalance < 450 || isCaseAnimationRunning;
-        }
-
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВРАЩЕНИЯ КОЛЕСА - СТРЕЛКА В СЕРЕДИНУ СЕГМЕНТА
         function spinWheel() {
-            if (isSpinning || userBalance < 50) return;
-            
-            isSpinning = true;
-            userBalance -= 50;
-            userStats.wheelSpins++;
-            userStats.totalSpent += 50;
-            
-            updateUI();
-            saveUserData();
-            
-            const wheel = document.getElementById('wheel');
-            const spinButton = document.getElementById('spinButton');
-            
-            spinButton.disabled = true;
-            
-            // Вычисляем случайный приз
-            const prizeIndex = Math.floor(Math.random() * prizes.length);
-            const prize = prizes[prizeIndex];
-            
-            // Вычисляем угол вращения (несколько полных оборотов + приз)
-            const segmentAngle = 360 / prizes.length;
-            const extraSpins = 5; // Количество дополнительных полных оборотов
-            const targetAngle = 360 * extraSpins + (360 - prizeIndex * segmentAngle) + 360 / prizes.length / 2;
-            
-            // Сохраняем текущее вращение
-            currentWheelRotation = (currentWheelRotation + targetAngle) % 360;
-            
-            // Анимация вращения
-            wheel.style.transition = 'transform 5s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
-            wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
-            
-            // Создаем конфетти
-            createConfetti();
-            
-            // Показываем выигрыш
-            setTimeout(() => {
-                showPrize(prize);
-                isSpinning = false;
-                updateButtons();
-                saveUserData();
-            }, 5000);
+            // РУЛЕТКА ВРЕМЕННО НЕДОСТУПНА
+            return;
         }
 
         function showPrize(prize) {
@@ -3349,9 +2455,6 @@
             flyingPrize.style.top = '50%';
             document.body.appendChild(flyingPrize);
             
-            // Показываем сообщение
-            alert(prize.message);
-            
             // Удаляем летящий предмет после анимации
             setTimeout(() => {
                 flyingPrize.remove();
@@ -3361,7 +2464,7 @@
         }
 
         function createConfetti() {
-            const confettiCount = 50;
+            const confettiCount = 20;
             const container = document.querySelector('.container');
             
             for (let i = 0; i < confettiCount; i++) {
@@ -3383,13 +2486,70 @@
             return colors[Math.floor(Math.random() * colors.length)];
         }
 
+        function updateUI() {
+            // Обновляем ID пользователя
+            document.getElementById('userId').textContent = currentUserId;
+            document.getElementById('profileUserId').textContent = currentUserId;
+            
+            // Обновляем баланс
+            document.getElementById('balanceAmount').textContent = userBalance + ' ★';
+            document.getElementById('starsCount').textContent = userBalance;
+            document.getElementById('profileBalance').textContent = userBalance + ' ★';
+            
+            // Обновляем статистику
+            document.getElementById('wheelSpins').textContent = userStats.wheelSpins;
+            document.getElementById('casesOpened').textContent = userStats.casesOpened;
+            document.getElementById('totalSpent').textContent = userStats.totalSpent;
+            document.getElementById('itemsWon').textContent = userStats.itemsWon;
+            
+            // Обновляем инвентарь
+            document.getElementById('profileInventory').textContent = userInventory.length + ' предметов';
+            
+            // Обновляем кнопки в зависимости от баланса
+            updateButtons();
+            
+            // Если пользователь админ, добавляем кнопку админ панели
+            if (isAdmin()) {
+                addAdminButton();
+            }
+        }
+
+        function addAdminButton() {
+            const navigation = document.querySelector('.navigation');
+            // Проверяем, не добавлена ли уже кнопка админа
+            if (!document.querySelector('.nav-btn[onclick="showAdminPage()"]')) {
+                const adminBtn = document.createElement('button');
+                adminBtn.className = 'nav-btn';
+                adminBtn.onclick = showAdminPage;
+                adminBtn.innerHTML = `
+                    <div class="nav-icon">🔧</div>
+                    <div class="nav-text">АДМИН</div>
+                `;
+                navigation.appendChild(adminBtn);
+                
+                // Обновляем grid-template-columns
+                navigation.style.gridTemplateColumns = 'repeat(7, 1fr)';
+            }
+        }
+
+        function isAdmin() {
+            return adminUsers.includes(currentUserId);
+        }
+
+        function updateButtons() {
+            const spinButton = document.getElementById('spinButton');
+            const caseButton1 = document.getElementById('openCaseButton1');
+            const caseButton2 = document.getElementById('openCaseButton2');
+            
+            // РУЛЕТКА ВСЕГДА НЕАКТИВНА
+            spinButton.disabled = true;
+            caseButton1.disabled = userBalance < 300 || isCaseAnimationRunning;
+            caseButton2.disabled = userBalance < 450 || isCaseAnimationRunning;
+        }
+
         function copyUserId() {
             navigator.clipboard.writeText(currentUserId).then(() => {
-                const notification = document.getElementById('copyNotification');
-                notification.style.display = 'block';
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 2000);
+                // УБРАНО УВЕДОМЛЕНИЕ О КОПИРОВАНИИ
             });
         }
 
@@ -3402,13 +2562,27 @@
             document.getElementById('overlay').style.display = 'none';
             document.getElementById('paymentPopup').style.display = 'none';
             document.getElementById('inventoryPopup').style.display = 'none';
+            document.getElementById('withdrawPopup').style.display = 'none';
+        }
+
+        function showWithdrawPopup() {
+            if (selectedWithdrawItems.length === 0) return;
+            
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('withdrawPopup').style.display = 'block';
+            document.getElementById('usernameInput').value = '';
+        }
+
+        function closeWithdrawPopup() {
+            document.getElementById('withdrawPopup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
         }
 
         // НАВИГАЦИЯ
         function showMainPage() {
             hideAllPages();
             document.getElementById('mainPage').style.display = 'block';
-            setActiveNavButton(2);
+            setActiveNavButton(1);
         }
 
         function showProfilePage() {
@@ -3420,38 +2594,32 @@
         function showCasesPage() {
             hideAllPages();
             document.getElementById('casesPage').style.display = 'block';
-            setActiveNavButton(3);
+            setActiveNavButton(2);
         }
 
         function showBettingPage() {
             hideAllPages();
             document.getElementById('bettingPage').style.display = 'block';
-            setActiveNavButton(4);
-        }
-
-        function showClanPage() {
-            hideAllPages();
-            document.getElementById('clanPage').style.display = 'block';
-            setActiveNavButton(1);
+            setActiveNavButton(3);
         }
 
         function showPvpPage() {
             hideAllPages();
             document.getElementById('pvpPage').style.display = 'block';
-            setActiveNavButton(5);
+            setActiveNavButton(4);
         }
 
         function showWithdrawPage() {
             hideAllPages();
             document.getElementById('withdrawPage').style.display = 'block';
-            setActiveNavButton(6);
+            setActiveNavButton(5);
             updateWithdrawItems();
         }
 
         function showAdminPage() {
             hideAllPages();
             document.getElementById('adminPage').style.display = 'block';
-            // Здесь можно загрузить данные для админ панели
+            loadAdminWithdrawRequests();
         }
 
         function hideAllPages() {
@@ -3473,19 +2641,20 @@
         }
 
         // ПРОМОКОДЫ
-        function activatePromoCode() {
+        async function activatePromoCode() {
             const promoInput = document.getElementById('promoCodeInput');
             const promoCode = promoInput.value.trim().toUpperCase();
             
             if (!promoCode) {
-                alert('❌ Введите промокод!');
                 return;
             }
             
             if (usedPromoCodes.includes(promoCode)) {
-                alert('❌ Этот промокод уже использован!');
                 return;
             }
+            
+            // Загружаем актуальные промокоды
+            await loadPromoCodesFromFirebase();
             
             const promo = promoDatabase[promoCode];
             if (promo && promo.used < promo.uses) {
@@ -3494,6 +2663,11 @@
                 promo.used++;
                 usedPromoCodes.push(promoCode);
                 
+                // Обновляем промокод в Firebase
+                await db.collection('promoCodes').doc(promoCode).update({
+                    used: promo.used
+                });
+                
                 // Обновляем UI
                 updateUI();
                 saveUserData();
@@ -3501,10 +2675,9 @@
                 // Показываем историю
                 updatePromoHistory();
                 
-                alert(`✅ Промокод активирован! Получено ${promo.stars} звезд!`);
                 promoInput.value = '';
             } else {
-                alert('❌ Неверный или неактивный промокод!');
+                // УБРАНО УВЕДОМЛЕНИЕ
             }
         }
 
@@ -3540,7 +2713,6 @@
             currentCaseCost = caseType === 1 ? 300 : 450;
             
             if (userBalance < currentCaseCost) {
-                alert('❌ Недостаточно звезд для открытия кейса!');
                 return;
             }
             
@@ -3652,7 +2824,6 @@
 
         function spinAgain() {
             if (userBalance < currentCaseCost) {
-                alert('❌ Недостаточно звезд для открытия кейса!');
                 closeCaseOpening();
                 return;
             }
@@ -3752,431 +2923,6 @@
             }, 3000);
         }
 
-        // НОВЫЕ ФУНКЦИИ ДЛЯ КЛАНОВ
-        async function toggleClansList() {
-            const userClanInfo = document.getElementById('userClanInfo');
-            const availableClans = document.getElementById('availableClans');
-            
-            if (userClan) {
-                alert('❌ Вы уже состоите в клане!');
-                return;
-            }
-            
-            if (availableClans.style.display === 'none') {
-                // Показываем список кланов
-                const clans = await loadClansFromFirebase();
-                displayClansList(clans);
-                userClanInfo.style.display = 'none';
-                availableClans.style.display = 'block';
-            } else {
-                // Скрываем список кланов
-                userClanInfo.style.display = 'block';
-                availableClans.style.display = 'none';
-            }
-        }
-
-        function displayClansList(clans) {
-            const container = document.getElementById('clansListContainer');
-            container.innerHTML = '';
-            
-            if (clans.length === 0) {
-                container.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Пока нет созданных кланов</div>';
-                return;
-            }
-            
-            clans.forEach(clan => {
-                const clanElement = document.createElement('div');
-                clanElement.className = 'clan-list-item';
-                clanElement.innerHTML = `
-                    <div class="clan-list-header">
-                        <div class="clan-list-name">${clan.name}</div>
-                        <div class="clan-list-rating">${clan.rating} ★</div>
-                    </div>
-                    <div class="clan-list-info">
-                        <div class="clan-list-members">
-                            <span>👥</span>
-                            <span>${clan.members.length}/10</span>
-                        </div>
-                        <div>Создан: ${new Date(clan.createdAt?.toDate()).toLocaleDateString()}</div>
-                    </div>
-                    <button class="join-clan-button" onclick="joinClan('${clan.id}')">
-                        ВСТУПИТЬ
-                    </button>
-                `;
-                container.appendChild(clanElement);
-            });
-        }
-
-        async function joinClan(clanId) {
-            if (userBalance < 500) {
-                alert('❌ Для вступления в клан нужно 500 звезд!');
-                return;
-            }
-            
-            const success = await joinClanInFirebase(clanId);
-            if (success) {
-                userBalance -= 500;
-                saveUserData();
-                updateUI();
-                alert('✅ Вы успешно вступили в клан!');
-                toggleClansList(); // Скрываем список кланов
-            }
-        }
-
-        async function showCreateClanForm() {
-            if (userClan) {
-                alert('❌ Вы уже состоите в клане!');
-                return;
-            }
-            
-            if (userBalance < 1000) {
-                alert('❌ Для создания клана нужно 1000 звезд!');
-                return;
-            }
-            
-            const clanName = prompt('Введите название клана (3-15 символов):');
-            if (!clanName) return;
-            
-            if (clanName.length < 3 || clanName.length > 15) {
-                alert('❌ Название клана должно быть от 3 до 15 символов!');
-                return;
-            }
-            
-            const success = await createClanInFirebase(clanName);
-            if (success) {
-                userBalance -= 1000;
-                saveUserData();
-                updateUI();
-                alert(`✅ Клан "${clanName}" создан!`);
-            }
-        }
-
-        // НОВЫЕ ФУНКЦИИ ДЛЯ PvP
-        function selectPvpMode(mode) {
-            selectedPvpMode = mode;
-            
-            // Сбрасываем выделение
-            const pvpModes = document.querySelectorAll('.pvp-mode');
-            pvpModes.forEach(modeElement => {
-                modeElement.classList.remove('selected');
-            });
-            
-            // Выделяем выбранный режим
-            event.currentTarget.classList.add('selected');
-            
-            updatePvpItems();
-        }
-
-        function updatePvpItems() {
-            const pvpItemsGrid = document.getElementById('pvpItemsGrid');
-            pvpItemsGrid.innerHTML = '';
-            
-            userInventory.forEach((item, index) => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'pvp-item';
-                itemElement.onclick = () => togglePvpItemSelection(index);
-                itemElement.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" class="pvp-item-image">
-                    <div class="pvp-item-name">${item.name}</div>
-                    <div class="pvp-item-value">${pvpItemPrices[item.name] || 100} ★</div>
-                `;
-                pvpItemsGrid.appendChild(itemElement);
-            });
-            
-            updatePvpStats();
-        }
-
-        function togglePvpItemSelection(index) {
-            const item = userInventory[index];
-            const itemIndex = selectedPvpItems.findIndex(selected => selected.name === item.name);
-            
-            if (itemIndex === -1) {
-                selectedPvpItems.push(item);
-            } else {
-                selectedPvpItems.splice(itemIndex, 1);
-            }
-            
-            updatePvpStats();
-            
-            // Обновляем выделение
-            const pvpItems = document.querySelectorAll('.pvp-item');
-            pvpItems.forEach((itemElement, i) => {
-                const currentItem = userInventory[i];
-                const isSelected = selectedPvpItems.some(selected => selected.name === currentItem.name);
-                itemElement.classList.toggle('selected', isSelected);
-            });
-        }
-
-        function updatePvpStats() {
-            const totalValue = selectedPvpItems.reduce((sum, item) => {
-                return sum + (pvpItemPrices[item.name] || 100);
-            }, 0);
-            
-            const commission = Math.floor(totalValue * 0.1); // 10% комиссия
-            const potentialWin = totalValue - commission;
-            
-            document.getElementById('selectedItemsCount').textContent = selectedPvpItems.length;
-            document.getElementById('totalBetValue').textContent = totalValue + ' ★';
-            document.getElementById('arenaCommission').textContent = commission + ' ★';
-            document.getElementById('potentialWin').textContent = potentialWin + ' ★';
-            
-            document.getElementById('startPvpButton').disabled = selectedPvpItems.length === 0;
-        }
-
-        function enterPvpQueue() {
-            if (selectedPvpMode === null || selectedPvpItems.length === 0) {
-                alert('❌ Выберите режим и предметы для ставки!');
-                return;
-            }
-            
-            if (selectedPvpMode === 'tournament') {
-                alert('❌ Турнир 4 игрока временно недоступен!');
-                return;
-            }
-            
-            isInPvpQueue = true;
-            document.getElementById('pvpQueue').style.display = 'block';
-            document.getElementById('startPvpButton').style.display = 'none';
-            
-            let timeLeft = 30;
-            updateQueueTimer(timeLeft);
-            
-            queueTimer = setInterval(() => {
-                timeLeft--;
-                updateQueueTimer(timeLeft);
-                
-                if (timeLeft <= 0) {
-                    leaveQueue();
-                    // Здесь будет логика для бота, если не найден реальный игрок
-                    if (selectedPvpMode === 'duel') {
-                        setTimeout(() => startPvpBattle(), 1000);
-                    }
-                }
-            }, 1000);
-        }
-
-        function updateQueueTimer(seconds) {
-            document.getElementById('queueTimer').textContent = 
-                `00:${seconds.toString().padStart(2, '0')}`;
-        }
-
-        function leaveQueue() {
-            isInPvpQueue = false;
-            clearInterval(queueTimer);
-            document.getElementById('pvpQueue').style.display = 'none';
-            document.getElementById('startPvpButton').style.display = 'block';
-        }
-
-        function startPvpBattle() {
-            document.getElementById('pvpBattleOverlay').style.display = 'flex';
-            resetPvpBattle();
-        }
-
-        function resetPvpBattle() {
-            pvpBattleState = {
-                playerHp: 100,
-                opponentHp: 100,
-                playerMaxHp: 100,
-                opponentMaxHp: 100,
-                playerDamage: 10,
-                opponentDamage: 10,
-                isPlayerTurn: true,
-                isBlocking: false,
-                opponentIsBlocking: false
-            };
-            
-            updatePvpBattleUI();
-            document.getElementById('battleResult').style.display = 'none';
-            document.getElementById('battleLog').innerHTML = '<div class="battle-message">Битва началась!</div>';
-        }
-
-        function updatePvpBattleUI() {
-            document.getElementById('playerHpText').textContent = `❤️ ${pvpBattleState.playerHp}/${pvpBattleState.playerMaxHp}`;
-            document.getElementById('opponentHpText').textContent = `❤️ ${pvpBattleState.opponentHp}/${pvpBattleState.opponentMaxHp}`;
-            document.getElementById('turnIndicator').textContent = pvpBattleState.isPlayerTurn ? 'Ваш ход!' : 'Ход противника...';
-            
-            // Блокируем кнопки во время хода противника
-            const actionButtons = document.querySelectorAll('.battle-action-btn');
-            actionButtons.forEach(button => {
-                button.disabled = !pvpBattleState.isPlayerTurn;
-            });
-        }
-
-        function performAction(action) {
-            if (!pvpBattleState.isPlayerTurn) return;
-            
-            const battleLog = document.getElementById('battleLog');
-            
-            switch (action) {
-                case 'attack':
-                    let damage = pvpBattleState.playerDamage;
-                    if (pvpBattleState.opponentIsBlocking) {
-                        damage = Math.floor(damage * 0.3);
-                        battleLog.innerHTML += `<div class="battle-message">⚔️ Вы атаковали, но противник блокировал часть урона! Нанесено ${damage} урона</div>`;
-                    } else {
-                        battleLog.innerHTML += `<div class="battle-message">⚔️ Вы атаковали и нанесли ${damage} урона</div>`;
-                    }
-                    pvpBattleState.opponentHp -= damage;
-                    break;
-                    
-                case 'crit':
-                    const critChance = Math.random();
-                    if (critChance > 0.7) {
-                        const critDamage = Math.floor(pvpBattleState.playerDamage * 2.5);
-                        pvpBattleState.opponentHp -= critDamage;
-                        battleLog.innerHTML += `<div class="battle-message">🔥 КРИТИЧЕСКИЙ УДАР! Нанесено ${critDamage} урона!</div>`;
-                        document.getElementById('playerCharacter').classList.add('critical');
-                        setTimeout(() => {
-                            document.getElementById('playerCharacter').classList.remove('critical');
-                        }, 1000);
-                    } else {
-                        battleLog.innerHTML += `<div class="battle-message">❌ Критический удар не сработал!</div>`;
-                    }
-                    break;
-                    
-                case 'heal':
-                    const healAmount = Math.floor(pvpBattleState.playerMaxHp * 0.3);
-                    pvpBattleState.playerHp = Math.min(pvpBattleState.playerMaxHp, pvpBattleState.playerHp + healAmount);
-                    battleLog.innerHTML += `<div class="battle-message">💚 Вы восстановили ${healAmount} здоровья</div>`;
-                    document.getElementById('playerCharacter').classList.add('healing');
-                    setTimeout(() => {
-                        document.getElementById('playerCharacter').classList.remove('healing');
-                    }, 1000);
-                    break;
-                    
-                case 'block':
-                    pvpBattleState.isBlocking = true;
-                    battleLog.innerHTML += `<div class="battle-message">🛡️ Вы приготовились блокировать следующую атаку</div>`;
-                    document.getElementById('playerCharacter').classList.add('blocking');
-                    setTimeout(() => {
-                        document.getElementById('playerCharacter').classList.remove('blocking');
-                    }, 500);
-                    break;
-            }
-            
-            // Прокрутка лога вниз
-            battleLog.scrollTop = battleLog.scrollHeight;
-            
-            // Проверяем конец битвы
-            if (checkBattleEnd()) return;
-            
-            // Передаем ход противнику
-            pvpBattleState.isPlayerTurn = false;
-            updatePvpBattleUI();
-            
-            // Ход противника
-            setTimeout(opponentTurn, 1500);
-        }
-
-        function opponentTurn() {
-            const battleLog = document.getElementById('battleLog');
-            const actions = ['attack', 'crit', 'heal', 'block'];
-            const action = actions[Math.floor(Math.random() * actions.length)];
-            
-            switch (action) {
-                case 'attack':
-                    let damage = pvpBattleState.opponentDamage;
-                    if (pvpBattleState.isBlocking) {
-                        damage = Math.floor(damage * 0.3);
-                        battleLog.innerHTML += `<div class="battle-message">⚔️ Противник атаковал, но вы блокировали часть урона! Получено ${damage} урона</div>`;
-                    } else {
-                        battleLog.innerHTML += `<div class="battle-message">⚔️ Противник атаковал и нанес ${damage} урона</div>`;
-                    }
-                    pvpBattleState.playerHp -= damage;
-                    document.getElementById('opponentCharacter').classList.add('attacking');
-                    setTimeout(() => {
-                        document.getElementById('opponentCharacter').classList.remove('attacking');
-                    }, 500);
-                    break;
-                    
-                case 'crit':
-                    const critChance = Math.random();
-                    if (critChance > 0.6) {
-                        const critDamage = Math.floor(pvpBattleState.opponentDamage * 2);
-                        pvpBattleState.playerHp -= critDamage;
-                        battleLog.innerHTML += `<div class="battle-message">🔥 Противник нанес критический удар! Получено ${critDamage} урона!</div>`;
-                        document.getElementById('opponentCharacter').classList.add('critical');
-                        setTimeout(() => {
-                            document.getElementById('opponentCharacter').classList.remove('critical');
-                        }, 1000);
-                    } else {
-                        battleLog.innerHTML += `<div class="battle-message">❌ Критический удар противника не сработал!</div>`;
-                    }
-                    break;
-                    
-                case 'heal':
-                    const healAmount = Math.floor(pvpBattleState.opponentMaxHp * 0.25);
-                    pvpBattleState.opponentHp = Math.min(pvpBattleState.opponentMaxHp, pvpBattleState.opponentHp + healAmount);
-                    battleLog.innerHTML += `<div class="battle-message">💚 Противник восстановил ${healAmount} здоровья</div>`;
-                    document.getElementById('opponentCharacter').classList.add('healing');
-                    setTimeout(() => {
-                        document.getElementById('opponentCharacter').classList.remove('healing');
-                    }, 1000);
-                    break;
-                    
-                case 'block':
-                    pvpBattleState.opponentIsBlocking = true;
-                    battleLog.innerHTML += `<div class="battle-message">🛡️ Противник приготовился блокировать</div>`;
-                    document.getElementById('opponentCharacter').classList.add('blocking');
-                    setTimeout(() => {
-                        document.getElementById('opponentCharacter').classList.remove('blocking');
-                    }, 500);
-                    break;
-            }
-            
-            // Сбрасываем блок игрока
-            pvpBattleState.isBlocking = false;
-            
-            // Прокрутка лога вниз
-            battleLog.scrollTop = battleLog.scrollHeight;
-            
-            // Проверяем конец битвы
-            if (checkBattleEnd()) return;
-            
-            // Возвращаем ход игроку
-            pvpBattleState.isPlayerTurn = true;
-            updatePvpBattleUI();
-        }
-
-        function checkBattleEnd() {
-            const battleResult = document.getElementById('battleResult');
-            const battleResultText = document.getElementById('battleResultText');
-            
-            if (pvpBattleState.playerHp <= 0) {
-                battleResultText.textContent = '❌ ВЫ ПРОИГРАЛИ';
-                battleResult.style.display = 'block';
-                userStats.pvpLosses++;
-                saveUserData();
-                return true;
-            }
-            
-            if (pvpBattleState.opponentHp <= 0) {
-                battleResultText.textContent = '🎉 ВЫ ПОБЕДИЛИ!';
-                battleResult.style.display = 'block';
-                userStats.pvpWins++;
-                
-                // Награда за победу
-                const totalValue = selectedPvpItems.reduce((sum, item) => {
-                    return sum + (pvpItemPrices[item.name] || 100);
-                }, 0);
-                const winAmount = Math.floor(totalValue * 0.9); // 90% от общей стоимости
-                userBalance += winAmount;
-                
-                battleResultText.textContent += `\n+${winAmount} ★`;
-                updateUI();
-                saveUserData();
-                return true;
-            }
-            
-            return false;
-        }
-
-        function closePvpBattle() {
-            document.getElementById('pvpBattleOverlay').style.display = 'none';
-            selectedPvpItems = [];
-            updatePvpStats();
-        }
-
         // ВЫВОД ПРЕДМЕТОВ
         function updateWithdrawItems() {
             const withdrawItemsGrid = document.getElementById('withdrawItemsGrid');
@@ -4221,53 +2967,48 @@
             document.getElementById('requestWithdrawButton').disabled = selectedWithdrawItems.length === 0;
         }
 
-        function requestWithdraw() {
-            if (selectedWithdrawItems.length === 0) {
-                alert('❌ Выберите предметы для вывода!');
+        async function confirmWithdraw() {
+            const username = document.getElementById('usernameInput').value.trim();
+            
+            if (!username) {
                 return;
             }
-            
-            alert(`📨 Для завершения вывода отправьте точку (.) в ЛС @NFT_c0llecti0n\n\nПосле отправки точки ваш запрос будет обработан.`);
             
             // Создаем запрос на вывод
             const request = {
                 userId: currentUserId,
+                username: username,
                 items: [...selectedWithdrawItems],
                 timestamp: Date.now(),
-                status: 'pending',
-                dotSent: false // Флаг, что точка еще не отправлена
+                status: 'pending'
             };
             
-            withdrawRequests.push(request);
-            saveWithdrawRequests();
+            // Сохраняем в Firebase
+            const success = await saveWithdrawRequestToFirebase(request);
             
-            // Удаляем предметы из инвентаря
-            selectedWithdrawItems.forEach(item => {
-                const itemIndex = userInventory.findIndex(invItem => 
-                    invItem.name === item.name
-                );
-                if (itemIndex !== -1) {
-                    userInventory.splice(itemIndex, 1);
-                }
-            });
-            
-            saveUserData();
-            updateUI();
-            updateWithdrawItems();
-            
-            alert('✅ Запрос на вывод создан! Отправьте точку в ЛС для подтверждения.');
-            selectedWithdrawItems = [];
-            updateWithdrawUI();
-        }
-
-        function saveWithdrawRequests() {
-            localStorage.setItem('withdrawRequests', JSON.stringify(withdrawRequests));
-        }
-
-        function loadWithdrawRequests() {
-            const saved = localStorage.getItem('withdrawRequests');
-            if (saved) {
-                withdrawRequests = JSON.parse(saved);
+            if (success) {
+                // Удаляем предметы из инвентаря
+                selectedWithdrawItems.forEach(item => {
+                    const itemIndex = userInventory.findIndex(invItem => 
+                        invItem.name === item.name
+                    );
+                    if (itemIndex !== -1) {
+                        userInventory.splice(itemIndex, 1);
+                    }
+                });
+                
+                saveUserData();
+                updateUI();
+                updateWithdrawItems();
+                
+                // Закрываем попап
+                closeWithdrawPopup();
+                
+                // Сбрасываем выбранные предметы
+                selectedWithdrawItems = [];
+                updateWithdrawUI();
+            } else {
+                // УБРАНО УВЕДОМЛЕНИЕ
             }
         }
 
@@ -4275,8 +3016,6 @@
         function showAdminTab(tabName) {
             // Скрываем все вкладки
             document.getElementById('adminWithdraws').style.display = 'none';
-            document.getElementById('adminUsers').style.display = 'none';
-            document.getElementById('adminPromo').style.display = 'none';
             
             // Показываем выбранную вкладку
             document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
@@ -4287,91 +3026,81 @@
                 tab.classList.remove('active');
             });
             event.currentTarget.classList.add('active');
-            
-            // Загружаем данные для вкладки
-            if (tabName === 'withdraws') {
-                loadWithdrawRequestsForAdmin();
-            }
         }
 
-        function loadWithdrawRequestsForAdmin() {
+        async function loadAdminWithdrawRequests() {
             const adminWithdraws = document.getElementById('adminWithdraws');
             adminWithdraws.innerHTML = '';
             
-            if (withdrawRequests.length === 0) {
+            // Загружаем заявки из Firebase
+            const requests = await loadWithdrawRequestsFromFirebase();
+            
+            if (requests.length === 0) {
                 adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
                 return;
             }
             
-            withdrawRequests.forEach((request, index) => {
+            requests.forEach((request) => {
                 const requestElement = document.createElement('div');
                 requestElement.className = 'withdraw-request';
+                
+                // Создаем элементы для отображения картинок предметов
+                const itemsHTML = request.items.map(item => `
+                    <div class="request-item">
+                        <img src="${item.image}" alt="${item.name}" class="request-item-image">
+                        ${item.name}
+                    </div>
+                `).join('');
+                
                 requestElement.innerHTML = `
-                    <div class="request-user">Пользователь: ${request.userId}</div>
+                    <div class="request-user">ID: ${request.userId}</div>
+                    <div class="request-username">Юзернейм: ${request.username}</div>
                     <div class="request-items">
-                        ${request.items.map(item => `
-                            <div class="request-item">${item.name}</div>
-                        `).join('')}
+                        ${itemsHTML}
                     </div>
                     <div>Статус: ${request.status}</div>
                     <div class="request-actions">
-                        <button class="approve-button" onclick="approveWithdraw(${index})">✅ Одобрить</button>
-                        <button class="reject-button" onclick="rejectWithdraw(${index})">❌ Отклонить</button>
+                        <button class="approve-button" onclick="approveWithdraw('${request.id}')">✅ Одобрить</button>
+                        <button class="reject-button" onclick="rejectWithdraw('${request.id}')">❌ Отклонить</button>
                     </div>
                 `;
                 adminWithdraws.appendChild(requestElement);
             });
         }
 
-        function approveWithdraw(index) {
-            withdrawRequests[index].status = 'approved';
-            saveWithdrawRequests();
-            loadWithdrawRequestsForAdmin();
-            alert('✅ Запрос на вывод одобрен!');
+        async function approveWithdraw(requestId) {
+            try {
+                await db.collection('withdrawRequests').doc(requestId).update({
+                    status: 'approved'
+                });
+                loadAdminWithdrawRequests();
+            } catch (error) {
+                console.error('Ошибка одобрения заявки:', error);
+            }
         }
 
-        function rejectWithdraw(index) {
-            withdrawRequests[index].status = 'rejected';
-            
-            // Возвращаем предметы пользователю
-            const request = withdrawRequests[index];
-            request.items.forEach(item => {
-                userInventory.push(item);
-            });
-            
-            saveWithdrawRequests();
-            saveUserData();
-            loadWithdrawRequestsForAdmin();
-            alert('❌ Запрос на вывод отклонен! Предметы возвращены в инвентарь.');
+        async function rejectWithdraw(requestId) {
+            try {
+                await db.collection('withdrawRequests').doc(requestId).update({
+                    status: 'rejected'
+                });
+                loadAdminWithdrawRequests();
+            } catch (error) {
+                console.error('Ошибка отклонения заявки:', error);
+            }
         }
 
         // ИНИЦИАЛИЗАЦИЯ
         async function init() {
-            createAnimatedBackground();
-            await loadUserFromFirebase(); // Загружаем из Firebase
+            await loadPromoCodesFromFirebase(); // Загружаем промокоды
             createWheel();
             updateUI();
             updatePromoHistory();
-            loadWithdrawRequests();
-            
-            // Если пользователь админ, показываем админ панель в навигации
-            if (isAdmin()) {
-                const navigation = document.querySelector('.navigation');
-                const adminBtn = document.createElement('button');
-                adminBtn.className = 'nav-btn';
-                adminBtn.onclick = showAdminPage;
-                adminBtn.innerHTML = `
-                    <div class="nav-icon">🔧</div>
-                    <div class="nav-text">АДМИН</div>
-                `;
-                navigation.appendChild(adminBtn);
-            }
         }
 
         // ЗАПУСК ПРИ ЗАГРУЗКЕ
         document.addEventListener('DOMContentLoaded', function() {
-            // Сразу начинаем игру без авторизации
-            startGame();
+            // Авторизация показывается по умолчанию
         });
     </script>
 </body>
