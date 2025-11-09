@@ -10,6 +10,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     
     <style>
+        /* ВСТАВЬТЕ ВЕСЬ CSS СТИЛЬ ОТСЮДА ДО КОНЦА */
         * {
             margin: 0;
             padding: 0;
@@ -2225,7 +2226,7 @@
         // ПЕРЕМЕННЫЕ
         let isSpinning = false;
         let currentUserId = '';
-        let userBalance = 0; // ИЗМЕНЕНО: начальный баланс 0
+        let userBalance = 0;
         let userInventory = [];
         let usedPromoCodes = [];
         let isCaseAnimationRunning = false;
@@ -2277,7 +2278,7 @@
                 const doc = await db.collection('users').doc(currentUserId).get();
                 if (doc.exists) {
                     const data = doc.data();
-                    userBalance = data.balance || 0; // ИЗМЕНЕНО: по умолчанию 0
+                    userBalance = data.balance || 0;
                     userInventory = data.inventory || [];
                     usedPromoCodes = data.usedPromoCodes || [];
                     userStats = data.stats || userStats;
@@ -2339,11 +2340,9 @@
         }
 
         function startGame() {
-            // Скрываем окно авторизации
             document.getElementById('authOverlay').style.display = 'none';
             document.getElementById('mainPage').style.display = 'block';
             
-            // Создаем уникальный ID для пользователя
             const savedUserId = localStorage.getItem('halloweenWheelUserId');
             if (savedUserId) {
                 currentUserId = savedUserId;
@@ -2352,20 +2351,15 @@
                 localStorage.setItem('halloweenWheelUserId', currentUserId);
             }
             
-            // Загружаем данные пользователя
             loadUserData();
-            
-            // Инициализируем игру
             init();
         }
 
         async function loadUserData() {
-            // Сначала пробуем загрузить из Firebase
             const loaded = await loadUserFromFirebase();
             
             if (!loaded) {
-                // Если нет в Firebase, создаем нового пользователя
-                userBalance = 0; // ИЗМЕНЕНО: начальный баланс 0
+                userBalance = 0;
                 userInventory = [];
                 usedPromoCodes = [];
                 userStats = {
@@ -2379,13 +2373,12 @@
                 userClan = null;
                 currentWheelRotation = 0;
                 
-                // Сохраняем в Firebase
                 await saveUserToFirebase();
             }
         }
 
         function saveUserData() {
-            saveUserToFirebase(); // Сохраняем в Firebase
+            saveUserToFirebase();
         }
 
         // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КОЛЕСА
@@ -2395,7 +2388,6 @@
             
             const segmentAngle = 360 / prizes.length;
             
-            // Создаем градиент для колеса
             let gradientString = 'conic-gradient(';
             prizes.forEach((prize, index) => {
                 const startAngle = index * segmentAngle;
@@ -2407,7 +2399,6 @@
             
             wheel.style.background = gradientString;
             
-            // Добавляем изображения на сегменты
             prizes.forEach((prize, index) => {
                 const segment = document.createElement('div');
                 segment.className = 'wheel-segment';
@@ -2426,18 +2417,15 @@
                 wheel.appendChild(segment);
             });
             
-            // Восстанавливаем предыдущее вращение
             wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВРАЩЕНИЯ КОЛЕСА - СТРЕЛКА В СЕРЕДИНУ СЕГМЕНТА
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВРАЩЕНИЯ КОЛЕСА
         function spinWheel() {
-            // РУЛЕТКА ВРЕМЕННО НЕДОСТУПНА
             return;
         }
 
         function showPrize(prize) {
-            // Добавляем предмет в инвентарь
             userInventory.push({
                 name: prize.name,
                 image: prize.image,
@@ -2447,7 +2435,6 @@
             
             userStats.itemsWon++;
             
-            // Показываем анимацию выигрыша
             const flyingPrize = document.createElement('img');
             flyingPrize.src = prize.image;
             flyingPrize.className = 'flying-prize';
@@ -2455,7 +2442,6 @@
             flyingPrize.style.top = '50%';
             document.body.appendChild(flyingPrize);
             
-            // Удаляем летящий предмет после анимации
             setTimeout(() => {
                 flyingPrize.remove();
             }, 2000);
@@ -2487,28 +2473,22 @@
         }
 
         function updateUI() {
-            // Обновляем ID пользователя
             document.getElementById('userId').textContent = currentUserId;
             document.getElementById('profileUserId').textContent = currentUserId;
             
-            // Обновляем баланс
             document.getElementById('balanceAmount').textContent = userBalance + ' ★';
             document.getElementById('starsCount').textContent = userBalance;
             document.getElementById('profileBalance').textContent = userBalance + ' ★';
             
-            // Обновляем статистику
             document.getElementById('wheelSpins').textContent = userStats.wheelSpins;
             document.getElementById('casesOpened').textContent = userStats.casesOpened;
             document.getElementById('totalSpent').textContent = userStats.totalSpent;
             document.getElementById('itemsWon').textContent = userStats.itemsWon;
             
-            // Обновляем инвентарь
             document.getElementById('profileInventory').textContent = userInventory.length + ' предметов';
             
-            // Обновляем кнопки в зависимости от баланса
             updateButtons();
             
-            // Если пользователь админ, добавляем кнопку админ панели
             if (isAdmin()) {
                 addAdminButton();
             }
@@ -2516,7 +2496,6 @@
 
         function addAdminButton() {
             const navigation = document.querySelector('.navigation');
-            // Проверяем, не добавлена ли уже кнопка админа
             if (!document.querySelector('.nav-btn[onclick="showAdminPage()"]')) {
                 const adminBtn = document.createElement('button');
                 adminBtn.className = 'nav-btn';
@@ -2527,7 +2506,6 @@
                 `;
                 navigation.appendChild(adminBtn);
                 
-                // Обновляем grid-template-columns
                 navigation.style.gridTemplateColumns = 'repeat(7, 1fr)';
             }
         }
@@ -2541,7 +2519,6 @@
             const caseButton1 = document.getElementById('openCaseButton1');
             const caseButton2 = document.getElementById('openCaseButton2');
             
-            // РУЛЕТКА ВСЕГДА НЕАКТИВНА
             spinButton.disabled = true;
             caseButton1.disabled = userBalance < 300 || isCaseAnimationRunning;
             caseButton2.disabled = userBalance < 450 || isCaseAnimationRunning;
@@ -2549,7 +2526,6 @@
 
         function copyUserId() {
             navigator.clipboard.writeText(currentUserId).then(() => {
-                // УБРАНО УВЕДОМЛЕНИЕ О КОПИРОВАНИИ
             });
         }
 
@@ -2640,44 +2616,40 @@
             });
         }
 
-        // ПРОМОКОДЫ
+        // ПРОМОКОДЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ
         async function activatePromoCode() {
             const promoInput = document.getElementById('promoCodeInput');
             const promoCode = promoInput.value.trim().toUpperCase();
             
-            if (!promoCode) {
-                return;
-            }
+            if (!promoCode) return;
+            if (usedPromoCodes.includes(promoCode)) return;
             
-            if (usedPromoCodes.includes(promoCode)) {
-                return;
-            }
-            
-            // Загружаем актуальные промокоды
             await loadPromoCodesFromFirebase();
             
-            const promo = promoDatabase[promoCode];
-            if (promo && promo.used < promo.uses) {
-                // Активируем промокод
-                userBalance += promo.stars;
-                promo.used++;
+            let foundPromo = null;
+            let foundDocId = null;
+            
+            for (const [docId, promoData] of Object.entries(promoDatabase)) {
+                if (promoData.code === promoCode) {
+                    foundPromo = promoData;
+                    foundDocId = docId;
+                    break;
+                }
+            }
+            
+            if (foundPromo && foundPromo.used < foundPromo.uses) {
+                userBalance += foundPromo.stars;
+                foundPromo.used++;
                 usedPromoCodes.push(promoCode);
                 
-                // Обновляем промокод в Firebase
-                await db.collection('promoCodes').doc(promoCode).update({
-                    used: promo.used
+                await db.collection('promoCodes').doc(foundDocId).update({
+                    used: foundPromo.used
                 });
                 
-                // Обновляем UI
                 updateUI();
                 saveUserData();
-                
-                // Показываем историю
                 updatePromoHistory();
-                
                 promoInput.value = '';
-            } else {
-                // УБРАНО УВЕДОМЛЕНИЕ
             }
         }
 
@@ -2691,13 +2663,20 @@
             
             historyList.innerHTML = '';
             usedPromoCodes.forEach(promoCode => {
-                const promo = promoDatabase[promoCode];
-                if (promo) {
+                let promoData = null;
+                for (const data of Object.values(promoDatabase)) {
+                    if (data.code === promoCode) {
+                        promoData = data;
+                        break;
+                    }
+                }
+                
+                if (promoData) {
                     const historyItem = document.createElement('div');
                     historyItem.className = 'promo-history-item';
                     historyItem.innerHTML = `
                         <div class="promo-code">${promoCode}</div>
-                        <div class="promo-reward">+${promo.stars} ★</div>
+                        <div class="promo-reward">+${promoData.stars} ★</div>
                         <div class="promo-status">✅ Активирован</div>
                     `;
                     historyList.appendChild(historyItem);
@@ -2712,20 +2691,15 @@
             currentCaseType = caseType;
             currentCaseCost = caseType === 1 ? 300 : 450;
             
-            if (userBalance < currentCaseCost) {
-                return;
-            }
+            if (userBalance < currentCaseCost) return;
             
-            // Показываем окно открытия кейса
             document.getElementById('caseOpeningOverlay').style.display = 'flex';
             document.getElementById('caseOpeningImage').src = caseType === 1 ? 
                 'https://i.ibb.co/hRf6YbV9/image.png' : 
                 'https://i.ibb.co/VcT5Prm5/image.png';
             
-            // Заполняем трек наград
             fillRewardsTrack(caseType);
             
-            // Сбрасываем состояние
             document.getElementById('wonItem').style.display = 'none';
             document.getElementById('confirmOpenCaseButton').style.display = 'block';
             document.getElementById('spinAgainButton').style.display = 'none';
@@ -2738,7 +2712,6 @@
             
             const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
             
-            // Создаем много копий наград для бесконечного трека
             for (let i = 0; i < 5; i++) {
                 rewards.forEach(reward => {
                     const rewardItem = document.createElement('div');
@@ -2770,7 +2743,6 @@
             confirmButton.style.display = 'none';
             spinCounter.textContent = 'Крутим...';
             
-            // Выбираем случайную награду
             const rewards = currentCaseType === 1 ? caseRewards1 : caseRewards2;
             const totalChance = rewards.reduce((sum, reward) => sum + reward.chance, 0);
             let random = Math.random() * totalChance;
@@ -2784,15 +2756,13 @@
                 }
             }
             
-            // Анимация вращения
-            const itemWidth = 120; // Ширина элемента + отступ
+            const itemWidth = 120;
             const targetPosition = -(itemWidth * 10 + Math.random() * itemWidth * rewards.length);
             
             rewardsTrack.style.transition = 'transform 5s cubic-bezier(0.1, 0.8, 0.2, 1)';
             rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
             
             setTimeout(() => {
-                // Показываем выигранный предмет
                 showWonItem(selectedReward);
                 isCaseAnimationRunning = false;
                 spinCounter.textContent = 'Готово!';
@@ -2809,7 +2779,6 @@
             wonItemName.textContent = reward.name;
             wonItem.style.display = 'block';
             
-            // Добавляем предмет в инвентарь
             userInventory.push({
                 name: reward.name,
                 image: reward.image,
@@ -2828,7 +2797,6 @@
                 return;
             }
             
-            // Сбрасываем анимацию
             document.getElementById('wonItem').style.display = 'none';
             document.getElementById('spinAgainButton').style.display = 'none';
             document.getElementById('confirmOpenCaseButton').style.display = 'block';
@@ -2847,13 +2815,11 @@
             selectedBetColor = color;
             selectedBetAmount = amount;
             
-            // Сбрасываем выделение
             const betOptions = document.querySelectorAll('.bet-option');
             betOptions.forEach(option => {
                 option.classList.remove('selected');
             });
             
-            // Выделяем выбранный вариант
             event.currentTarget.classList.add('selected');
             
             document.getElementById('placeBetButton').disabled = false;
@@ -2876,7 +2842,6 @@
             placeBetButton.disabled = true;
             betResult.textContent = 'Крутим колесо...';
             
-            // Вращаем колесо
             const extraSpins = 3;
             const targetAngle = 360 * extraSpins + Math.random() * 360;
             
@@ -2884,7 +2849,6 @@
             betWheel.style.transform = `rotate(${targetAngle}deg)`;
             
             setTimeout(() => {
-                // Определяем результат
                 const finalAngle = targetAngle % 360;
                 let winningColor = '';
                 
@@ -2896,14 +2860,12 @@
                 const betMultiplier = betColors.find(color => color.name === selectedBetColor).multiplier;
                 
                 if (winningColor === selectedBetColor) {
-                    // Выигрыш
                     const winAmount = Math.floor(selectedBetAmount * betMultiplier);
                     userBalance += winAmount;
                     userStats.betsWon++;
                     betResult.innerHTML = `🎉 ВЫИГРЫШ! +${winAmount} ★<br>Цвет: ${selectedBetColor}`;
                     createConfetti();
                 } else {
-                    // Проигрыш
                     userStats.betsLost++;
                     betResult.innerHTML = `❌ ПРОИГРЫШ<br>Выпал цвет: ${winningColor}`;
                 }
@@ -2913,7 +2875,6 @@
                 isBetSpinning = false;
                 placeBetButton.disabled = false;
                 
-                // Сбрасываем выбор
                 selectedBetColor = null;
                 selectedBetAmount = 0;
                 const betOptions = document.querySelectorAll('.bet-option');
@@ -2954,7 +2915,6 @@
             
             updateWithdrawUI();
             
-            // Обновляем выделение
             const withdrawItems = document.querySelectorAll('.withdraw-item');
             withdrawItems.forEach((itemElement, i) => {
                 const currentItem = userInventory[i];
@@ -2970,11 +2930,8 @@
         async function confirmWithdraw() {
             const username = document.getElementById('usernameInput').value.trim();
             
-            if (!username) {
-                return;
-            }
+            if (!username) return;
             
-            // Создаем запрос на вывод
             const request = {
                 userId: currentUserId,
                 username: username,
@@ -2983,11 +2940,9 @@
                 status: 'pending'
             };
             
-            // Сохраняем в Firebase
             const success = await saveWithdrawRequestToFirebase(request);
             
             if (success) {
-                // Удаляем предметы из инвентаря
                 selectedWithdrawItems.forEach(item => {
                     const itemIndex = userInventory.findIndex(invItem => 
                         invItem.name === item.name
@@ -3001,26 +2956,19 @@
                 updateUI();
                 updateWithdrawItems();
                 
-                // Закрываем попап
                 closeWithdrawPopup();
                 
-                // Сбрасываем выбранные предметы
                 selectedWithdrawItems = [];
                 updateWithdrawUI();
-            } else {
-                // УБРАНО УВЕДОМЛЕНИЕ
             }
         }
 
         // АДМИН ПАНЕЛЬ
         function showAdminTab(tabName) {
-            // Скрываем все вкладки
             document.getElementById('adminWithdraws').style.display = 'none';
             
-            // Показываем выбранную вкладку
             document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
             
-            // Обновляем активную вкладку
             const tabs = document.querySelectorAll('.admin-tab');
             tabs.forEach(tab => {
                 tab.classList.remove('active');
@@ -3032,7 +2980,6 @@
             const adminWithdraws = document.getElementById('adminWithdraws');
             adminWithdraws.innerHTML = '';
             
-            // Загружаем заявки из Firebase
             const requests = await loadWithdrawRequestsFromFirebase();
             
             if (requests.length === 0) {
@@ -3044,7 +2991,6 @@
                 const requestElement = document.createElement('div');
                 requestElement.className = 'withdraw-request';
                 
-                // Создаем элементы для отображения картинок предметов
                 const itemsHTML = request.items.map(item => `
                     <div class="request-item">
                         <img src="${item.image}" alt="${item.name}" class="request-item-image">
@@ -3092,7 +3038,7 @@
 
         // ИНИЦИАЛИЗАЦИЯ
         async function init() {
-            await loadPromoCodesFromFirebase(); // Загружаем промокоды
+            await loadPromoCodesFromFirebase();
             createWheel();
             updateUI();
             updatePromoHistory();
@@ -3100,7 +3046,6 @@
 
         // ЗАПУСК ПРИ ЗАГРУЗКЕ
         document.addEventListener('DOMContentLoaded', function() {
-            // Авторизация показывается по умолчанию
         });
     </script>
 </body>
