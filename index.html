@@ -2551,7 +2551,6 @@
             const userId = searchInput.value.trim();
             
             if (!userId) {
-                alert('Введите ID пользователя для поиска');
                 return;
             }
             
@@ -2577,7 +2576,6 @@
                 }
             } catch (error) {
                 console.error('Ошибка поиска пользователя:', error);
-                alert('Ошибка при поиске пользователя');
             }
         }
 
@@ -2591,8 +2589,6 @@
             if (userIdInput.value) {
                 document.getElementById('adminStarsAmount').value = amount;
                 giveStarsToUser();
-            } else {
-                alert('Сначала введите ID пользователя');
             }
         }
 
@@ -2601,17 +2597,14 @@
             const starsAmount = parseInt(document.getElementById('adminStarsAmount').value);
             
             if (!userId) {
-                alert('Введите ID пользователя');
                 return;
             }
             
             if (!starsAmount || starsAmount <= 0) {
-                alert('Введите корректное количество звезд');
                 return;
             }
             
             if (starsAmount > 10000) {
-                alert('Максимальное количество звезд за раз: 10,000');
                 return;
             }
             
@@ -2620,7 +2613,6 @@
                 const userDoc = await db.collection('users').doc(userId).get();
                 
                 if (!userDoc.exists) {
-                    alert('Пользователь не найден');
                     return;
                 }
                 
@@ -2642,14 +2634,11 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                alert(`✅ Успешно выдано ${starsAmount} ★ пользователю ${userId}\nНовый баланс: ${newBalance} ★`);
-                
                 // Очищаем поля
                 document.getElementById('adminStarsAmount').value = '';
                 
             } catch (error) {
                 console.error('Ошибка выдачи звезд:', error);
-                alert('❌ Ошибка при выдаче звезд');
             }
         }
 
@@ -2774,20 +2763,20 @@
 
         // ОСТАЛЬНЫЕ ФУНКЦИИ
         function generateUserId() {
-            return 'user_' + Math.random().toString(36).substr(2, 9);
+            // Постоянный ID на основе localStorage
+            let userId = localStorage.getItem('halloweenWheelUserId');
+            if (!userId) {
+                userId = 'user_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('halloweenWheelUserId', userId);
+            }
+            return userId;
         }
 
         function startGame() {
             document.getElementById('authOverlay').style.display = 'none';
             document.getElementById('mainPage').style.display = 'block';
             
-            const savedUserId = localStorage.getItem('halloweenWheelUserId');
-            if (savedUserId) {
-                currentUserId = savedUserId;
-            } else {
-                currentUserId = generateUserId();
-                localStorage.setItem('halloweenWheelUserId', currentUserId);
-            }
+            currentUserId = generateUserId();
             
             loadUserData();
             init();
@@ -2964,7 +2953,7 @@
 
         function copyUserId() {
             navigator.clipboard.writeText(currentUserId).then(() => {
-                alert('ID скопирован в буфер обмена!');
+                // Без уведомления
             });
         }
 
@@ -3061,12 +3050,10 @@
             const promoCode = promoInput.value.trim().toUpperCase();
             
             if (!promoCode) {
-                alert('Введите промокод!');
                 return;
             }
             
             if (usedPromoCodes.includes(promoCode)) {
-                alert('Вы уже использовали этот промокод!');
                 return;
             }
             
@@ -3097,9 +3084,6 @@
                 updatePromoHistory();
                 promoInput.value = '';
                 
-                alert(`🎉 Промокод активирован! Получено ${foundPromo.stars} звезд!`);
-            } else {
-                alert('❌ Промокод не найден или уже использован!');
             }
         }
 
@@ -3142,7 +3126,6 @@
             currentCaseCost = caseType === 1 ? 300 : 450;
             
             if (userBalance < currentCaseCost) {
-                alert('Недостаточно звезд для открытия кейса!');
                 return;
             }
             
@@ -3384,7 +3367,6 @@
             const username = document.getElementById('usernameInput').value.trim();
             
             if (!username) {
-                alert('Введите ваш юзернейм!');
                 return;
             }
             
@@ -3417,9 +3399,6 @@
                 selectedWithdrawItems = [];
                 updateWithdrawUI();
                 
-                alert('✅ Заявка на вывод отправлена! Свяжитесь с администратором.');
-            } else {
-                alert('❌ Ошибка при отправке заявки. Попробуйте позже.');
             }
         }
 
