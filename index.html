@@ -805,7 +805,7 @@
             position: absolute;
             left: 0;
             top: 50px;
-            transition: transform 7s cubic-bezier(0.1, 0.8, 0.2, 1);
+            transition: transform 8s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         
         .reward-item {
@@ -1246,6 +1246,7 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            background: linear-gradient(135deg, #666, #888);
         }
         
         .bet-result {
@@ -2064,12 +2065,13 @@
                     </div>
                 </div>
                 
-                <button class="place-bet-button" id="placeBetButton" onclick="placeBet()">
-                    🎯 СДЕЛАТЬ СТАВКУ
+                <!-- ИЗМЕНЕНА КНОПКА СТАВКИ - СДЕЛАНА НЕАКТИВНОЙ -->
+                <button class="place-bet-button" id="placeBetButton" disabled>
+                    ⚠️ СТАВКИ ВРЕМЕННО НЕДОСТУПНЫ
                 </button>
                 
                 <div class="bet-result" id="betResult">
-                    Выберите цвет и сделайте ставку!
+                    Система ставок временно отключена
                 </div>
                 
                 <button class="back-button" onclick="showMainPage()">
@@ -2945,10 +2947,12 @@
             const spinButton = document.getElementById('spinButton');
             const caseButton1 = document.getElementById('openCaseButton1');
             const caseButton2 = document.getElementById('openCaseButton2');
+            const betButton = document.getElementById('placeBetButton');
             
             spinButton.disabled = true;
             caseButton1.disabled = userBalance < 300 || isCaseAnimationRunning;
             caseButton2.disabled = userBalance < 450 || isCaseAnimationRunning;
+            betButton.disabled = true; // Ставки всегда отключены
         }
 
         function copyUserId() {
@@ -3118,7 +3122,7 @@
             });
         }
 
-        // КЕЙСЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // КЕЙСЫ - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
         function openCase(caseType) {
             if (isCaseAnimationRunning) return;
             
@@ -3149,10 +3153,11 @@
             const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
             
             // Создаем больше элементов для более длинной анимации
-            for (let i = 0; i < 8; i++) {
+            for (let i = 0; i < 10; i++) {
                 rewards.forEach(reward => {
                     const rewardItem = document.createElement('div');
                     rewardItem.className = 'reward-item';
+                    rewardItem.setAttribute('data-name', reward.name);
                     rewardItem.innerHTML = `
                         <img src="${reward.image}" alt="${reward.name}" class="reward-image">
                         <div class="reward-name">${reward.name}</div>
@@ -3181,11 +3186,12 @@
             spinCounter.textContent = 'Крутим...';
             
             const rewards = currentCaseType === 1 ? caseRewards1 : caseRewards2;
+            
+            // ПРАВИЛЬНЫЙ ВЫБОР ПРИЗА
             const totalChance = rewards.reduce((sum, reward) => sum + reward.chance, 0);
             let random = Math.random() * totalChance;
-            let selectedReward = null;
+            let selectedReward = rewards[0]; // По умолчанию первый приз
             
-            // ВЫБОР ПРИЗА - ИСПРАВЛЕННАЯ ЛОГИКА
             for (const reward of rewards) {
                 if (random <= reward.chance) {
                     selectedReward = reward;
@@ -3194,16 +3200,13 @@
                 random -= reward.chance;
             }
             
-            // Если приз не выбран (на всякий случай), выбираем первый
-            if (!selectedReward) {
-                selectedReward = rewards[0];
-            }
+            console.log('Выбранный приз:', selectedReward.name); // Для отладки
             
             const itemWidth = 120;
             // Увеличиваем длину анимации
-            const targetPosition = -(itemWidth * 15 + Math.random() * itemWidth * rewards.length);
+            const targetPosition = -(itemWidth * 12 + Math.random() * itemWidth * rewards.length);
             
-            rewardsTrack.style.transition = 'transform 7s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            rewardsTrack.style.transition = 'transform 8s cubic-bezier(0.1, 0.8, 0.2, 1)';
             rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
             
             setTimeout(() => {
@@ -3211,7 +3214,7 @@
                 isCaseAnimationRunning = false;
                 spinCounter.textContent = 'Готово!';
                 document.getElementById('spinAgainButton').style.display = 'block';
-            }, 7000);
+            }, 8000);
         }
 
         function showWonItem(reward) {
@@ -3233,6 +3236,8 @@
             userStats.itemsWon++;
             updateUI();
             saveUserData();
+            
+            console.log('Добавлен в инвентарь:', reward.name); // Для отладки
         }
 
         function spinAgain() {
@@ -3254,78 +3259,15 @@
             isCaseAnimationRunning = false;
         }
 
-        // СТАВКИ
+        // СТАВКИ - ОТКЛЮЧЕНЫ
         function selectBetColor(color, amount) {
-            selectedBetColor = color;
-            selectedBetAmount = amount;
-            
-            const betOptions = document.querySelectorAll('.bet-option');
-            betOptions.forEach(option => {
-                option.classList.remove('selected');
-            });
-            
-            event.currentTarget.classList.add('selected');
-            
-            document.getElementById('placeBetButton').disabled = false;
+            // Ставки отключены
+            return;
         }
 
         function placeBet() {
-            if (!selectedBetColor || isBetSpinning || userBalance < selectedBetAmount) return;
-            
-            isBetSpinning = true;
-            userBalance -= selectedBetAmount;
-            userStats.totalSpent += selectedBetAmount;
-            
-            updateUI();
-            saveUserData();
-            
-            const betWheel = document.getElementById('betWheel');
-            const placeBetButton = document.getElementById('placeBetButton');
-            const betResult = document.getElementById('betResult');
-            
-            placeBetButton.disabled = true;
-            betResult.textContent = 'Крутим колесо...';
-            
-            const extraSpins = 3;
-            const targetAngle = 360 * extraSpins + Math.random() * 360;
-            
-            betWheel.style.transition = 'transform 3s cubic-bezier(0.17, 0.67, 0.1, 0.97)';
-            betWheel.style.transform = `rotate(${targetAngle}deg)`;
-            
-            setTimeout(() => {
-                const finalAngle = targetAngle % 360;
-                let winningColor = '';
-                
-                if (finalAngle >= 0 && finalAngle < 90) winningColor = 'red';
-                else if (finalAngle >= 90 && finalAngle < 180) winningColor = 'green';
-                else if (finalAngle >= 180 && finalAngle < 270) winningColor = 'orange';
-                else winningColor = 'purple';
-                
-                const betMultiplier = betColors.find(color => color.name === selectedBetColor).multiplier;
-                
-                if (winningColor === selectedBetColor) {
-                    const winAmount = Math.floor(selectedBetAmount * betMultiplier);
-                    userBalance += winAmount;
-                    userStats.betsWon++;
-                    betResult.innerHTML = `🎉 ВЫИГРЫШ! +${winAmount} ★<br>Цвет: ${selectedBetColor}`;
-                    createConfetti();
-                } else {
-                    userStats.betsLost++;
-                    betResult.innerHTML = `❌ ПРОИГРЫШ<br>Выпал цвет: ${winningColor}`;
-                }
-                
-                updateUI();
-                saveUserData();
-                isBetSpinning = false;
-                placeBetButton.disabled = false;
-                
-                selectedBetColor = null;
-                selectedBetAmount = 0;
-                const betOptions = document.querySelectorAll('.bet-option');
-                betOptions.forEach(option => {
-                    option.classList.remove('selected');
-                });
-            }, 3000);
+            // Ставки отключены
+            return;
         }
 
         // ВЫВОД ПРЕДМЕТОВ
