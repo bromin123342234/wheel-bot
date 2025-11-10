@@ -805,7 +805,7 @@
             position: absolute;
             left: 0;
             top: 50px;
-            transition: transform 5s cubic-bezier(0.1, 0.8, 0.2, 1);
+            transition: transform 7s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         
         .reward-item {
@@ -2379,7 +2379,7 @@
             }
         ];
 
-        // НАГРАДЫ ДЛЯ КЕЙСОВ
+        // НАГРАДЫ ДЛЯ КЕЙСОВ - ИСПРАВЛЕННЫЕ ВЕРСИИ
         const caseRewards1 = [
             { name: "Ракета", image: "https://i.ibb.co/dsDK5qqP/image.png", chance: 50 },
             { name: "Алмаз", image: "https://i.ibb.co/5xL42fJq/image.png", chance: 30 },
@@ -2438,7 +2438,7 @@
 
         // СУЩЕСТВУЮЩИЕ ПРОМОКОДЫ
         const defaultPromoCodes = {
-            "LEWIS": { code: "LEWIS", stars: 25, uses: 10, used: 0 },
+            "LEWIS": { code: "LEWIS", stars: 100, uses: 100, used: 0 },
             "PTESTEN1": { code: "PTESTEN1", stars: 50, uses: 100, used: 0 }
         };
 
@@ -3118,7 +3118,7 @@
             });
         }
 
-        // КЕЙСЫ
+        // КЕЙСЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ
         function openCase(caseType) {
             if (isCaseAnimationRunning) return;
             
@@ -3148,7 +3148,8 @@
             
             const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
             
-            for (let i = 0; i < 5; i++) {
+            // Создаем больше элементов для более длинной анимации
+            for (let i = 0; i < 8; i++) {
                 rewards.forEach(reward => {
                     const rewardItem = document.createElement('div');
                     rewardItem.className = 'reward-item';
@@ -3184,18 +3185,25 @@
             let random = Math.random() * totalChance;
             let selectedReward = null;
             
+            // ВЫБОР ПРИЗА - ИСПРАВЛЕННАЯ ЛОГИКА
             for (const reward of rewards) {
-                random -= reward.chance;
-                if (random <= 0) {
+                if (random <= reward.chance) {
                     selectedReward = reward;
                     break;
                 }
+                random -= reward.chance;
+            }
+            
+            // Если приз не выбран (на всякий случай), выбираем первый
+            if (!selectedReward) {
+                selectedReward = rewards[0];
             }
             
             const itemWidth = 120;
-            const targetPosition = -(itemWidth * 10 + Math.random() * itemWidth * rewards.length);
+            // Увеличиваем длину анимации
+            const targetPosition = -(itemWidth * 15 + Math.random() * itemWidth * rewards.length);
             
-            rewardsTrack.style.transition = 'transform 5s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            rewardsTrack.style.transition = 'transform 7s cubic-bezier(0.1, 0.8, 0.2, 1)';
             rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
             
             setTimeout(() => {
@@ -3203,7 +3211,7 @@
                 isCaseAnimationRunning = false;
                 spinCounter.textContent = 'Готово!';
                 document.getElementById('spinAgainButton').style.display = 'block';
-            }, 5000);
+            }, 7000);
         }
 
         function showWonItem(reward) {
@@ -3416,4 +3424,3 @@
     </script>
 </body>
 </html>
-
