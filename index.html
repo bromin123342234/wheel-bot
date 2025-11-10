@@ -10,7 +10,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     
     <style>
-        /* ВСТАВЬТЕ ВЕСЬ CSS СТИЛЬ ОТСЮДА ДО КОНЦА */
         * {
             margin: 0;
             padding: 0;
@@ -18,7 +17,7 @@
         }
         
         body {
-            background: linear-gradient(135deg, #0c0c0c, #1a1025, #2d0c35);
+            background: linear-gradient(135deg, #0a0a0a, #151022, #250a30);
             color: #ff8c42;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
@@ -34,9 +33,9 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 30%, rgba(255, 140, 66, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 80% 70%, rgba(157, 78, 221, 0.03) 0%, transparent 50%),
-                radial-gradient(circle at 40% 80%, rgba(34, 139, 34, 0.02) 0%, transparent 50%);
+                radial-gradient(circle at 20% 30%, rgba(255, 140, 66, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(157, 78, 221, 0.02) 0%, transparent 50%),
+                radial-gradient(circle at 40% 80%, rgba(34, 139, 34, 0.01) 0%, transparent 50%);
             z-index: -1;
             pointer-events: none;
         }
@@ -61,22 +60,23 @@
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
-            text-shadow: 0 0 30px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 30px rgba(255, 140, 66, 0.4);
             animation: glow 2s ease-in-out infinite alternate;
         }
         
         @keyframes glow {
-            from { text-shadow: 0 0 20px rgba(255, 140, 66, 0.5); }
-            to { text-shadow: 0 0 30px rgba(255, 140, 66, 0.8), 0 0 40px rgba(157, 78, 221, 0.6); }
+            from { text-shadow: 0 0 20px rgba(255, 140, 66, 0.3); }
+            to { text-shadow: 0 0 30px rgba(255, 140, 66, 0.5), 0 0 40px rgba(157, 78, 221, 0.3); }
         }
 
         .user-id-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.12), rgba(255, 140, 66, 0.12));
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 15px;
             padding: 15px;
             margin: 10px 0;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
         }
 
         .user-id-title {
@@ -84,6 +84,7 @@
             opacity: 0.8;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #ffa366;
         }
 
         .user-id-value {
@@ -91,28 +92,29 @@
             font-weight: bold;
             color: #ff8c42;
             word-break: break-all;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             padding: 8px;
             border-radius: 8px;
-            border: 1px solid rgba(255, 140, 66, 0.2);
+            border: 1px solid rgba(255, 140, 66, 0.15);
             cursor: pointer;
             transition: all 0.3s ease;
         }
 
         .user-id-value:hover {
-            background: rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.12);
             transform: scale(1.02);
         }
         
         .balance-card {
-            background: linear-gradient(135deg, rgba(255, 140, 66, 0.15), rgba(157, 78, 221, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            background: linear-gradient(135deg, rgba(255, 140, 66, 0.12), rgba(157, 78, 221, 0.12));
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 20px;
             padding: 20px;
             margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
         
         .balance-title {
@@ -120,13 +122,14 @@
             opacity: 0.8;
             margin-bottom: 5px;
             font-weight: bold;
+            color: #ffa366;
         }
         
         .balance-amount {
             font-size: 36px;
             font-weight: bold;
             color: #ff8c42;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
             margin: 10px 0;
         }
         
@@ -138,10 +141,11 @@
             align-items: center;
             justify-content: center;
             gap: 5px;
+            color: #ffa366;
         }
         
         .top-up-button {
-            background: linear-gradient(135deg, #228b22, #32cd32);
+            background: linear-gradient(135deg, #1a6b1a, #228b22);
             color: white;
             border: none;
             padding: 8px 16px;
@@ -151,12 +155,12 @@
             cursor: pointer;
             margin-top: 10px;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.4);
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
         }
         
         .top-up-button:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.6);
+            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.4);
         }
         
         .wheel-section {
@@ -177,10 +181,10 @@
             border-radius: 50%;
             position: relative;
             transition: transform 4s cubic-bezier(0.2, 0.8, 0.3, 1);
-            border: 8px solid #2d0c35;
+            border: 8px solid #1a0a23;
             box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 0.5),
-                0 0 30px rgba(255, 140, 66, 0.3);
+                inset 0 0 20px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(255, 140, 66, 0.2);
             overflow: hidden;
         }
 
@@ -240,7 +244,7 @@
             cursor: pointer;
             margin: 25px 0;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 25px rgba(255, 140, 66, 0.4);
+            box-shadow: 0 8px 25px rgba(255, 140, 66, 0.3);
         }
         
         .spin-button:hover {
@@ -255,6 +259,7 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
+            background: linear-gradient(135deg, #666, #888);
         }
         
         .flying-prize {
@@ -310,9 +315,9 @@
         }
         
         .nav-btn {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             color: #ff8c42;
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            border: 2px solid rgba(255, 140, 66, 0.25);
             padding: 12px 5px;
             border-radius: 12px;
             cursor: pointer;
@@ -325,18 +330,19 @@
             align-items: center;
             justify-content: center;
             min-height: 60px;
+            backdrop-filter: blur(10px);
         }
         
         .nav-btn:hover {
-            background: rgba(255, 140, 66, 0.2);
+            background: rgba(255, 140, 66, 0.15);
             border-color: #ff8c42;
             transform: translateY(-2px);
         }
         
         .nav-btn.active {
-            background: rgba(255, 140, 66, 0.3);
+            background: rgba(255, 140, 66, 0.2);
             border-color: #ff8c42;
-            box-shadow: 0 0 15px rgba(255, 140, 66, 0.4);
+            box-shadow: 0 0 15px rgba(255, 140, 66, 0.3);
         }
         
         .nav-icon {
@@ -379,14 +385,15 @@
         }
         
         .profile-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.12), rgba(255, 140, 66, 0.12));
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 20px;
             padding: 25px;
             margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
         
         .profile-title {
@@ -395,15 +402,15 @@
             color: #ff8c42;
             margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .profile-info {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
             padding: 20px;
             margin: 15px 0;
-            border: 1px solid rgba(255, 140, 66, 0.2);
+            border: 1px solid rgba(255, 140, 66, 0.15);
         }
         
         .profile-item {
@@ -412,13 +419,14 @@
             align-items: center;
             margin: 12px 0;
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255, 140, 66, 0.2);
+            border-bottom: 1px solid rgba(255, 140, 66, 0.15);
         }
         
         .profile-label {
             font-size: 14px;
             opacity: 0.8;
             font-weight: bold;
+            color: #ffa366;
         }
         
         .profile-value {
@@ -435,8 +443,8 @@
         }
         
         .stat-card {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 140, 66, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 140, 66, 0.15);
             border-radius: 15px;
             padding: 20px;
             text-align: center;
@@ -453,17 +461,18 @@
             font-weight: bold;
             color: #ff8c42;
             margin-bottom: 5px;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .stat-label {
             font-size: 12px;
             opacity: 0.8;
             font-weight: bold;
+            color: #ffa366;
         }
         
         .profile-top-up-button {
-            background: linear-gradient(135deg, #228b22, #32cd32);
+            background: linear-gradient(135deg, #1a6b1a, #228b22);
             color: white;
             border: none;
             padding: 15px 25px;
@@ -473,13 +482,13 @@
             cursor: pointer;
             margin: 20px 0;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.4);
+            box-shadow: 0 4px 15px rgba(34, 139, 34, 0.3);
             width: 100%;
         }
         
         .profile-top-up-button:hover {
             transform: scale(1.05);
-            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.6);
+            box-shadow: 0 6px 20px rgba(34, 139, 34, 0.4);
         }
         
         .back-button {
@@ -493,7 +502,7 @@
             cursor: pointer;
             margin: 15px 0;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.4);
+            box-shadow: 0 4px 15px rgba(255, 140, 66, 0.3);
             width: 100%;
         }
         
@@ -505,6 +514,7 @@
             font-size: 14px;
             opacity: 0.8;
             margin-top: 5px;
+            color: #ffa366;
         }
 
         /* СТИЛИ ДЛЯ ПРОМОКОДОВ */
@@ -522,9 +532,9 @@
         .promo-input {
             flex: 1;
             padding: 12px;
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             color: white;
             font-size: 14px;
             text-align: center;
@@ -572,8 +582,8 @@
         }
         
         .promo-history-item {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 140, 66, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 140, 66, 0.15);
             border-radius: 10px;
             padding: 10px 15px;
             margin: 5px 0;
@@ -596,6 +606,7 @@
         .promo-status {
             font-size: 12px;
             opacity: 0.8;
+            color: #ffa366;
         }
 
         /* СТИЛИ ДЛЯ КЕЙСОВ */
@@ -610,7 +621,7 @@
             color: #ff8c42;
             margin-bottom: 25px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .cases-grid {
@@ -621,23 +632,24 @@
         }
         
         .case-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 3px solid rgba(255, 140, 66, 0.4);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.12), rgba(255, 140, 66, 0.12));
+            border: 3px solid rgba(255, 140, 66, 0.3);
             border-radius: 25px;
             padding: 25px 20px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
             transition: all 0.3s ease;
             display: flex;
             flex-direction: column;
             align-items: center;
+            backdrop-filter: blur(10px);
         }
         
         .case-card:hover {
             transform: translateY(-5px);
             border-color: #ff8c42;
-            box-shadow: 0 15px 50px rgba(255, 140, 66, 0.3);
+            box-shadow: 0 15px 50px rgba(255, 140, 66, 0.2);
         }
         
         .case-preview {
@@ -646,8 +658,8 @@
             height: 180px;
             margin: 0 auto 15px;
             border-radius: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            border: 3px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.6);
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -667,7 +679,7 @@
             color: #ff8c42;
             margin-bottom: 10px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .case-description {
@@ -676,6 +688,7 @@
             margin-bottom: 15px;
             line-height: 1.4;
             text-align: center;
+            color: #ffa366;
         }
         
         .case-price {
@@ -700,7 +713,7 @@
             cursor: pointer;
             margin: 10px 0;
             transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(255, 140, 66, 0.4);
+            box-shadow: 0 6px 20px rgba(255, 140, 66, 0.3);
             width: 100%;
             max-width: 200px;
         }
@@ -731,7 +744,7 @@
         
         .case-opening-container {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             padding: 30px;
             max-width: 350px;
@@ -760,7 +773,7 @@
             object-fit: contain;
             margin: 0 auto 20px;
             border-radius: 20px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         
@@ -771,7 +784,7 @@
             overflow: hidden;
             border-radius: 15px;
             background: rgba(0, 0, 0, 0.3);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.15);
         }
         
         .rewards-pointer {
@@ -806,7 +819,7 @@
             flex-shrink: 0;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             transition: all 0.3s ease;
         }
         
@@ -925,7 +938,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.8);
             display: none;
             z-index: 999;
             animation: fadeIn 0.3s ease-out;
@@ -938,10 +951,10 @@
         
         .inventory-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             border-radius: 25px;
             padding: 25px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
             display: none;
             animation: slideInUp 0.5s ease-out;
             position: fixed;
@@ -995,7 +1008,7 @@
             border-radius: 15px;
             padding: 15px;
             text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             animation: itemAppear 0.5s ease-out;
         }
         
@@ -1032,10 +1045,10 @@
 
         .payment-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.98), rgba(255, 140, 66, 0.98));
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             padding: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
             display: none;
             animation: bounceIn 0.6s ease-out;
             position: fixed;
@@ -1059,7 +1072,7 @@
 
         .payment-instruction {
             background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             border-radius: 20px;
             padding: 25px;
             margin: 20px 0;
@@ -1100,12 +1113,13 @@
         }
         
         .betting-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.12), rgba(255, 140, 66, 0.12));
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 20px;
             padding: 25px;
             margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
         }
         
         .betting-title {
@@ -1114,7 +1128,7 @@
             color: #ff8c42;
             margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .bet-wheel-container {
@@ -1130,10 +1144,10 @@
             border-radius: 50%;
             position: relative;
             transition: transform 3s cubic-bezier(0.17, 0.67, 0.1, 0.97);
-            border: 6px solid #2d0c35;
+            border: 6px solid #1a0a23;
             box-shadow: 
-                inset 0 0 20px rgba(0, 0, 0, 0.5),
-                0 0 30px rgba(255, 140, 66, 0.3);
+                inset 0 0 20px rgba(0, 0, 0, 0.6),
+                0 0 30px rgba(255, 140, 66, 0.2);
             overflow: hidden;
             background: conic-gradient(
                 from 0deg,
@@ -1164,8 +1178,8 @@
         }
         
         .bet-option {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 140, 66, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 140, 66, 0.15);
             border-radius: 15px;
             padding: 15px;
             text-align: center;
@@ -1179,9 +1193,9 @@
         }
         
         .bet-option.selected {
-            background: rgba(255, 140, 66, 0.2);
+            background: rgba(255, 140, 66, 0.15);
             border-color: #ff8c42;
-            box-shadow: 0 0 15px rgba(255, 140, 66, 0.4);
+            box-shadow: 0 0 15px rgba(255, 140, 66, 0.3);
         }
         
         .bet-color {
@@ -1207,6 +1221,7 @@
         .bet-multiplier {
             font-size: 12px;
             opacity: 0.8;
+            color: #ffa366;
         }
         
         .place-bet-button {
@@ -1234,17 +1249,18 @@
         }
         
         .bet-result {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
             padding: 15px;
             margin: 15px 0;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.15);
             min-height: 60px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 16px;
             text-align: center;
+            color: #ffa366;
         }
 
         /* СТИЛИ ДЛЯ PvP АРЕНЫ */
@@ -1254,12 +1270,13 @@
         }
         
         .pvp-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.12), rgba(255, 140, 66, 0.12));
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 20px;
             padding: 25px;
             margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
         }
         
         .pvp-title {
@@ -1268,15 +1285,15 @@
             color: #ff8c42;
             margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .pvp-content {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
             padding: 40px 20px;
             text-align: center;
-            border: 2px solid rgba(255, 140, 66, 0.2);
+            border: 2px solid rgba(255, 140, 66, 0.15);
         }
         
         .pvp-icon {
@@ -1287,14 +1304,14 @@
         
         .pvp-message {
             font-size: 18px;
-            color: white;
+            color: #ffa366;
             margin-bottom: 15px;
             line-height: 1.5;
         }
         
         .pvp-note {
             font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
+            color: rgba(255, 163, 102, 0.7);
             margin-top: 20px;
         }
 
@@ -1305,12 +1322,13 @@
         }
         
         .withdraw-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.12), rgba(255, 140, 66, 0.12));
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 20px;
             padding: 25px;
             margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
         }
         
         .withdraw-title {
@@ -1319,20 +1337,20 @@
             color: #ff8c42;
             margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .withdraw-instruction {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
             padding: 20px;
             margin: 15px 0;
-            border: 1px solid rgba(255, 140, 66, 0.2);
+            border: 1px solid rgba(255, 140, 66, 0.15);
             text-align: center;
         }
         
         .withdraw-text {
-            color: white;
+            color: #ffa366;
             font-size: 16px;
             line-height: 1.6;
             margin-bottom: 15px;
@@ -1370,12 +1388,12 @@
             padding: 10px;
             background: rgba(255, 255, 255, 0.05);
             border-radius: 10px;
-            border: 1px solid rgba(255, 140, 66, 0.2);
+            border: 1px solid rgba(255, 140, 66, 0.15);
         }
         
         .withdraw-item {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 140, 66, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 140, 66, 0.15);
             border-radius: 10px;
             padding: 10px;
             text-align: center;
@@ -1389,9 +1407,9 @@
         }
         
         .withdraw-item.selected {
-            background: rgba(255, 140, 66, 0.2);
+            background: rgba(255, 140, 66, 0.15);
             border-color: #ff8c42;
-            box-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
+            box-shadow: 0 0 10px rgba(255, 140, 66, 0.3);
         }
         
         .withdraw-item-image {
@@ -1435,10 +1453,10 @@
         /* СТИЛИ ДЛЯ ПОПАПА ВЫВОДА */
         .withdraw-popup {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.98), rgba(255, 140, 66, 0.98));
-            border: 3px solid rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.2);
             border-radius: 25px;
             padding: 30px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
             display: none;
             animation: bounceIn 0.6s ease-out;
             position: fixed;
@@ -1462,7 +1480,7 @@
 
         .withdraw-popup-content {
             background: rgba(255, 255, 255, 0.15);
-            border: 2px solid rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.15);
             border-radius: 20px;
             padding: 25px;
             margin: 20px 0;
@@ -1480,7 +1498,7 @@
         .username-input {
             width: 100%;
             padding: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -1494,7 +1512,7 @@
         }
 
         .confirm-withdraw-button {
-            background: linear-gradient(135deg, #228b22, #32cd32);
+            background: linear-gradient(135deg, #1a6b1a, #228b22);
             color: white;
             border: none;
             padding: 15px;
@@ -1518,12 +1536,13 @@
         }
         
         .admin-card {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(255, 140, 66, 0.15));
-            border: 2px solid rgba(255, 140, 66, 0.3);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.12), rgba(255, 140, 66, 0.12));
+            border: 2px solid rgba(255, 140, 66, 0.25);
             border-radius: 20px;
             padding: 25px;
             margin: 15px 0;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
         }
         
         .admin-title {
@@ -1532,7 +1551,7 @@
             color: #ff8c42;
             margin-bottom: 20px;
             text-align: center;
-            text-shadow: 0 0 10px rgba(255, 140, 66, 0.5);
+            text-shadow: 0 0 10px rgba(255, 140, 66, 0.4);
         }
         
         .admin-tabs {
@@ -1544,19 +1563,21 @@
         .admin-tab {
             flex: 1;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px solid rgba(255, 140, 66, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            border: 2px solid rgba(255, 140, 66, 0.15);
             border-radius: 10px;
-            color: white;
+            color: #ffa366;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
+            font-size: 12px;
         }
         
         .admin-tab.active {
-            background: rgba(255, 140, 66, 0.3);
+            background: rgba(255, 140, 66, 0.2);
             border-color: #ff8c42;
+            color: #ff8c42;
         }
         
         .admin-tab:hover {
@@ -1564,33 +1585,35 @@
         }
         
         .admin-content {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 15px;
             padding: 20px;
             margin: 15px 0;
-            border: 1px solid rgba(255, 140, 66, 0.2);
+            border: 1px solid rgba(255, 140, 66, 0.15);
             max-height: 300px;
             overflow-y: auto;
         }
         
         .withdraw-request {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.08);
             border-radius: 10px;
             padding: 15px;
             margin: 10px 0;
-            border: 1px solid rgba(255, 140, 66, 0.2);
+            border: 1px solid rgba(255, 140, 66, 0.15);
         }
         
         .request-user {
             font-weight: bold;
             color: #ff8c42;
             margin-bottom: 5px;
+            font-size: 14px;
         }
         
         .request-username {
             color: #32cd32;
             font-weight: bold;
             margin-bottom: 10px;
+            font-size: 13px;
         }
         
         .request-items {
@@ -1608,6 +1631,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            color: #ffa366;
         }
         
         .request-item-image {
@@ -1623,7 +1647,7 @@
         }
         
         .approve-button {
-            background: linear-gradient(135deg, #228b22, #32cd32);
+            background: linear-gradient(135deg, #1a6b1a, #228b22);
             color: white;
             border: none;
             padding: 8px 15px;
@@ -1644,6 +1668,118 @@
             font-weight: bold;
         }
 
+        /* НОВЫЕ СТИЛИ ДЛЯ АДМИН ПАНЕЛИ */
+        .admin-controls {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 15px 0;
+            border: 1px solid rgba(255, 140, 66, 0.15);
+        }
+        
+        .admin-control-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #ff8c42;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .admin-input-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .admin-input {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid rgba(255, 140, 66, 0.25);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 14px;
+        }
+        
+        .admin-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+        
+        .admin-button {
+            background: linear-gradient(135deg, #1a6b1a, #228b22);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+        
+        .admin-button:hover {
+            transform: scale(1.05);
+        }
+        
+        .admin-button.secondary {
+            background: linear-gradient(135deg, #ff8c42, #9d4edd);
+        }
+        
+        .user-search-results {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .user-result {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 140, 66, 0.15);
+            border-radius: 8px;
+            padding: 10px;
+            margin: 5px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-id {
+            font-size: 12px;
+            color: #ff8c42;
+            font-weight: bold;
+        }
+        
+        .user-balance {
+            font-size: 11px;
+            color: rgba(255, 163, 102, 0.7);
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .quick-action-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 140, 66, 0.25);
+            color: #ffa366;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 11px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .quick-action-btn:hover {
+            background: rgba(255, 140, 66, 0.15);
+            color: #ff8c42;
+        }
+
         /* СТИЛИ ДЛЯ АВТОРИЗАЦИИ */
         .auth-overlay {
             position: fixed;
@@ -1651,7 +1787,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0c0c0c, #1a1025, #2d0c35);
+            background: linear-gradient(135deg, #0a0a0a, #151022, #250a30);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -1660,13 +1796,13 @@
         
         .auth-container {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
-            border: 4px solid rgba(255, 255, 255, 0.3);
+            border: 4px solid rgba(255, 255, 255, 0.2);
             border-radius: 30px;
             padding: 40px 30px;
             max-width: 350px;
             width: 90%;
             text-align: center;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
         }
         
         .auth-title {
@@ -1686,7 +1822,7 @@
         .auth-input {
             width: 100%;
             padding: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.2);
             border-radius: 15px;
             background: rgba(255, 255, 255, 0.1);
             color: white;
@@ -1700,7 +1836,7 @@
         }
         
         .auth-button {
-            background: linear-gradient(135deg, #228b22, #32cd32);
+            background: linear-gradient(135deg, #1a6b1a, #228b22);
             color: white;
             border: none;
             padding: 15px;
@@ -1996,11 +2132,57 @@
                 <div class="admin-title">🔧 АДМИН ПАНЕЛЬ</div>
                 
                 <div class="admin-tabs">
-                    <div class="admin-tab active" onclick="showAdminTab('withdraws')">Запросы на вывод</div>
+                    <div class="admin-tab active" onclick="showAdminTab('stars')">Выдача звезд</div>
+                    <div class="admin-tab" onclick="showAdminTab('withdraws')">Запросы на вывод</div>
+                    <div class="admin-tab" onclick="showAdminTab('users')">Поиск пользователей</div>
                 </div>
                 
-                <div class="admin-content" id="adminWithdraws">
+                <!-- ВКЛАДКА ВЫДАЧИ ЗВЕЗД -->
+                <div class="admin-content" id="adminStars">
+                    <div class="admin-controls">
+                        <div class="admin-control-title">🎯 ВЫДАЧА ЗВЕЗД ПОЛЬЗОВАТЕЛЮ</div>
+                        
+                        <div class="admin-input-group">
+                            <input type="text" class="admin-input" id="adminUserId" placeholder="ID пользователя">
+                            <input type="number" class="admin-input" id="adminStarsAmount" placeholder="Количество звезд" min="1" max="10000">
+                            <button class="admin-button" onclick="giveStarsToUser()">ВЫДАТЬ ЗВЕЗДЫ</button>
+                        </div>
+                        
+                        <div class="admin-input-group">
+                            <input type="text" class="admin-input" id="adminSearchUser" placeholder="Поиск по ID пользователя">
+                            <button class="admin-button secondary" onclick="searchUser()">НАЙТИ</button>
+                        </div>
+                        
+                        <div class="user-search-results" id="userSearchResults">
+                            <!-- Результаты поиска будут здесь -->
+                        </div>
+                    </div>
+                    
+                    <div class="admin-controls">
+                        <div class="admin-control-title">⚡ БЫСТРАЯ ВЫДАЧА</div>
+                        
+                        <div class="admin-input-group">
+                            <button class="admin-button secondary" onclick="quickGiveStars(100)">+100 ★</button>
+                            <button class="admin-button secondary" onclick="quickGiveStars(500)">+500 ★</button>
+                            <button class="admin-button secondary" onclick="quickGiveStars(1000)">+1000 ★</button>
+                            <button class="admin-button secondary" onclick="quickGiveStars(5000)">+5000 ★</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- ВКЛАДКА ЗАПРОСОВ НА ВЫВОД -->
+                <div class="admin-content" id="adminWithdraws" style="display: none;">
                     <!-- Запросы на вывод будут добавлены через JavaScript -->
+                </div>
+                
+                <!-- ВКЛАДКА ПОИСКА ПОЛЬЗОВАТЕЛЕЙ -->
+                <div class="admin-content" id="adminUsers" style="display: none;">
+                    <div class="admin-controls">
+                        <div class="admin-control-title">👥 ПОСЛЕДНИЕ ПОЛЬЗОВАТЕЛИ</div>
+                        <div id="recentUsersList">
+                            <!-- Список пользователей будет здесь -->
+                        </div>
+                    </div>
                 </div>
                 
                 <button class="back-button" onclick="showMainPage()">
@@ -2126,6 +2308,7 @@
         const firebaseConfig = {
             apiKey: "AIzaSyAaXhwLzJFVOuAHI3c8LpUXWal0416Xdkc",
             authDomain: "halloween-wheel-game.firebaseapp.com",
+            databaseURL: "https://halloween-wheel-game-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "halloween-wheel-game",
             storageBucket: "halloween-wheel-game.firebasestorage.app",
             messagingSenderId: "994979036087",
@@ -2138,6 +2321,8 @@
 
         // АДМИНЫ (ID пользователей, которые видят админ панели)
         const adminUsers = [
+            "user_peme2uhzx",
+            "user_9fptws23g",
             "user_p7fk034lp",
             "user_ouuniidck"
         ];
@@ -2251,6 +2436,12 @@
         // БАЗА ДАННЫХ ДЛЯ ПРОМОКОДОВ
         let promoDatabase = {};
 
+        // СУЩЕСТВУЮЩИЕ ПРОМОКОДЫ
+        const defaultPromoCodes = {
+            "LEWIS": { code: "LEWIS", stars: 100, uses: 100, used: 0 },
+            "PTESTEN1": { code: "PTESTEN1", stars: 50, uses: 100, used: 0 }
+        };
+
         // ФУНКЦИИ FIREBASE
         async function saveUserToFirebase() {
             if (!currentUserId) return;
@@ -2299,8 +2490,27 @@
                 snapshot.forEach(doc => {
                     promoDatabase[doc.id] = doc.data();
                 });
+                
+                // Если промокодов нет в базе, добавляем стандартные
+                if (Object.keys(promoDatabase).length === 0) {
+                    await initializeDefaultPromoCodes();
+                }
             } catch (error) {
                 console.error('Ошибка загрузки промокодов:', error);
+                // Если произошла ошибка, инициализируем стандартные промокоды
+                await initializeDefaultPromoCodes();
+            }
+        }
+
+        async function initializeDefaultPromoCodes() {
+            try {
+                for (const [code, data] of Object.entries(defaultPromoCodes)) {
+                    await db.collection('promoCodes').doc(code).set(data);
+                    promoDatabase[code] = data;
+                }
+                console.log('Стандартные промокоды инициализированы');
+            } catch (error) {
+                console.error('Ошибка инициализации промокодов:', error);
             }
         }
 
@@ -2335,6 +2545,234 @@
             }
         }
 
+        // НОВЫЕ ФУНКЦИИ ДЛЯ АДМИН ПАНЕЛИ
+        async function searchUser() {
+            const searchInput = document.getElementById('adminSearchUser');
+            const userId = searchInput.value.trim();
+            
+            if (!userId) {
+                alert('Введите ID пользователя для поиска');
+                return;
+            }
+            
+            try {
+                const doc = await db.collection('users').doc(userId).get();
+                const resultsContainer = document.getElementById('userSearchResults');
+                
+                if (doc.exists) {
+                    const userData = doc.data();
+                    resultsContainer.innerHTML = `
+                        <div class="user-result">
+                            <div class="user-info">
+                                <div class="user-id">${userData.userId}</div>
+                                <div class="user-balance">Баланс: ${userData.balance || 0} ★ | Предметов: ${userData.inventory ? userData.inventory.length : 0}</div>
+                            </div>
+                            <div class="quick-actions">
+                                <button class="quick-action-btn" onclick="setUserForStars('${userData.userId}')">Выдать звезды</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    resultsContainer.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">Пользователь не найден</div>';
+                }
+            } catch (error) {
+                console.error('Ошибка поиска пользователя:', error);
+                alert('Ошибка при поиске пользователя');
+            }
+        }
+
+        function setUserForStars(userId) {
+            document.getElementById('adminUserId').value = userId;
+            document.getElementById('adminSearchUser').value = userId;
+        }
+
+        function quickGiveStars(amount) {
+            const userIdInput = document.getElementById('adminUserId');
+            if (userIdInput.value) {
+                document.getElementById('adminStarsAmount').value = amount;
+                giveStarsToUser();
+            } else {
+                alert('Сначала введите ID пользователя');
+            }
+        }
+
+        async function giveStarsToUser() {
+            const userId = document.getElementById('adminUserId').value.trim();
+            const starsAmount = parseInt(document.getElementById('adminStarsAmount').value);
+            
+            if (!userId) {
+                alert('Введите ID пользователя');
+                return;
+            }
+            
+            if (!starsAmount || starsAmount <= 0) {
+                alert('Введите корректное количество звезд');
+                return;
+            }
+            
+            if (starsAmount > 10000) {
+                alert('Максимальное количество звезд за раз: 10,000');
+                return;
+            }
+            
+            try {
+                // Получаем текущие данные пользователя
+                const userDoc = await db.collection('users').doc(userId).get();
+                
+                if (!userDoc.exists) {
+                    alert('Пользователь не найден');
+                    return;
+                }
+                
+                const userData = userDoc.data();
+                const newBalance = (userData.balance || 0) + starsAmount;
+                
+                // Обновляем баланс пользователя
+                await db.collection('users').doc(userId).update({
+                    balance: newBalance,
+                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Записываем историю выдачи
+                await db.collection('adminActions').add({
+                    adminId: currentUserId,
+                    targetUserId: userId,
+                    action: 'give_stars',
+                    amount: starsAmount,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                alert(`✅ Успешно выдано ${starsAmount} ★ пользователю ${userId}\nНовый баланс: ${newBalance} ★`);
+                
+                // Очищаем поля
+                document.getElementById('adminStarsAmount').value = '';
+                
+            } catch (error) {
+                console.error('Ошибка выдачи звезд:', error);
+                alert('❌ Ошибка при выдаче звезд');
+            }
+        }
+
+        async function loadRecentUsers() {
+            try {
+                const snapshot = await db.collection('users')
+                    .orderBy('lastUpdated', 'desc')
+                    .limit(20)
+                    .get();
+                
+                const usersList = document.getElementById('recentUsersList');
+                usersList.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    usersList.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет пользователей</div>';
+                    return;
+                }
+                
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    const userElement = document.createElement('div');
+                    userElement.className = 'user-result';
+                    userElement.innerHTML = `
+                        <div class="user-info">
+                            <div class="user-id">${userData.userId}</div>
+                            <div class="user-balance">Баланс: ${userData.balance || 0} ★ | Кейсов: ${userData.stats ? userData.stats.casesOpened || 0 : 0}</div>
+                        </div>
+                        <div class="quick-actions">
+                            <button class="quick-action-btn" onclick="setUserForStars('${userData.userId}')">Выдать</button>
+                        </div>
+                    `;
+                    usersList.appendChild(userElement);
+                });
+            } catch (error) {
+                console.error('Ошибка загрузки пользователей:', error);
+            }
+        }
+
+        function showAdminTab(tabName) {
+            // Скрываем все вкладки
+            document.getElementById('adminStars').style.display = 'none';
+            document.getElementById('adminWithdraws').style.display = 'none';
+            document.getElementById('adminUsers').style.display = 'none';
+            
+            // Показываем выбранную вкладку
+            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
+            
+            // Загружаем данные для вкладки если нужно
+            if (tabName === 'withdraws') {
+                loadAdminWithdrawRequests();
+            } else if (tabName === 'users') {
+                loadRecentUsers();
+            }
+            
+            // Обновляем активную вкладку
+            const tabs = document.querySelectorAll('.admin-tab');
+            tabs.forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
+
+        async function loadAdminWithdrawRequests() {
+            const adminWithdraws = document.getElementById('adminWithdraws');
+            adminWithdraws.innerHTML = '';
+            
+            const requests = await loadWithdrawRequestsFromFirebase();
+            
+            if (requests.length === 0) {
+                adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
+                return;
+            }
+            
+            requests.forEach((request) => {
+                const requestElement = document.createElement('div');
+                requestElement.className = 'withdraw-request';
+                
+                const itemsHTML = request.items.map(item => `
+                    <div class="request-item">
+                        <img src="${item.image}" alt="${item.name}" class="request-item-image">
+                        ${item.name}
+                    </div>
+                `).join('');
+                
+                requestElement.innerHTML = `
+                    <div class="request-user">ID: ${request.userId}</div>
+                    <div class="request-username">Юзернейм: ${request.username}</div>
+                    <div class="request-items">
+                        ${itemsHTML}
+                    </div>
+                    <div>Статус: ${request.status}</div>
+                    <div class="request-actions">
+                        <button class="approve-button" onclick="approveWithdraw('${request.id}')">✅ Одобрить</button>
+                        <button class="reject-button" onclick="rejectWithdraw('${request.id}')">❌ Отклонить</button>
+                    </div>
+                `;
+                adminWithdraws.appendChild(requestElement);
+            });
+        }
+
+        async function approveWithdraw(requestId) {
+            try {
+                await db.collection('withdrawRequests').doc(requestId).update({
+                    status: 'approved'
+                });
+                loadAdminWithdrawRequests();
+            } catch (error) {
+                console.error('Ошибка одобрения заявки:', error);
+            }
+        }
+
+        async function rejectWithdraw(requestId) {
+            try {
+                await db.collection('withdrawRequests').doc(requestId).update({
+                    status: 'rejected'
+                });
+                loadAdminWithdrawRequests();
+            } catch (error) {
+                console.error('Ошибка отклонения заявки:', error);
+            }
+        }
+
+        // ОСТАЛЬНЫЕ ФУНКЦИИ
         function generateUserId() {
             return 'user_' + Math.random().toString(36).substr(2, 9);
         }
@@ -2375,13 +2813,14 @@
                 
                 await saveUserToFirebase();
             }
+            
+            updateUI();
         }
 
         function saveUserData() {
             saveUserToFirebase();
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОЗДАНИЯ КОЛЕСА
         function createWheel() {
             const wheel = document.getElementById('wheel');
             wheel.innerHTML = '';
@@ -2420,7 +2859,6 @@
             wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ВРАЩЕНИЯ КОЛЕСА
         function spinWheel() {
             return;
         }
@@ -2526,6 +2964,7 @@
 
         function copyUserId() {
             navigator.clipboard.writeText(currentUserId).then(() => {
+                alert('ID скопирован в буфер обмена!');
             });
         }
 
@@ -2616,13 +3055,20 @@
             });
         }
 
-        // ПРОМОКОДЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // ПРОМОКОДЫ
         async function activatePromoCode() {
             const promoInput = document.getElementById('promoCodeInput');
             const promoCode = promoInput.value.trim().toUpperCase();
             
-            if (!promoCode) return;
-            if (usedPromoCodes.includes(promoCode)) return;
+            if (!promoCode) {
+                alert('Введите промокод!');
+                return;
+            }
+            
+            if (usedPromoCodes.includes(promoCode)) {
+                alert('Вы уже использовали этот промокод!');
+                return;
+            }
             
             await loadPromoCodesFromFirebase();
             
@@ -2650,6 +3096,10 @@
                 saveUserData();
                 updatePromoHistory();
                 promoInput.value = '';
+                
+                alert(`🎉 Промокод активирован! Получено ${foundPromo.stars} звезд!`);
+            } else {
+                alert('❌ Промокод не найден или уже использован!');
             }
         }
 
@@ -2691,7 +3141,10 @@
             currentCaseType = caseType;
             currentCaseCost = caseType === 1 ? 300 : 450;
             
-            if (userBalance < currentCaseCost) return;
+            if (userBalance < currentCaseCost) {
+                alert('Недостаточно звезд для открытия кейса!');
+                return;
+            }
             
             document.getElementById('caseOpeningOverlay').style.display = 'flex';
             document.getElementById('caseOpeningImage').src = caseType === 1 ? 
@@ -2930,7 +3383,10 @@
         async function confirmWithdraw() {
             const username = document.getElementById('usernameInput').value.trim();
             
-            if (!username) return;
+            if (!username) {
+                alert('Введите ваш юзернейм!');
+                return;
+            }
             
             const request = {
                 userId: currentUserId,
@@ -2960,79 +3416,10 @@
                 
                 selectedWithdrawItems = [];
                 updateWithdrawUI();
-            }
-        }
-
-        // АДМИН ПАНЕЛЬ
-        function showAdminTab(tabName) {
-            document.getElementById('adminWithdraws').style.display = 'none';
-            
-            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
-            
-            const tabs = document.querySelectorAll('.admin-tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-        }
-
-        async function loadAdminWithdrawRequests() {
-            const adminWithdraws = document.getElementById('adminWithdraws');
-            adminWithdraws.innerHTML = '';
-            
-            const requests = await loadWithdrawRequestsFromFirebase();
-            
-            if (requests.length === 0) {
-                adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
-                return;
-            }
-            
-            requests.forEach((request) => {
-                const requestElement = document.createElement('div');
-                requestElement.className = 'withdraw-request';
                 
-                const itemsHTML = request.items.map(item => `
-                    <div class="request-item">
-                        <img src="${item.image}" alt="${item.name}" class="request-item-image">
-                        ${item.name}
-                    </div>
-                `).join('');
-                
-                requestElement.innerHTML = `
-                    <div class="request-user">ID: ${request.userId}</div>
-                    <div class="request-username">Юзернейм: ${request.username}</div>
-                    <div class="request-items">
-                        ${itemsHTML}
-                    </div>
-                    <div>Статус: ${request.status}</div>
-                    <div class="request-actions">
-                        <button class="approve-button" onclick="approveWithdraw('${request.id}')">✅ Одобрить</button>
-                        <button class="reject-button" onclick="rejectWithdraw('${request.id}')">❌ Отклонить</button>
-                    </div>
-                `;
-                adminWithdraws.appendChild(requestElement);
-            });
-        }
-
-        async function approveWithdraw(requestId) {
-            try {
-                await db.collection('withdrawRequests').doc(requestId).update({
-                    status: 'approved'
-                });
-                loadAdminWithdrawRequests();
-            } catch (error) {
-                console.error('Ошибка одобрения заявки:', error);
-            }
-        }
-
-        async function rejectWithdraw(requestId) {
-            try {
-                await db.collection('withdrawRequests').doc(requestId).update({
-                    status: 'rejected'
-                });
-                loadAdminWithdrawRequests();
-            } catch (error) {
-                console.error('Ошибка отклонения заявки:', error);
+                alert('✅ Заявка на вывод отправлена! Свяжитесь с администратором.');
+            } else {
+                alert('❌ Ошибка при отправке заявки. Попробуйте позже.');
             }
         }
 
