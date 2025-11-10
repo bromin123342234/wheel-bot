@@ -805,7 +805,7 @@
             position: absolute;
             left: 0;
             top: 50px;
-            transition: transform 8s cubic-bezier(0.1, 0.8, 0.2, 1);
+            transition: transform 10s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         
         .reward-item {
@@ -3152,8 +3152,8 @@
             
             const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
             
-            // Создаем больше элементов для более длинной анимации
-            for (let i = 0; i < 10; i++) {
+            // Создаем много элементов для длинной и плавной анимации
+            for (let i = 0; i < 20; i++) {
                 rewards.forEach(reward => {
                     const rewardItem = document.createElement('div');
                     rewardItem.className = 'reward-item';
@@ -3187,34 +3187,61 @@
             
             const rewards = currentCaseType === 1 ? caseRewards1 : caseRewards2;
             
-            // ПРАВИЛЬНЫЙ ВЫБОР ПРИЗА
+            // ПРАВИЛЬНЫЙ ВЫБОР ПРИЗА С УЧЕТОМ ШАНСОВ
             const totalChance = rewards.reduce((sum, reward) => sum + reward.chance, 0);
             let random = Math.random() * totalChance;
-            let selectedReward = rewards[0]; // По умолчанию первый приз
+            let selectedReward = rewards[0];
+            let chanceSum = 0;
             
             for (const reward of rewards) {
-                if (random <= reward.chance) {
+                chanceSum += reward.chance;
+                if (random <= chanceSum) {
                     selectedReward = reward;
                     break;
                 }
-                random -= reward.chance;
             }
             
-            console.log('Выбранный приз:', selectedReward.name); // Для отладки
+            console.log('Выбранный приз:', selectedReward.name, 'Шанс:', selectedReward.chance);
             
+            // НАХОДИМ ПОЗИЦИЮ ВЫБРАННОГО ПРИЗА В ДОРОЖКЕ
             const itemWidth = 120;
-            // Увеличиваем длину анимации
-            const targetPosition = -(itemWidth * 12 + Math.random() * itemWidth * rewards.length);
+            const rewardsPerSet = rewards.length;
+            const totalItems = rewardsTrack.children.length;
             
-            rewardsTrack.style.transition = 'transform 8s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            // Находим индекс выбранного приза в первом наборе
+            let targetIndex = 0;
+            for (let i = 0; i < rewardsPerSet; i++) {
+                if (rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
+                    targetIndex = i;
+                    break;
+                }
+            }
+            
+            // Вычисляем позицию так, чтобы выбранный приз оказался под указателем
+            // Добавляем случайное смещение для разнообразия, но гарантируем попадание на нужный приз
+            const targetPosition = -(itemWidth * (totalItems - 15 - targetIndex));
+            
+            rewardsTrack.style.transition = 'transform 10s cubic-bezier(0.2, 0.1, 0.2, 1)';
             rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
             
+            // Подсвечиваем выигранный предмет в конце анимации
             setTimeout(() => {
+                // Находим и подсвечиваем выигранный предмет в видимой области
+                const visibleItems = document.querySelectorAll('.reward-item');
+                visibleItems.forEach(item => {
+                    if (item.getAttribute('data-name') === selectedReward.name) {
+                        item.classList.add('won');
+                    }
+                });
+                
                 showWonItem(selectedReward);
                 isCaseAnimationRunning = false;
                 spinCounter.textContent = 'Готово!';
                 document.getElementById('spinAgainButton').style.display = 'block';
-            }, 8000);
+                
+                // Создаем конфетти для праздничного эффекта
+                createConfetti();
+            }, 10000);
         }
 
         function showWonItem(reward) {
@@ -3226,18 +3253,20 @@
             wonItemName.textContent = reward.name;
             wonItem.style.display = 'block';
             
+            // Добавляем предмет в инвентарь
             userInventory.push({
                 name: reward.name,
                 image: reward.image,
                 type: 'case',
-                wonAt: Date.now()
+                wonAt: Date.now(),
+                caseType: currentCaseType
             });
             
             userStats.itemsWon++;
             updateUI();
             saveUserData();
             
-            console.log('Добавлен в инвентарь:', reward.name); // Для отладки
+            console.log('Добавлен в инвентарь:', reward.name);
         }
 
         function spinAgain() {
@@ -3250,6 +3279,10 @@
             document.getElementById('spinAgainButton').style.display = 'none';
             document.getElementById('confirmOpenCaseButton').style.display = 'block';
             document.getElementById('spinCounter').textContent = 'Готов к вращению';
+            
+            // Убираем подсветку с предыдущего выигрыша
+            const wonItems = document.querySelectorAll('.reward-item.won');
+            wonItems.forEach(item => item.classList.remove('won'));
             
             fillRewardsTrack(currentCaseType);
         }
