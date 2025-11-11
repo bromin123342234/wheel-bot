@@ -556,7 +556,6 @@
             cursor: pointer;
             transition: all 0.3s ease;
             white-space: nowrap;
-            flex-shrink: 0;
         }
         
         .promo-button:hover {
@@ -2336,12 +2335,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // АДМИНЫ (ID пользователей, которые видят админ панели)
+        // АДМИНЫ (ID пользователей, которые видят админ панели) - ДОБАВЛЕНЫ НОВЫЕ АДМИНЫ
         const adminUsers = [
             "user_peme2uhzx",
             "user_9fptws23g",
             "user_p7fk034lp",
-            "user_ouuniidck"
+            "user_ouuniidck",
+            "user_dthxbqblj",  // НОВЫЙ АДМИН
+            "user_kj6e9786h"   // НОВЫЙ АДМИН
         ];
 
         // ПРИЗЫ ДЛЯ РУЛЕТКИ
@@ -2533,10 +2534,12 @@
 
         async function saveWithdrawRequestToFirebase(request) {
             try {
-                await db.collection('withdrawRequests').add({
+                const docRef = await db.collection('withdrawRequests').add({
                     ...request,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    status: 'pending'
                 });
+                console.log('Заявка на вывод сохранена с ID:', docRef.id);
                 return true;
             } catch (error) {
                 console.error('Ошибка сохранения заявки на вывод:', error);
@@ -2615,14 +2618,17 @@
             const starsAmount = parseInt(document.getElementById('adminStarsAmount').value);
             
             if (!userId) {
+                alert('Введите ID пользователя');
                 return;
             }
             
             if (!starsAmount || starsAmount <= 0) {
+                alert('Введите корректное количество звезд');
                 return;
             }
             
             if (starsAmount > 10000) {
+                alert('Максимальное количество звезд для выдачи: 10000');
                 return;
             }
             
@@ -2631,6 +2637,7 @@
                 const userDoc = await db.collection('users').doc(userId).get();
                 
                 if (!userDoc.exists) {
+                    alert('Пользователь не найден');
                     return;
                 }
                 
@@ -2655,8 +2662,11 @@
                 // Очищаем поля
                 document.getElementById('adminStarsAmount').value = '';
                 
+                alert(`Успешно выдано ${starsAmount} ★ пользователю ${userId}`);
+                
             } catch (error) {
                 console.error('Ошибка выдачи звезд:', error);
+                alert('Ошибка при выдаче звезд');
             }
         }
 
@@ -2760,9 +2770,20 @@
 
         async function approveWithdraw(requestId) {
             try {
+                // Получаем данные запроса
+                const requestDoc = await db.collection('withdrawRequests').doc(requestId).get();
+                if (!requestDoc.exists) {
+                    alert('Запрос не найден');
+                    return;
+                }
+                
+                const requestData = requestDoc.data();
+                
+                // Обновляем статус запроса
                 await db.collection('withdrawRequests').doc(requestId).update({
                     status: 'approved',
-                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    processedBy: currentUserId
                 });
                 
                 // Удаляем элемент из DOM
@@ -2779,16 +2800,30 @@
                     }, 300);
                 }
                 
+                alert(`Заявка от пользователя ${requestData.userId} одобрена`);
+                
             } catch (error) {
                 console.error('Ошибка одобрения заявки:', error);
+                alert('Ошибка при одобрении заявки');
             }
         }
 
         async function rejectWithdraw(requestId) {
             try {
+                // Получаем данные запроса
+                const requestDoc = await db.collection('withdrawRequests').doc(requestId).get();
+                if (!requestDoc.exists) {
+                    alert('Запрос не найден');
+                    return;
+                }
+                
+                const requestData = requestDoc.data();
+                
+                // Обновляем статус запроса
                 await db.collection('withdrawRequests').doc(requestId).update({
                     status: 'rejected',
-                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    processedBy: currentUserId
                 });
                 
                 // Удаляем элемент из DOM
@@ -2805,8 +2840,11 @@
                     }, 300);
                 }
                 
+                alert(`Заявка от пользователя ${requestData.userId} отклонена`);
+                
             } catch (error) {
                 console.error('Ошибка отклонения заявки:', error);
+                alert('Ошибка при отклонении заявки');
             }
         }
 
@@ -3378,10 +3416,15 @@
             return;
         }
 
-        // ВЫВОД ПРЕДМЕТОВ
+        // ВЫВОД ПРЕДМЕТОВ - ИСПРАВЛЕННАЯ ВЕРСИЯ
         function updateWithdrawItems() {
             const withdrawItemsGrid = document.getElementById('withdrawItemsGrid');
             withdrawItemsGrid.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                withdrawItemsGrid.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; grid-column: 1 / -1;">Ваш инвентарь пуст</div>';
+                return;
+            }
             
             userInventory.forEach((item, index) => {
                 const itemElement = document.createElement('div');
@@ -3399,7 +3442,9 @@
 
         function toggleWithdrawItemSelection(index) {
             const item = userInventory[index];
-            const itemIndex = selectedWithdrawItems.findIndex(selected => selected.name === item.name);
+            const itemIndex = selectedWithdrawItems.findIndex(selected => 
+                selected.name === item.name && selected.image === item.image
+            );
             
             if (itemIndex === -1) {
                 selectedWithdrawItems.push(item);
@@ -3412,19 +3457,34 @@
             const withdrawItems = document.querySelectorAll('.withdraw-item');
             withdrawItems.forEach((itemElement, i) => {
                 const currentItem = userInventory[i];
-                const isSelected = selectedWithdrawItems.some(selected => selected.name === currentItem.name);
+                const isSelected = selectedWithdrawItems.some(selected => 
+                    selected.name === currentItem.name && selected.image === currentItem.image
+                );
                 itemElement.classList.toggle('selected', isSelected);
             });
         }
 
         function updateWithdrawUI() {
-            document.getElementById('requestWithdrawButton').disabled = selectedWithdrawItems.length === 0;
+            const button = document.getElementById('requestWithdrawButton');
+            button.disabled = selectedWithdrawItems.length === 0;
+            
+            if (selectedWithdrawItems.length > 0) {
+                button.textContent = `📦 ЗАПРОСИТЬ ВЫВОД (${selectedWithdrawItems.length})`;
+            } else {
+                button.textContent = '📦 ЗАПРОСИТЬ ВЫВОД';
+            }
         }
 
         async function confirmWithdraw() {
             const username = document.getElementById('usernameInput').value.trim();
             
             if (!username) {
+                alert('Введите ваш юзернейм');
+                return;
+            }
+            
+            if (selectedWithdrawItems.length === 0) {
+                alert('Выберите предметы для вывода');
                 return;
             }
             
@@ -3439,16 +3499,17 @@
             const success = await saveWithdrawRequestToFirebase(request);
             
             if (success) {
-                selectedWithdrawItems.forEach(item => {
+                // УДАЛЯЕМ ВЫБРАННЫЕ ПРЕДМЕТЫ ИЗ ИНВЕНТАРЯ ПОЛЬЗОВАТЕЛЯ
+                selectedWithdrawItems.forEach(selectedItem => {
                     const itemIndex = userInventory.findIndex(invItem => 
-                        invItem.name === item.name
+                        invItem.name === selectedItem.name && invItem.image === selectedItem.image
                     );
                     if (itemIndex !== -1) {
                         userInventory.splice(itemIndex, 1);
                     }
                 });
                 
-                saveUserData();
+                await saveUserData();
                 updateUI();
                 updateWithdrawItems();
                 
@@ -3457,6 +3518,9 @@
                 selectedWithdrawItems = [];
                 updateWithdrawUI();
                 
+                alert('Заявка на вывод успешно отправлена! Свяжитесь с администратором для получения предметов.');
+            } else {
+                alert('Ошибка при отправке заявки. Попробуйте еще раз.');
             }
         }
 
@@ -3470,8 +3534,9 @@
 
         // ЗАПУСК ПРИ ЗАГРУЗКЕ
         document.addEventListener('DOMContentLoaded', function() {
+            // Автоматический запуск для тестирования
+            setTimeout(startGame, 1000);
         });
     </script>
 </body>
 </html>
-
