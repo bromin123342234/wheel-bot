@@ -903,13 +903,13 @@
             transform: scale(1.05);
         }
 
-        /* ИСПРАВЛЕННЫЕ СТИЛИ ДЛЯ КНОПОК В КЕЙСАХ */
+        /* ИСПРАВЛЕННЫЕ СТИЛИ ДЛЯ КНОПОК В КЕЙСАХ - КНОПКА СДВИНУТА ВЛЕВО */
         .case-buttons-container {
             display: flex;
             flex-direction: column;
             gap: 10px;
             margin-top: 15px;
-            align-items: flex-end; /* Выравнивание по правому краю */
+            align-items: flex-start;
             width: 100%;
         }
 
@@ -925,9 +925,9 @@
             margin: 10px 0;
             transition: all 0.3s ease;
             display: none;
-            width: auto; /* Автоматическая ширина */
-            min-width: 180px; /* Минимальная ширина */
-            align-self: flex-end; /* Выравнивание вправо */
+            width: auto;
+            min-width: 180px;
+            align-self: flex-start;
         }
         
         .spin-again-button:hover {
@@ -2195,7 +2195,7 @@
                 <!-- ВКЛАДКА ПОИСКА ПОЛЬЗОВАТЕЛЕЙ -->
                 <div class="admin-content" id="adminUsers" style="display: none;">
                     <div class="admin-controls">
-                        <div class="admin-control-title">👥 ПОСЛЕДНИЕ ПОЛЬЗОВАТЕЛИ</div>
+                        <div class="admin-control-title">👥 ПОСЛЕДНИЕ ПОЛЬЗОВАТЕЛЕЙ</div>
                         <div id="recentUsersList">
                             <!-- Список пользователей будет здесь -->
                         </div>
@@ -2335,14 +2335,14 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        // АДМИНЫ (ID пользователей, которые видят админ панели) - ДОБАВЛЕНЫ НОВЫЕ АДМИНЫ
+        // АДМИНЫ (ID пользователей, которые видят админ панели)
         const adminUsers = [
             "user_peme2uhzx",
             "user_9fptws23g",
             "user_p7fk034lp",
             "user_ouuniidck",
-            "user_dthxbqblj",  // НОВЫЙ АДМИН
-            "user_kj6e9786h"   // НОВЫЙ АДМИН
+            "user_dthxbqblj",
+            "user_kj6e9786h"
         ];
 
         // ПРИЗЫ ДЛЯ РУЛЕТКИ
@@ -2397,7 +2397,7 @@
             }
         ];
 
-        // НАГРАДЫ ДЛЯ КЕЙСОВ - ИСПРАВЛЕННЫЕ ВЕРСИИ
+        // НАГРАДЫ ДЛЯ КЕЙСОВ
         const caseRewards1 = [
             { name: "Ракета", image: "https://i.ibb.co/dsDK5qqP/image.png", chance: 50 },
             { name: "Алмаз", image: "https://i.ibb.co/5xL42fJq/image.png", chance: 30 },
@@ -2509,13 +2509,11 @@
                     promoDatabase[doc.id] = doc.data();
                 });
                 
-                // Если промокодов нет в базе, добавляем стандартные
                 if (Object.keys(promoDatabase).length === 0) {
                     await initializeDefaultPromoCodes();
                 }
             } catch (error) {
                 console.error('Ошибка загрузки промокодов:', error);
-                // Если произошла ошибка, инициализируем стандартные промокоды
                 await initializeDefaultPromoCodes();
             }
         }
@@ -2532,21 +2530,26 @@
             }
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ ЗАЯВКИ НА ВЫВОД
         async function saveWithdrawRequestToFirebase(request) {
             try {
                 const docRef = await db.collection('withdrawRequests').add({
-                    ...request,
+                    userId: request.userId,
+                    username: request.username,
+                    items: request.items,
+                    status: 'pending',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    status: 'pending'
+                    timestamp: Date.now()
                 });
-                console.log('Заявка на вывод сохранена с ID:', docRef.id);
+                console.log('✅ Заявка на вывод сохранена с ID:', docRef.id);
                 return true;
             } catch (error) {
-                console.error('Ошибка сохранения заявки на вывод:', error);
+                console.error('❌ Ошибка сохранения заявки на вывод:', error);
                 return false;
             }
         }
 
+        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ЗАЯВОК НА ВЫВОД
         async function loadWithdrawRequestsFromFirebase() {
             try {
                 const snapshot = await db.collection('withdrawRequests')
@@ -2557,23 +2560,31 @@
                 
                 const requests = [];
                 snapshot.forEach(doc => {
-                    requests.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    requests.push({ 
+                        id: doc.id, 
+                        userId: data.userId,
+                        username: data.username,
+                        items: data.items || [],
+                        status: data.status,
+                        createdAt: data.createdAt,
+                        timestamp: data.timestamp
+                    });
                 });
+                console.log('✅ Загружено заявок на вывод:', requests.length);
                 return requests;
             } catch (error) {
-                console.error('Ошибка загрузки заявок на вывод:', error);
+                console.error('❌ Ошибка загрузки заявок на вывод:', error);
                 return [];
             }
         }
 
-        // НОВЫЕ ФУНКЦИИ ДЛЯ АДМИН ПАНЕЛИ
+        // ФУНКЦИИ АДМИН ПАНЕЛИ
         async function searchUser() {
             const searchInput = document.getElementById('adminSearchUser');
             const userId = searchInput.value.trim();
             
-            if (!userId) {
-                return;
-            }
+            if (!userId) return;
             
             try {
                 const doc = await db.collection('users').doc(userId).get();
@@ -2633,7 +2644,6 @@
             }
             
             try {
-                // Получаем текущие данные пользователя
                 const userDoc = await db.collection('users').doc(userId).get();
                 
                 if (!userDoc.exists) {
@@ -2644,13 +2654,11 @@
                 const userData = userDoc.data();
                 const newBalance = (userData.balance || 0) + starsAmount;
                 
-                // Обновляем баланс пользователя
                 await db.collection('users').doc(userId).update({
                     balance: newBalance,
                     lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Записываем историю выдачи
                 await db.collection('adminActions').add({
                     adminId: currentUserId,
                     targetUserId: userId,
@@ -2659,14 +2667,12 @@
                     timestamp: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Очищаем поля
                 document.getElementById('adminStarsAmount').value = '';
-                
-                alert(`Успешно выдано ${starsAmount} ★ пользователю ${userId}`);
+                alert(`✅ Успешно выдано ${starsAmount} ★ пользователю ${userId}`);
                 
             } catch (error) {
                 console.error('Ошибка выдачи звезд:', error);
-                alert('Ошибка при выдаче звезд');
+                alert('❌ Ошибка при выдаче звезд');
             }
         }
 
@@ -2706,22 +2712,18 @@
         }
 
         function showAdminTab(tabName) {
-            // Скрываем все вкладки
             document.getElementById('adminStars').style.display = 'none';
             document.getElementById('adminWithdraws').style.display = 'none';
             document.getElementById('adminUsers').style.display = 'none';
             
-            // Показываем выбранную вкладку
             document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
             
-            // Загружаем данные для вкладки если нужно
             if (tabName === 'withdraws') {
                 loadAdminWithdrawRequests();
             } else if (tabName === 'users') {
                 loadRecentUsers();
             }
             
-            // Обновляем активную вкладку
             const tabs = document.querySelectorAll('.admin-tab');
             tabs.forEach(tab => {
                 tab.classList.remove('active');
@@ -2731,7 +2733,7 @@
 
         async function loadAdminWithdrawRequests() {
             const adminWithdraws = document.getElementById('adminWithdraws');
-            adminWithdraws.innerHTML = '';
+            adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Загрузка заявок...</div>';
             
             const requests = await loadWithdrawRequestsFromFirebase();
             
@@ -2739,6 +2741,8 @@
                 adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
                 return;
             }
+            
+            adminWithdraws.innerHTML = '';
             
             requests.forEach((request) => {
                 const requestElement = document.createElement('div');
@@ -2770,29 +2774,17 @@
 
         async function approveWithdraw(requestId) {
             try {
-                // Получаем данные запроса
-                const requestDoc = await db.collection('withdrawRequests').doc(requestId).get();
-                if (!requestDoc.exists) {
-                    alert('Запрос не найден');
-                    return;
-                }
-                
-                const requestData = requestDoc.data();
-                
-                // Обновляем статус запроса
                 await db.collection('withdrawRequests').doc(requestId).update({
                     status: 'approved',
                     processedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     processedBy: currentUserId
                 });
                 
-                // Удаляем элемент из DOM
                 const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
                 if (requestElement) {
                     requestElement.style.animation = 'fadeOut 0.3s ease-out';
                     setTimeout(() => {
                         requestElement.remove();
-                        // Если запросов не осталось, показываем сообщение
                         const adminWithdraws = document.getElementById('adminWithdraws');
                         if (adminWithdraws.children.length === 0) {
                             adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
@@ -2800,39 +2792,27 @@
                     }, 300);
                 }
                 
-                alert(`Заявка от пользователя ${requestData.userId} одобрена`);
+                alert('✅ Заявка одобрена');
                 
             } catch (error) {
                 console.error('Ошибка одобрения заявки:', error);
-                alert('Ошибка при одобрении заявки');
+                alert('❌ Ошибка при одобрении заявки');
             }
         }
 
         async function rejectWithdraw(requestId) {
             try {
-                // Получаем данные запроса
-                const requestDoc = await db.collection('withdrawRequests').doc(requestId).get();
-                if (!requestDoc.exists) {
-                    alert('Запрос не найден');
-                    return;
-                }
-                
-                const requestData = requestDoc.data();
-                
-                // Обновляем статус запроса
                 await db.collection('withdrawRequests').doc(requestId).update({
                     status: 'rejected',
                     processedAt: firebase.firestore.FieldValue.serverTimestamp(),
                     processedBy: currentUserId
                 });
                 
-                // Удаляем элемент из DOM
                 const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
                 if (requestElement) {
                     requestElement.style.animation = 'fadeOut 0.3s ease-out';
                     setTimeout(() => {
                         requestElement.remove();
-                        // Если запросов не осталось, показываем сообщение
                         const adminWithdraws = document.getElementById('adminWithdraws');
                         if (adminWithdraws.children.length === 0) {
                             adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
@@ -2840,17 +2820,16 @@
                     }, 300);
                 }
                 
-                alert(`Заявка от пользователя ${requestData.userId} отклонена`);
+                alert('✅ Заявка отклонена');
                 
             } catch (error) {
                 console.error('Ошибка отклонения заявки:', error);
-                alert('Ошибка при отклонении заявки');
+                alert('❌ Ошибка при отклонении заявки');
             }
         }
 
-        // ОСТАЛЬНЫЕ ФУНКЦИИ
+        // ОСНОВНЫЕ ФУНКЦИИ
         function generateUserId() {
-            // Постоянный ID на основе localStorage
             let userId = localStorage.getItem('halloweenWheelUserId');
             if (!userId) {
                 userId = 'user_' + Math.random().toString(36).substr(2, 9);
@@ -3138,13 +3117,9 @@
             const promoInput = document.getElementById('promoCodeInput');
             const promoCode = promoInput.value.trim().toUpperCase();
             
-            if (!promoCode) {
-                return;
-            }
+            if (!promoCode) return;
             
-            if (usedPromoCodes.includes(promoCode)) {
-                return;
-            }
+            if (usedPromoCodes.includes(promoCode)) return;
             
             await loadPromoCodesFromFirebase();
             
@@ -3172,7 +3147,6 @@
                 saveUserData();
                 updatePromoHistory();
                 promoInput.value = '';
-                
             }
         }
 
@@ -3207,16 +3181,14 @@
             });
         }
 
-        // КЕЙСЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ АНИМАЦИИ
+        // КЕЙСЫ - КНОПКА "КРУТИТЬ ЕЩЕ РАЗ" СДВИНУТА ВЛЕВО
         function openCase(caseType) {
             if (isCaseAnimationRunning) return;
             
             currentCaseType = caseType;
             currentCaseCost = caseType === 1 ? 300 : 450;
             
-            if (userBalance < currentCaseCost) {
-                return;
-            }
+            if (userBalance < currentCaseCost) return;
             
             document.getElementById('caseOpeningOverlay').style.display = 'flex';
             document.getElementById('caseOpeningImage').src = caseType === 1 ? 
@@ -3230,12 +3202,10 @@
             document.getElementById('spinAgainButton').style.display = 'none';
             document.getElementById('spinCounter').textContent = 'Готов к вращению';
             
-            // Сбрасываем анимацию
             const rewardsTrack = document.getElementById('rewardsTrack');
             rewardsTrack.style.transition = 'none';
             rewardsTrack.style.transform = 'translateX(0)';
             
-            // Убираем подсветку с предыдущих предметов
             const wonItems = document.querySelectorAll('.reward-item.won');
             wonItems.forEach(item => item.classList.remove('won'));
         }
@@ -3246,8 +3216,7 @@
             
             const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
             
-            // Создаем элементы для анимации - КАЖДЫЙ ПРЕДМЕТ 3 РАЗА
-            for (let i = 0; i < 3; i++) { // 3 полных цикла
+            for (let i = 0; i < 3; i++) {
                 rewards.forEach(reward => {
                     const rewardItem = document.createElement('div');
                     rewardItem.className = 'reward-item';
@@ -3281,7 +3250,6 @@
             
             const rewards = currentCaseType === 1 ? caseRewards1 : caseRewards2;
             
-            // ВЫБОР ПРИЗА
             const totalChance = rewards.reduce((sum, reward) => sum + reward.chance, 0);
             let random = Math.random() * totalChance;
             let selectedReward = rewards[0];
@@ -3295,17 +3263,13 @@
                 }
             }
             
-            console.log('Выбранный приз:', selectedReward.name);
-            
-            // РАСЧЕТ ПОЗИЦИИ ДЛЯ ОСТАНОВКИ - КАЖДЫЙ ПРЕДМЕТ ДОЛЖЕН ПРОЙТИ 3 РАЗА
             const itemWidth = 120;
             const rewardsPerSet = rewards.length;
             const totalItems = rewardsTrack.children.length;
             
-            // Находим позицию выбранного приза в ТРЕТЬЕМ проходе
             let targetIndex = -1;
-            const thirdPassStart = rewardsPerSet * 2; // Начало третьего прохода
-            const thirdPassEnd = rewardsPerSet * 3;   // Конец третьего прохода
+            const thirdPassStart = rewardsPerSet * 2;
+            const thirdPassEnd = rewardsPerSet * 3;
             
             for (let i = thirdPassStart; i < thirdPassEnd; i++) {
                 if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
@@ -3314,7 +3278,6 @@
                 }
             }
             
-            // Если не нашли в третьем проходе, ищем в любом месте
             if (targetIndex === -1) {
                 for (let i = 0; i < totalItems; i++) {
                     if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
@@ -3324,24 +3287,18 @@
                 }
             }
             
-            // Вычисляем конечную позицию (центрируем под указателем)
-            const pointerPosition = 150; // Позиция указателя
+            const pointerPosition = 150;
             const targetPosition = -(targetIndex * itemWidth - pointerPosition + itemWidth / 2);
+            const startPosition = 0;
             
-            // Добавляем начальное смещение для эффекта спина (проходим все 3 цикла)
-            const startPosition = 0; // Начинаем с начала
-            
-            // Сначала устанавливаем начальную позицию без анимации
             rewardsTrack.style.transition = 'none';
             rewardsTrack.style.transform = `translateX(${startPosition}px)`;
             
-            // Затем запускаем анимацию с задержкой
             setTimeout(() => {
                 rewardsTrack.style.transition = 'transform 5s cubic-bezier(0.1, 0.8, 0.2, 1)';
                 rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
                 
                 setTimeout(() => {
-                    // Подсвечиваем выигранный предмет
                     const allItems = document.querySelectorAll('.reward-item');
                     allItems.forEach(item => {
                         if (item.getAttribute('data-name') === selectedReward.name) {
@@ -3396,7 +3353,6 @@
                 return;
             }
             
-            // Полностью перезагружаем кейс
             openCase(currentCaseType);
         }
 
@@ -3416,7 +3372,7 @@
             return;
         }
 
-        // ВЫВОД ПРЕДМЕТОВ - ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // ВЫВОД ПРЕДМЕТОВ
         function updateWithdrawItems() {
             const withdrawItemsGrid = document.getElementById('withdrawItemsGrid');
             withdrawItemsGrid.innerHTML = '';
@@ -3499,7 +3455,6 @@
             const success = await saveWithdrawRequestToFirebase(request);
             
             if (success) {
-                // УДАЛЯЕМ ВЫБРАННЫЕ ПРЕДМЕТЫ ИЗ ИНВЕНТАРЯ ПОЛЬЗОВАТЕЛЯ
                 selectedWithdrawItems.forEach(selectedItem => {
                     const itemIndex = userInventory.findIndex(invItem => 
                         invItem.name === selectedItem.name && invItem.image === selectedItem.image
@@ -3518,9 +3473,9 @@
                 selectedWithdrawItems = [];
                 updateWithdrawUI();
                 
-                alert('Заявка на вывод успешно отправлена! Свяжитесь с администратором для получения предметов.');
+                alert('✅ Заявка на вывод успешно отправлена! Свяжитесь с администратором для получения предметов.');
             } else {
-                alert('Ошибка при отправке заявки. Попробуйте еще раз.');
+                alert('❌ Ошибка при отправке заявки. Попробуйте еще раз.');
             }
         }
 
@@ -3534,7 +3489,6 @@
 
         // ЗАПУСК ПРИ ЗАГРУЗКЕ
         document.addEventListener('DOMContentLoaded', function() {
-            // Автоматический запуск для тестирования
             setTimeout(startGame, 1000);
         });
     </script>
