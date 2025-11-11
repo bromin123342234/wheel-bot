@@ -808,7 +808,7 @@
             position: absolute;
             left: 0;
             top: 50px;
-            transition: transform 10s cubic-bezier(0.1, 0.8, 0.2, 1);
+            transition: transform 5s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         
         .reward-item {
@@ -904,7 +904,16 @@
             transform: scale(1.05);
         }
 
-        /* НОВАЯ КНОПКА "КРУТИТЬ ЕЩЕ РАЗ" */
+        /* ИСПРАВЛЕННЫЕ СТИЛИ ДЛЯ КНОПОК В КЕЙСАХ */
+        .case-buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+            align-items: flex-end; /* Выравнивание по правому краю */
+            width: 100%;
+        }
+
         .spin-again-button {
             background: linear-gradient(135deg, #ff8c42, #9d4edd);
             color: white;
@@ -917,7 +926,9 @@
             margin: 10px 0;
             transition: all 0.3s ease;
             display: none;
-            width: 100%;
+            width: auto; /* Автоматическая ширина */
+            min-width: 180px; /* Минимальная ширина */
+            align-self: flex-end; /* Выравнивание вправо */
         }
         
         .spin-again-button:hover {
@@ -928,13 +939,6 @@
             opacity: 0.6;
             cursor: not-allowed;
             transform: none;
-        }
-
-        .case-buttons-container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
         }
 
         .overlay {
@@ -3165,7 +3169,7 @@
             });
         }
 
-        // КЕЙСЫ - ПОЛНОСТЬЮ ИСПРАВЛЕННАЯ ВЕРСИЯ
+        // КЕЙСЫ - ИСПРАВЛЕННАЯ ВЕРСИЯ АНИМАЦИИ
         function openCase(caseType) {
             if (isCaseAnimationRunning) return;
             
@@ -3204,8 +3208,8 @@
             
             const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
             
-            // Создаем элементы для анимации
-            for (let i = 0; i < 25; i++) {
+            // Создаем элементы для анимации - КАЖДЫЙ ПРЕДМЕТ 3 РАЗА
+            for (let i = 0; i < 3; i++) { // 3 полных цикла
                 rewards.forEach(reward => {
                     const rewardItem = document.createElement('div');
                     rewardItem.className = 'reward-item';
@@ -3255,21 +3259,24 @@
             
             console.log('Выбранный приз:', selectedReward.name);
             
-            // РАСЧЕТ ПОЗИЦИИ ДЛЯ ОСТАНОВКИ
+            // РАСЧЕТ ПОЗИЦИИ ДЛЯ ОСТАНОВКИ - КАЖДЫЙ ПРЕДМЕТ ДОЛЖЕН ПРОЙТИ 3 РАЗА
             const itemWidth = 120;
             const rewardsPerSet = rewards.length;
             const totalItems = rewardsTrack.children.length;
             
-            // Находим позицию выбранного приза в середине дорожки
+            // Находим позицию выбранного приза в ТРЕТЬЕМ проходе
             let targetIndex = -1;
-            for (let i = Math.floor(totalItems / 3); i < Math.floor(totalItems * 2 / 3); i++) {
+            const thirdPassStart = rewardsPerSet * 2; // Начало третьего прохода
+            const thirdPassEnd = rewardsPerSet * 3;   // Конец третьего прохода
+            
+            for (let i = thirdPassStart; i < thirdPassEnd; i++) {
                 if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
                     targetIndex = i;
                     break;
                 }
             }
             
-            // Если не нашли, берем первую подходящую позицию
+            // Если не нашли в третьем проходе, ищем в любом месте
             if (targetIndex === -1) {
                 for (let i = 0; i < totalItems; i++) {
                     if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
@@ -3283,8 +3290,8 @@
             const pointerPosition = 150; // Позиция указателя
             const targetPosition = -(targetIndex * itemWidth - pointerPosition + itemWidth / 2);
             
-            // Добавляем начальное смещение для эффекта спина
-            const startPosition = -(rewardsPerSet * itemWidth * 8);
+            // Добавляем начальное смещение для эффекта спина (проходим все 3 цикла)
+            const startPosition = 0; // Начинаем с начала
             
             // Сначала устанавливаем начальную позицию без анимации
             rewardsTrack.style.transition = 'none';
@@ -3292,7 +3299,7 @@
             
             // Затем запускаем анимацию с задержкой
             setTimeout(() => {
-                rewardsTrack.style.transition = 'transform 10s cubic-bezier(0.1, 0.8, 0.2, 1)';
+                rewardsTrack.style.transition = 'transform 5s cubic-bezier(0.1, 0.8, 0.2, 1)';
                 rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
                 
                 setTimeout(() => {
@@ -3316,7 +3323,7 @@
                     document.getElementById('spinAgainButton').style.display = 'block';
                     createConfetti();
                     
-                }, 10000);
+                }, 5000);
             }, 50);
         }
 
