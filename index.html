@@ -740,18 +740,21 @@
             z-index: 1000;
             align-items: center;
             justify-content: center;
+            padding: 20px;
         }
         
         .case-opening-container {
             background: linear-gradient(135deg, rgba(157, 78, 221, 0.95), rgba(255, 140, 66, 0.95));
             border: 4px solid rgba(255, 255, 255, 0.2);
             border-radius: 30px;
-            padding: 30px;
+            padding: 20px;
             max-width: 350px;
-            width: 90%;
+            width: 100%;
             text-align: center;
             position: relative;
             animation: caseOpen 0.5s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         @keyframes caseOpen {
@@ -805,7 +808,7 @@
             position: absolute;
             left: 0;
             top: 50px;
-            transition: transform 10s cubic-bezier(0.1, 0.8, 0.2, 1);
+            transition: transform 8s cubic-bezier(0.1, 0.8, 0.2, 1);
         }
         
         .reward-item {
@@ -893,6 +896,7 @@
             cursor: pointer;
             margin-top: 15px;
             transition: all 0.3s ease;
+            width: 100%;
         }
         
         .close-case-button:hover {
@@ -910,9 +914,10 @@
             font-weight: bold;
             border-radius: 15px;
             cursor: pointer;
-            margin: 10px 5px;
+            margin: 10px 0;
             transition: all 0.3s ease;
             display: none;
+            width: 100%;
         }
         
         .spin-again-button:hover {
@@ -927,7 +932,7 @@
 
         .case-buttons-container {
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             gap: 10px;
             margin-top: 15px;
         }
@@ -1601,6 +1606,7 @@
             padding: 15px;
             margin: 10px 0;
             border: 1px solid rgba(255, 140, 66, 0.15);
+            animation: fadeIn 0.3s ease-out;
         }
         
         .request-user {
@@ -1858,6 +1864,12 @@
             color: rgba(255, 255, 255, 0.7);
             font-size: 12px;
             margin-top: 20px;
+        }
+
+        /* АНИМАЦИИ ДЛЯ ИСЧЕЗНОВЕНИЯ */
+        @keyframes fadeOut {
+            from { opacity: 1; transform: translateY(0); }
+            to { opacity: 0; transform: translateY(-10px); }
         }
 
     </style>
@@ -2249,11 +2261,10 @@
                 <button class="spin-again-button" id="spinAgainButton" onclick="spinAgain()">
                     🔄 КРУТИТЬ ЕЩЕ РАЗ
                 </button>
+                <button class="close-case-button" onclick="closeCaseOpening()">
+                    ❌ ЗАКРЫТЬ
+                </button>
             </div>
-            
-            <button class="close-case-button" onclick="closeCaseOpening()">
-                ❌ ЗАКРЫТЬ
-            </button>
         </div>
     </div>
 
@@ -2532,6 +2543,7 @@
         async function loadWithdrawRequestsFromFirebase() {
             try {
                 const snapshot = await db.collection('withdrawRequests')
+                    .where('status', '==', 'pending')
                     .orderBy('createdAt', 'desc')
                     .limit(50)
                     .get();
@@ -2717,6 +2729,7 @@
             requests.forEach((request) => {
                 const requestElement = document.createElement('div');
                 requestElement.className = 'withdraw-request';
+                requestElement.setAttribute('data-request-id', request.id);
                 
                 const itemsHTML = request.items.map(item => `
                     <div class="request-item">
@@ -2744,9 +2757,24 @@
         async function approveWithdraw(requestId) {
             try {
                 await db.collection('withdrawRequests').doc(requestId).update({
-                    status: 'approved'
+                    status: 'approved',
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                loadAdminWithdrawRequests();
+                
+                // Удаляем элемент из DOM
+                const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
+                if (requestElement) {
+                    requestElement.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        requestElement.remove();
+                        // Если запросов не осталось, показываем сообщение
+                        const adminWithdraws = document.getElementById('adminWithdraws');
+                        if (adminWithdraws.children.length === 0) {
+                            adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
+                        }
+                    }, 300);
+                }
+                
             } catch (error) {
                 console.error('Ошибка одобрения заявки:', error);
             }
@@ -2755,9 +2783,24 @@
         async function rejectWithdraw(requestId) {
             try {
                 await db.collection('withdrawRequests').doc(requestId).update({
-                    status: 'rejected'
+                    status: 'rejected',
+                    processedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                loadAdminWithdrawRequests();
+                
+                // Удаляем элемент из DOM
+                const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
+                if (requestElement) {
+                    requestElement.style.animation = 'fadeOut 0.3s ease-out';
+                    setTimeout(() => {
+                        requestElement.remove();
+                        // Если запросов не осталось, показываем сообщение
+                        const adminWithdraws = document.getElementById('adminWithdraws');
+                        if (adminWithdraws.children.length === 0) {
+                            adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
+                        }
+                    }, 300);
+                }
+                
             } catch (error) {
                 console.error('Ошибка отклонения заявки:', error);
             }
@@ -3143,17 +3186,26 @@
             document.getElementById('wonItem').style.display = 'none';
             document.getElementById('confirmOpenCaseButton').style.display = 'block';
             document.getElementById('spinAgainButton').style.display = 'none';
+            document.getElementById('spinCounter').textContent = 'Готов к вращению';
+            
+            // Сбрасываем анимацию
+            const rewardsTrack = document.getElementById('rewardsTrack');
+            rewardsTrack.style.transition = 'none';
+            rewardsTrack.style.transform = 'translateX(0)';
+            
+            // Убираем подсветку с предыдущих предметов
+            const wonItems = document.querySelectorAll('.reward-item.won');
+            wonItems.forEach(item => item.classList.remove('won'));
         }
 
         function fillRewardsTrack(caseType) {
             const rewardsTrack = document.getElementById('rewardsTrack');
             rewardsTrack.innerHTML = '';
-            rewardsTrack.style.transform = 'translateX(0)';
             
             const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
             
-            // Создаем много элементов для длинной анимации
-            for (let i = 0; i < 30; i++) {
+            // Создаем элементы для анимации
+            for (let i = 0; i < 25; i++) {
                 rewards.forEach(reward => {
                     const rewardItem = document.createElement('div');
                     rewardItem.className = 'reward-item';
@@ -3187,7 +3239,7 @@
             
             const rewards = currentCaseType === 1 ? caseRewards1 : caseRewards2;
             
-            // ПРАВИЛЬНЫЙ ВЫБОР ПРИЗА
+            // ВЫБОР ПРИЗА
             const totalChance = rewards.reduce((sum, reward) => sum + reward.chance, 0);
             let random = Math.random() * totalChance;
             let selectedReward = rewards[0];
@@ -3203,28 +3255,42 @@
             
             console.log('Выбранный приз:', selectedReward.name);
             
-            // ПРОСТОЙ И РАБОЧИЙ РАСЧЕТ
+            // РАСЧЕТ ПОЗИЦИИ ДЛЯ ОСТАНОВКИ
             const itemWidth = 120;
             const rewardsPerSet = rewards.length;
+            const totalItems = rewardsTrack.children.length;
             
-            // Находим позицию выбранного приза во втором наборе (для гарантии)
-            let targetPosition = 0;
-            for (let i = rewardsPerSet; i < rewardsPerSet * 2; i++) {
+            // Находим позицию выбранного приза в середине дорожки
+            let targetIndex = -1;
+            for (let i = Math.floor(totalItems / 3); i < Math.floor(totalItems * 2 / 3); i++) {
                 if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
-                    // Центрируем под указателем (указатель на 150px от левого края)
-                    targetPosition = -(i * itemWidth - 150 + itemWidth/2);
+                    targetIndex = i;
                     break;
                 }
             }
             
-            // Добавляем быструю прокрутку в начале
-            const fastScrollDistance = -(rewardsPerSet * itemWidth * 10);
+            // Если не нашли, берем первую подходящую позицию
+            if (targetIndex === -1) {
+                for (let i = 0; i < totalItems; i++) {
+                    if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
+                        targetIndex = i;
+                        break;
+                    }
+                }
+            }
             
-            // Сначала быстро крутим
-            rewardsTrack.style.transition = 'transform 0s';
-            rewardsTrack.style.transform = `translateX(${fastScrollDistance}px)`;
+            // Вычисляем конечную позицию (центрируем под указателем)
+            const pointerPosition = 150; // Позиция указателя
+            const targetPosition = -(targetIndex * itemWidth - pointerPosition + itemWidth / 2);
             
-            // Затем плавно останавливаемся на выбранном призе
+            // Добавляем начальное смещение для эффекта спина
+            const startPosition = -(rewardsPerSet * itemWidth * 8);
+            
+            // Сначала устанавливаем начальную позицию без анимации
+            rewardsTrack.style.transition = 'none';
+            rewardsTrack.style.transform = `translateX(${startPosition}px)`;
+            
+            // Затем запускаем анимацию с задержкой
             setTimeout(() => {
                 rewardsTrack.style.transition = 'transform 8s cubic-bezier(0.1, 0.8, 0.2, 1)';
                 rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
@@ -3277,20 +3343,16 @@
         }
 
         function spinAgain() {
+            if (isCaseAnimationRunning) return;
+            
             if (userBalance < currentCaseCost) {
+                alert('Недостаточно звезд для открытия кейса!');
                 closeCaseOpening();
                 return;
             }
             
-            document.getElementById('wonItem').style.display = 'none';
-            document.getElementById('spinAgainButton').style.display = 'none';
-            document.getElementById('confirmOpenCaseButton').style.display = 'block';
-            document.getElementById('spinCounter').textContent = 'Готов к вращению';
-            
-            const wonItems = document.querySelectorAll('.reward-item.won');
-            wonItems.forEach(item => item.classList.remove('won'));
-            
-            fillRewardsTrack(currentCaseType);
+            // Полностью перезагружаем кейс
+            openCase(currentCaseType);
         }
 
         function closeCaseOpening() {
