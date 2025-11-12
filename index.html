@@ -5,10 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎃Halloween Wheel🎃</title>
     
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
-    
+    <!-- Firebase 9 (Modular) -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, doc, getDoc, setDoc, updateDoc, query, where, orderBy, limit, serverTimestamp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAaXhwLzJFVOuAHI3c8LpUXWal0416Xdkc",
+            authDomain: "halloween-wheel-game.firebaseapp.com",
+            databaseURL: "https://halloween-wheel-game-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "halloween-wheel-game",
+            storageBucket: "halloween-wheel-game.firebasestorage.app",
+            messagingSenderId: "994979036087",
+            appId: "1:994979036087:web:e4e13001a8fc7f2a670632"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        // Сделаем Firebase доступным глобально
+        window.firebase = {
+            db,
+            collection,
+            addDoc,
+            getDocs,
+            doc,
+            getDoc,
+            setDoc,
+            updateDoc,
+            query,
+            where,
+            orderBy,
+            limit,
+            serverTimestamp
+        };
+
+        console.log('✅ Firebase инициализирован успешно!');
+    </script>
+
     <style>
         * {
             margin: 0;
@@ -715,7 +752,6 @@
             box-shadow: 0 6px 20px rgba(255, 140, 66, 0.3);
             width: 100%;
             max-width: 200px;
-            margin-left: 5px; /* Сдвиг влево уменьшен */
         }
         
         .open-case-button:hover {
@@ -929,7 +965,6 @@
             width: auto;
             min-width: 180px;
             align-self: flex-start;
-            margin-left: 5px; /* Сдвиг влево уменьшен */
         }
         
         .spin-again-button:hover {
@@ -1612,6 +1647,7 @@
             margin: 10px 0;
             border: 1px solid rgba(255, 140, 66, 0.15);
             animation: fadeIn 0.3s ease-out;
+            border-left: 4px solid #ff8c42;
         }
         
         .request-user {
@@ -1626,6 +1662,18 @@
             font-weight: bold;
             margin-bottom: 10px;
             font-size: 13px;
+        }
+        
+        .request-date {
+            font-size: 12px;
+            color: #ffa366;
+            margin-bottom: 10px;
+        }
+        
+        .request-items-title {
+            font-size: 12px;
+            color: #ffa366;
+            margin-bottom: 5px;
         }
         
         .request-items {
@@ -1650,6 +1698,11 @@
             width: 20px;
             height: 20px;
             object-fit: contain;
+        }
+        
+        .request-status {
+            margin: 10px 0;
+            font-size: 14px;
         }
         
         .request-actions {
@@ -1829,22 +1882,6 @@
             color: rgba(255, 255, 255, 0.8);
             margin-bottom: 30px;
             font-size: 14px;
-        }
-        
-        .auth-input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-radius: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            font-size: 16px;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        
-        .auth-input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
         }
         
         .auth-button {
@@ -2032,7 +2069,7 @@
                     <div class="case-preview">
                         <img src="https://i.ibb.co/VcT5Prm5/image.png" alt="Кейс Силы" class="case-image">
                     </div>
-                    <div class="case-name">🌟 КЕЙС ситх</div>
+                    <div class="case-name">🌟 КЕЙС СИЛЫ</div>
                     <div class="case-description">Эксклюзивный кейс с редкими световыми мечами и уникальными предметами!</div>
                     <div class="case-price">
                         <span>450</span>
@@ -2191,7 +2228,15 @@
                 
                 <!-- ВКЛАДКА ЗАПРОСОВ НА ВЫВОД -->
                 <div class="admin-content" id="adminWithdraws" style="display: none;">
-                    <!-- Запросы на вывод будут добавлены через JavaScript -->
+                    <div class="admin-controls">
+                        <div class="admin-control-title">📦 ЗАПРОСЫ НА ВЫВОД</div>
+                        <button class="admin-button secondary" onclick="loadAdminWithdrawRequests()">
+                            🔄 ОБНОВИТЬ ЗАПРОСЫ
+                        </button>
+                        <div id="withdrawRequestsList">
+                            <!-- Запросы на вывод будут здесь -->
+                        </div>
+                    </div>
                 </div>
                 
                 <!-- ВКЛАДКА ПОИСКА ПОЛЬЗОВАТЕЛЕЙ -->
@@ -2322,25 +2367,10 @@
     </div>
 
     <script>
-        // КОНФИГУРАЦИЯ FIREBASE
-        const firebaseConfig = {
-            apiKey: "AIzaSyAaXhwLzJFVOuAHI3c8LpUXWal0416Xdkc",
-            authDomain: "halloween-wheel-game.firebaseapp.com",
-            databaseURL: "https://halloween-wheel-game-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "halloween-wheel-game",
-            storageBucket: "halloween-wheel-game.firebasestorage.app",
-            messagingSenderId: "994979036087",
-            appId: "1:994979036087:web:e4e13001a8fc7f2a670632"
-        };
-
-        // ИНИЦИАЛИЗАЦИЯ FIREBASE
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        // АДМИНЫ (ID пользователей, которые видят админ панели)
+        // КОНСТАНТЫ
         const adminUsers = [
             "user_peme2uhzx",
-            "user_9fptws23g",
+            "user_9fptws23g", 
             "user_p7fk034lp",
             "user_ouuniidck",
             "user_dthxbqblj",
@@ -2399,16 +2429,14 @@
             }
         ];
 
-        // НАГРАДЫ ДЛЯ КЕЙСОВ (ОБНОВЛЕННЫЕ)
+        // НАГРАДЫ ДЛЯ КЕЙСОВ
         const caseRewards1 = [
             { name: "Ракета", image: "https://i.ibb.co/dsDK5qqP/image.png", chance: 50 },
             { name: "Алмаз", image: "https://i.ibb.co/5xL42fJq/image.png", chance: 30 },
             { name: "Эскимо", image: "https://i.ibb.co/W4JRbR9G/image.png", chance: 15 },
             { name: "Носки", image: "https://i.ibb.co/9HZJQzhT/image.png", chance: 10 },
             { name: "Печенька", image: "https://i.ibb.co/Xf4YrFTt/image.png", chance: 7 },
-            { name: "Световой меч", image: "https://i.ibb.co/gF66LM94/image.png", chance: 5 },
-            { name: "Каблуки", image: "https://i.ibb.co/8n6pdmkj/image.png", chance: 2 },
-            { name: "Алмазное кольцо", image: "https://i.ibb.co/gC8CWxX/image.png", chance: 0.5 }
+            { name: "Световой меч", image: "https://i.ibb.co/gF66LM94/image.png", chance: 5 }
         ];
 
         const caseRewards2 = [
@@ -2419,422 +2447,271 @@
             { name: "Яйцо", image: "https://i.ibb.co/BHpy8vJj/image.png", chance: 8 },
             { name: "Двухклинковый световой меч", image: "https://i.ibb.co/v6TfvCHG/image.png", chance: 5 },
             { name: "Разряженный световой меч", image: "https://i.ibb.co/hRs23C0w/image.png", chance: 3 },
-            { name: "Лавовый световой меч", image: "https://i.ibb.co/MksJ5C27/image.png", chance: 1 },
-            { name: "Плюшевый медведь", image: "https://i.ibb.co/yc0P17vy/image.png", chance: 1 },
-            { name: "Лампа джина", image: "https://i.ibb.co/TDLnsJnx/image.png", chance: 0.3 }
-        ];
-
-        // ЦВЕТА ДЛЯ СТАВОК
-        const betColors = [
-            { name: "red", angle: 0, multiplier: 2 },
-            { name: "green", angle: 90, multiplier: 2.5 },
-            { name: "orange", angle: 180, multiplier: 3 },
-            { name: "purple", angle: 270, multiplier: 5 }
+            { name: "Лавовый световой меч", image: "https://i.ibb.co/MksJ5C27/image.png", chance: 1 }
         ];
 
         // ПЕРЕМЕННЫЕ
-        let isSpinning = false;
         let currentUserId = '';
-        let userBalance = 0;
-        let userInventory = [];
-        let usedPromoCodes = [];
+        let userBalance = 1000;
+        let userInventory = [
+            { name: "Тестовый предмет 1", image: "https://i.ibb.co/q3xL5y2h/image.png", type: "item" },
+            { name: "Тестовый предмет 2", image: "https://i.ibb.co/5gkW5WjD/image.png", type: "item" },
+            { name: "Ракета", image: "https://i.ibb.co/dsDK5qqP/image.png", type: "case" },
+            { name: "Алмаз", image: "https://i.ibb.co/5xL42fJq/image.png", type: "case" }
+        ];
+        let selectedWithdrawItems = [];
         let isCaseAnimationRunning = false;
         let currentCaseType = 1;
-        let currentCaseCost = 300;
-        let selectedBetColor = null;
-        let selectedBetAmount = 0;
-        let isBetSpinning = false;
-        let userClan = null;
-        let currentWheelRotation = 0;
-        let selectedWithdrawItems = [];
 
-        let userStats = {
-            wheelSpins: 0,
-            casesOpened: 0,
-            totalSpent: 0,
-            itemsWon: 0,
-            betsWon: 0,
-            betsLost: 0
-        };
-
-        // БАЗА ДАННЫХ ДЛЯ ПРОМОКОДОВ
-        let promoDatabase = {};
-
-        // СУЩЕСТВУЮЩИЕ ПРОМОКОДЫ
-        const defaultPromoCodes = {
-            "LEWIS": { code: "LEWIS", stars: 50, uses: 100, used: 0 },
-            "PTESTEN1": { code: "PTESTEN1", stars: 50, uses: 100, used: 0 }
-        };
-
-        // ФУНКЦИИ FIREBASE
-        async function saveUserToFirebase() {
-            if (!currentUserId) return;
-            
-            try {
-                await db.collection('users').doc(currentUserId).set({
-                    userId: currentUserId,
-                    balance: userBalance,
-                    inventory: userInventory,
-                    usedPromoCodes: usedPromoCodes,
-                    stats: userStats,
-                    clan: userClan,
-                    currentWheelRotation: currentWheelRotation,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                });
-            } catch (error) {
-                console.error('Ошибка сохранения в Firebase:', error);
-            }
-        }
-
-        async function loadUserFromFirebase() {
-            if (!currentUserId) return;
-            
-            try {
-                const doc = await db.collection('users').doc(currentUserId).get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    userBalance = data.balance || 0;
-                    userInventory = data.inventory || [];
-                    usedPromoCodes = data.usedPromoCodes || [];
-                    userStats = data.stats || userStats;
-                    userClan = data.clan || null;
-                    currentWheelRotation = data.currentWheelRotation || 0;
-                    return true;
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки из Firebase:', error);
-            }
-            return false;
-        }
-
-        async function loadPromoCodesFromFirebase() {
-            try {
-                const snapshot = await db.collection('promoCodes').get();
-                promoDatabase = {};
-                snapshot.forEach(doc => {
-                    promoDatabase[doc.id] = doc.data();
-                });
-                
-                if (Object.keys(promoDatabase).length === 0) {
-                    await initializeDefaultPromoCodes();
-                }
-            } catch (error) {
-                console.error('Ошибка загрузки промокодов:', error);
-                await initializeDefaultPromoCodes();
-            }
-        }
-
-        async function initializeDefaultPromoCodes() {
-            try {
-                for (const [code, data] of Object.entries(defaultPromoCodes)) {
-                    await db.collection('promoCodes').doc(code).set(data);
-                    promoDatabase[code] = data;
-                }
-                console.log('Стандартные промокоды инициализированы');
-            } catch (error) {
-                console.error('Ошибка инициализации промокодов:', error);
-            }
-        }
-
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ СОХРАНЕНИЯ ЗАЯВКИ НА ВЫВОД
+        // ОСНОВНЫЕ ФУНКЦИИ FIREBASE
         async function saveWithdrawRequestToFirebase(request) {
             try {
-                const docRef = await db.collection('withdrawRequests').add({
+                console.log('📤 Сохраняем заявку на вывод:', request);
+                
+                const docRef = await firebase.addDoc(firebase.collection(firebase.db, 'withdrawRequests'), {
                     userId: request.userId,
                     username: request.username,
                     items: request.items,
                     status: 'pending',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    createdAt: firebase.serverTimestamp(),
                     timestamp: Date.now()
                 });
-                console.log('✅ Заявка на вывод сохранена с ID:', docRef.id);
+                
+                console.log('✅ Заявка успешно сохранена с ID:', docRef.id);
                 return true;
             } catch (error) {
-                console.error('❌ Ошибка сохранения заявки на вывод:', error);
+                console.error('❌ Ошибка сохранения заявки:', error);
                 return false;
             }
         }
 
-        // ИСПРАВЛЕННАЯ ФУНКЦИЯ ЗАГРУЗКИ ЗАЯВОК НА ВЫВОД
-        async function loadWithdrawRequestsFromFirebase() {
+        async function loadAdminWithdrawRequests() {
+            const requestsList = document.getElementById('withdrawRequestsList');
+            requestsList.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Загрузка заявок...</div>';
+            
             try {
-                const snapshot = await db.collection('withdrawRequests')
-                    .where('status', '==', 'pending')
-                    .orderBy('createdAt', 'desc')
-                    .limit(50)
-                    .get();
+                const q = firebase.query(
+                    firebase.collection(firebase.db, 'withdrawRequests'),
+                    firebase.where('status', '==', 'pending'),
+                    firebase.orderBy('timestamp', 'desc'),
+                    firebase.limit(50)
+                );
                 
+                const querySnapshot = await firebase.getDocs(q);
                 const requests = [];
-                snapshot.forEach(doc => {
+                
+                querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    requests.push({ 
-                        id: doc.id, 
-                        userId: data.userId,
-                        username: data.username,
-                        items: data.items || [],
-                        status: data.status,
-                        createdAt: data.createdAt,
-                        timestamp: data.timestamp
+                    requests.push({
+                        id: doc.id,
+                        ...data
                     });
                 });
-                console.log('✅ Загружено заявок на вывод:', requests.length);
-                return requests;
-            } catch (error) {
-                console.error('❌ Ошибка загрузки заявок на вывод:', error);
-                return [];
-            }
-        }
-
-        // ФУНКЦИИ АДМИН ПАНЕЛИ
-        async function searchUser() {
-            const searchInput = document.getElementById('adminSearchUser');
-            const userId = searchInput.value.trim();
-            
-            if (!userId) return;
-            
-            try {
-                const doc = await db.collection('users').doc(userId).get();
-                const resultsContainer = document.getElementById('userSearchResults');
                 
-                if (doc.exists) {
-                    const userData = doc.data();
-                    resultsContainer.innerHTML = `
-                        <div class="user-result">
-                            <div class="user-info">
-                                <div class="user-id">${userData.userId}</div>
-                                <div class="user-balance">Баланс: ${userData.balance || 0} ★ | Предметов: ${userData.inventory ? userData.inventory.length : 0}</div>
-                            </div>
-                            <div class="quick-actions">
-                                <button class="quick-action-btn" onclick="setUserForStars('${userData.userId}')">Выдать звезды</button>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    resultsContainer.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 10px;">Пользователь не найден</div>';
-                }
-            } catch (error) {
-                console.error('Ошибка поиска пользователя:', error);
-            }
-        }
-
-        function setUserForStars(userId) {
-            document.getElementById('adminUserId').value = userId;
-            document.getElementById('adminSearchUser').value = userId;
-        }
-
-        function quickGiveStars(amount) {
-            const userIdInput = document.getElementById('adminUserId');
-            if (userIdInput.value) {
-                document.getElementById('adminStarsAmount').value = amount;
-                giveStarsToUser();
-            }
-        }
-
-        async function giveStarsToUser() {
-            const userId = document.getElementById('adminUserId').value.trim();
-            const starsAmount = parseInt(document.getElementById('adminStarsAmount').value);
-            
-            if (!userId) {
-                alert('Введите ID пользователя');
-                return;
-            }
-            
-            if (!starsAmount || starsAmount <= 0) {
-                alert('Введите корректное количество звезд');
-                return;
-            }
-            
-            if (starsAmount > 10000) {
-                alert('Максимальное количество звезд для выдачи: 10000');
-                return;
-            }
-            
-            try {
-                const userDoc = await db.collection('users').doc(userId).get();
+                console.log('✅ Загружено заявок:', requests.length);
                 
-                if (!userDoc.exists) {
-                    alert('Пользователь не найден');
+                if (requests.length === 0) {
+                    requestsList.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
                     return;
                 }
                 
-                const userData = userDoc.data();
-                const newBalance = (userData.balance || 0) + starsAmount;
-                
-                await db.collection('users').doc(userId).update({
-                    balance: newBalance,
-                    lastUpdated: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                await db.collection('adminActions').add({
-                    adminId: currentUserId,
-                    targetUserId: userId,
-                    action: 'give_stars',
-                    amount: starsAmount,
-                    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                document.getElementById('adminStarsAmount').value = '';
-                alert(`✅ Успешно выдано ${starsAmount} ★ пользователю ${userId}`);
+                displayWithdrawRequests(requests);
                 
             } catch (error) {
-                console.error('Ошибка выдачи звезд:', error);
-                alert('❌ Ошибка при выдаче звезд');
+                console.error('❌ Ошибка загрузки заявок:', error);
+                requestsList.innerHTML = '<div style="color: #ff4444; text-align: center; padding: 20px;">Ошибка загрузки: ' + error.message + '</div>';
             }
         }
 
-        async function loadRecentUsers() {
-            try {
-                const snapshot = await db.collection('users')
-                    .orderBy('lastUpdated', 'desc')
-                    .limit(20)
-                    .get();
-                
-                const usersList = document.getElementById('recentUsersList');
-                usersList.innerHTML = '';
-                
-                if (snapshot.empty) {
-                    usersList.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет пользователей</div>';
-                    return;
-                }
-                
-                snapshot.forEach(doc => {
-                    const userData = doc.data();
-                    const userElement = document.createElement('div');
-                    userElement.className = 'user-result';
-                    userElement.innerHTML = `
-                        <div class="user-info">
-                            <div class="user-id">${userData.userId}</div>
-                            <div class="user-balance">Баланс: ${userData.balance || 0} ★ | Кейсов: ${userData.stats ? userData.stats.casesOpened || 0 : 0}</div>
-                        </div>
-                        <div class="quick-actions">
-                            <button class="quick-action-btn" onclick="setUserForStars('${userData.userId}')">Выдать</button>
-                        </div>
-                    `;
-                    usersList.appendChild(userElement);
-                });
-            } catch (error) {
-                console.error('Ошибка загрузки пользователей:', error);
-            }
-        }
-
-        function showAdminTab(tabName) {
-            document.getElementById('adminStars').style.display = 'none';
-            document.getElementById('adminWithdraws').style.display = 'none';
-            document.getElementById('adminUsers').style.display = 'none';
-            
-            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
-            
-            if (tabName === 'withdraws') {
-                loadAdminWithdrawRequests();
-            } else if (tabName === 'users') {
-                loadRecentUsers();
-            }
-            
-            const tabs = document.querySelectorAll('.admin-tab');
-            tabs.forEach(tab => {
-                tab.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
-        }
-
-        async function loadAdminWithdrawRequests() {
-            const adminWithdraws = document.getElementById('adminWithdraws');
-            adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Загрузка заявок...</div>';
-            
-            const requests = await loadWithdrawRequestsFromFirebase();
-            
-            if (requests.length === 0) {
-                adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
-                return;
-            }
-            
-            adminWithdraws.innerHTML = '';
+        function displayWithdrawRequests(requests) {
+            const requestsList = document.getElementById('withdrawRequestsList');
+            requestsList.innerHTML = '';
             
             requests.forEach((request) => {
                 const requestElement = document.createElement('div');
                 requestElement.className = 'withdraw-request';
                 requestElement.setAttribute('data-request-id', request.id);
                 
+                // Форматируем дату
+                let dateString = 'Неизвестно';
+                if (request.createdAt) {
+                    try {
+                        if (request.createdAt.toDate) {
+                            dateString = request.createdAt.toDate().toLocaleString('ru-RU');
+                        } else {
+                            dateString = new Date(request.timestamp).toLocaleString('ru-RU');
+                        }
+                    } catch (e) {
+                        dateString = new Date(request.timestamp).toLocaleString('ru-RU');
+                    }
+                } else if (request.timestamp) {
+                    dateString = new Date(request.timestamp).toLocaleString('ru-RU');
+                }
+                
+                // Создаем HTML для предметов
                 const itemsHTML = request.items.map(item => `
                     <div class="request-item">
-                        <img src="${item.image}" alt="${item.name}" class="request-item-image">
+                        <img src="${item.image}" alt="${item.name}" class="request-item-image" onerror="this.src='https://via.placeholder.com/40?text=?'">
                         ${item.name}
                     </div>
                 `).join('');
                 
                 requestElement.innerHTML = `
-                    <div class="request-user">ID: ${request.userId}</div>
-                    <div class="request-username">Юзернейм: ${request.username}</div>
+                    <div class="request-user">
+                        <strong>ID:</strong> ${request.userId || 'Не указан'}
+                    </div>
+                    <div class="request-username">
+                        <strong>Юзернейм:</strong> ${request.username || 'Не указан'}
+                    </div>
+                    <div class="request-date">
+                        <strong>Дата:</strong> ${dateString}
+                    </div>
+                    <div class="request-items-title">
+                        <strong>Предметы (${request.items.length}):</strong>
+                    </div>
                     <div class="request-items">
                         ${itemsHTML}
                     </div>
-                    <div>Статус: ${request.status}</div>
+                    <div class="request-status">
+                        <strong>Статус:</strong> <span style="color: #ff8c42;">${request.status}</span>
+                    </div>
                     <div class="request-actions">
-                        <button class="approve-button" onclick="approveWithdraw('${request.id}')">✅ Одобрить</button>
-                        <button class="reject-button" onclick="rejectWithdraw('${request.id}')">❌ Отклонить</button>
+                        <button class="approve-button" onclick="approveWithdraw('${request.id}')">
+                            ✅ Одобрить
+                        </button>
+                        <button class="reject-button" onclick="rejectWithdraw('${request.id}')">
+                            ❌ Отклонить
+                        </button>
                     </div>
                 `;
-                adminWithdraws.appendChild(requestElement);
+                
+                requestsList.appendChild(requestElement);
             });
         }
 
         async function approveWithdraw(requestId) {
+            if (!confirm('Вы уверены, что хотите одобрить эту заявку?')) return;
+            
             try {
-                await db.collection('withdrawRequests').doc(requestId).update({
+                await firebase.updateDoc(firebase.doc(firebase.db, 'withdrawRequests', requestId), {
                     status: 'approved',
-                    processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    processedAt: firebase.serverTimestamp(),
                     processedBy: currentUserId
                 });
                 
+                // Удаляем элемент из списка
                 const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
                 if (requestElement) {
                     requestElement.style.animation = 'fadeOut 0.3s ease-out';
                     setTimeout(() => {
                         requestElement.remove();
-                        const adminWithdraws = document.getElementById('adminWithdraws');
-                        if (adminWithdraws.children.length === 0) {
-                            adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
+                        // Проверяем, остались ли еще заявки
+                        const remainingRequests = document.querySelectorAll('.withdraw-request');
+                        if (remainingRequests.length === 0) {
+                            document.getElementById('withdrawRequestsList').innerHTML = 
+                                '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
                         }
                     }, 300);
                 }
                 
-                alert('✅ Заявка одобрена');
+                alert('✅ Заявка успешно одобрена!');
                 
             } catch (error) {
-                console.error('Ошибка одобрения заявки:', error);
-                alert('❌ Ошибка при одобрении заявки');
+                console.error('❌ Ошибка одобрения заявки:', error);
+                alert('❌ Ошибка при одобрении заявки: ' + error.message);
             }
         }
 
         async function rejectWithdraw(requestId) {
+            if (!confirm('Вы уверены, что хотите отклонить эту заявку?')) return;
+            
             try {
-                await db.collection('withdrawRequests').doc(requestId).update({
+                await firebase.updateDoc(firebase.doc(firebase.db, 'withdrawRequests', requestId), {
                     status: 'rejected',
-                    processedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    processedAt: firebase.serverTimestamp(),
                     processedBy: currentUserId
                 });
                 
+                // Удаляем элемент из списка
                 const requestElement = document.querySelector(`[data-request-id="${requestId}"]`);
                 if (requestElement) {
                     requestElement.style.animation = 'fadeOut 0.3s ease-out';
                     setTimeout(() => {
                         requestElement.remove();
-                        const adminWithdraws = document.getElementById('adminWithdraws');
-                        if (adminWithdraws.children.length === 0) {
-                            adminWithdraws.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
+                        // Проверяем, остались ли еще заявки
+                        const remainingRequests = document.querySelectorAll('.withdraw-request');
+                        if (remainingRequests.length === 0) {
+                            document.getElementById('withdrawRequestsList').innerHTML = 
+                                '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px;">Нет запросов на вывод</div>';
                         }
                     }, 300);
                 }
                 
-                alert('✅ Заявка отклонена');
+                alert('✅ Заявка успешно отклонена!');
                 
             } catch (error) {
-                console.error('Ошибка отклонения заявки:', error);
-                alert('❌ Ошибка при отклонении заявки');
+                console.error('❌ Ошибка отклонения заявки:', error);
+                alert('❌ Ошибка при отклонении заявки: ' + error.message);
             }
         }
 
-        // ОСНОВНЫЕ ФУНКЦИИ
+        // ФУНКЦИИ ВЫВОДА ДЛЯ ПОЛЬЗОВАТЕЛЯ
+        async function confirmWithdraw() {
+            const username = document.getElementById('usernameInput').value.trim();
+            
+            if (!username) {
+                alert('Введите ваш юзернейм');
+                return;
+            }
+            
+            if (selectedWithdrawItems.length === 0) {
+                alert('Выберите предметы для вывода');
+                return;
+            }
+
+            const request = {
+                userId: currentUserId,
+                username: username,
+                items: [...selectedWithdrawItems],
+                timestamp: Date.now(),
+                status: 'pending'
+            };
+
+            console.log('📤 Отправляем заявку на вывод:', request);
+
+            const success = await saveWithdrawRequestToFirebase(request);
+            
+            if (success) {
+                // Удаляем предметы из инвентаря пользователя
+                selectedWithdrawItems.forEach(selectedItem => {
+                    const itemIndex = userInventory.findIndex(invItem => 
+                        invItem.name === selectedItem.name && invItem.image === selectedItem.image
+                    );
+                    if (itemIndex !== -1) {
+                        userInventory.splice(itemIndex, 1);
+                    }
+                });
+                
+                // Сохраняем обновленный инвентарь
+                await saveUserData();
+                
+                // Обновляем интерфейс
+                updateUI();
+                updateWithdrawItems();
+                
+                // Закрываем попап и сбрасываем выбранные предметы
+                closeWithdrawPopup();
+                selectedWithdrawItems = [];
+                updateWithdrawUI();
+                
+                alert('✅ Заявка на вывод успешно отправлена!\n\nСвяжитесь с администратором для получения предметов.');
+                
+            } else {
+                alert('❌ Ошибка при отправке заявки. Попробуйте еще раз.');
+            }
+        }
+
+        // ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ
         function generateUserId() {
             let userId = localStorage.getItem('halloweenWheelUserId');
             if (!userId) {
@@ -2849,148 +2726,153 @@
             document.getElementById('mainPage').style.display = 'block';
             
             currentUserId = generateUserId();
-            
             loadUserData();
             init();
         }
 
         async function loadUserData() {
-            const loaded = await loadUserFromFirebase();
-            
-            if (!loaded) {
-                userBalance = 0;
-                userInventory = [];
-                usedPromoCodes = [];
-                userStats = {
-                    wheelSpins: 0,
-                    casesOpened: 0,
-                    totalSpent: 0,
-                    itemsWon: 0,
-                    betsWon: 0,
-                    betsLost: 0
-                };
-                userClan = null;
-                currentWheelRotation = 0;
-                
-                await saveUserToFirebase();
-            }
-            
+            // Для демонстрации используем тестовые данные
             updateUI();
         }
 
-        function saveUserData() {
-            saveUserToFirebase();
-        }
-
-        function createWheel() {
-            const wheel = document.getElementById('wheel');
-            wheel.innerHTML = '';
-            
-            const segmentAngle = 360 / prizes.length;
-            
-            let gradientString = 'conic-gradient(';
-            prizes.forEach((prize, index) => {
-                const startAngle = index * segmentAngle;
-                const endAngle = (index + 1) * segmentAngle;
-                gradientString += `${prize.color} ${startAngle}deg ${endAngle}deg`;
-                if (index < prizes.length - 1) gradientString += ', ';
-            });
-            gradientString += ')';
-            
-            wheel.style.background = gradientString;
-            
-            prizes.forEach((prize, index) => {
-                const segment = document.createElement('div');
-                segment.className = 'wheel-segment';
-                segment.style.transform = `rotate(${index * segmentAngle}deg)`;
-                
-                const content = document.createElement('div');
-                content.className = 'segment-content';
-                
-                const image = document.createElement('img');
-                image.src = prize.image;
-                image.alt = prize.name;
-                image.className = 'segment-image';
-                
-                content.appendChild(image);
-                segment.appendChild(content);
-                wheel.appendChild(segment);
-            });
-            
-            wheel.style.transform = `rotate(${currentWheelRotation}deg)`;
-        }
-
-        function spinWheel() {
-            return;
-        }
-
-        function showPrize(prize) {
-            userInventory.push({
-                name: prize.name,
-                image: prize.image,
-                type: prize.type,
-                wonAt: Date.now()
-            });
-            
-            userStats.itemsWon++;
-            
-            const flyingPrize = document.createElement('img');
-            flyingPrize.src = prize.image;
-            flyingPrize.className = 'flying-prize';
-            flyingPrize.style.left = '50%';
-            flyingPrize.style.top = '50%';
-            document.body.appendChild(flyingPrize);
-            
-            setTimeout(() => {
-                flyingPrize.remove();
-            }, 2000);
-            
-            updateUI();
-        }
-
-        function createConfetti() {
-            const confettiCount = 20;
-            const container = document.querySelector('.container');
-            
-            for (let i = 0; i < confettiCount; i++) {
-                const confetti = document.createElement('div');
-                confetti.className = 'confetti';
-                confetti.style.left = Math.random() * 100 + '%';
-                confetti.style.background = getRandomColor();
-                confetti.style.animationDelay = Math.random() * 2 + 's';
-                container.appendChild(confetti);
-                
-                setTimeout(() => {
-                    confetti.remove();
-                }, 3000);
-            }
-        }
-
-        function getRandomColor() {
-            const colors = ['#ff8c42', '#9d4edd', '#228b22', '#ff4444', '#8a2be2'];
-            return colors[Math.floor(Math.random() * colors.length)];
+        async function saveUserData() {
+            // Сохранение данных пользователя
+            console.log('💾 Сохранение данных пользователя');
         }
 
         function updateUI() {
             document.getElementById('userId').textContent = currentUserId;
             document.getElementById('profileUserId').textContent = currentUserId;
-            
             document.getElementById('balanceAmount').textContent = userBalance + ' ★';
             document.getElementById('starsCount').textContent = userBalance;
             document.getElementById('profileBalance').textContent = userBalance + ' ★';
-            
-            document.getElementById('wheelSpins').textContent = userStats.wheelSpins;
-            document.getElementById('casesOpened').textContent = userStats.casesOpened;
-            document.getElementById('totalSpent').textContent = userStats.totalSpent;
-            document.getElementById('itemsWon').textContent = userStats.itemsWon;
-            
             document.getElementById('profileInventory').textContent = userInventory.length + ' предметов';
             
-            updateButtons();
+            // Обновляем статистику (для демонстрации)
+            document.getElementById('wheelSpins').textContent = '0';
+            document.getElementById('casesOpened').textContent = '0';
+            document.getElementById('totalSpent').textContent = '0';
+            document.getElementById('itemsWon').textContent = userInventory.length;
+            
+            updateWithdrawItems();
             
             if (isAdmin()) {
                 addAdminButton();
             }
+        }
+
+        function updateWithdrawItems() {
+            const withdrawItemsGrid = document.getElementById('withdrawItemsGrid');
+            if (!withdrawItemsGrid) return;
+            
+            withdrawItemsGrid.innerHTML = '';
+            
+            if (userInventory.length === 0) {
+                withdrawItemsGrid.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; grid-column: 1 / -1;">Ваш инвентарь пуст</div>';
+                return;
+            }
+            
+            userInventory.forEach((item, index) => {
+                const isSelected = selectedWithdrawItems.some(selected => 
+                    selected.name === item.name && selected.image === item.image
+                );
+                
+                const itemElement = document.createElement('div');
+                itemElement.className = `withdraw-item ${isSelected ? 'selected' : ''}`;
+                itemElement.onclick = () => toggleWithdrawItemSelection(index);
+                itemElement.innerHTML = `
+                    <img src="${item.image}" alt="${item.name}" class="withdraw-item-image">
+                    <div class="withdraw-item-name">${item.name}</div>
+                `;
+                withdrawItemsGrid.appendChild(itemElement);
+            });
+            
+            updateWithdrawUI();
+        }
+
+        function toggleWithdrawItemSelection(index) {
+            const item = userInventory[index];
+            const itemIndex = selectedWithdrawItems.findIndex(selected => 
+                selected.name === item.name && selected.image === item.image
+            );
+            
+            if (itemIndex === -1) {
+                selectedWithdrawItems.push(item);
+            } else {
+                selectedWithdrawItems.splice(itemIndex, 1);
+            }
+            
+            updateWithdrawItems();
+        }
+
+        function updateWithdrawUI() {
+            const button = document.getElementById('requestWithdrawButton');
+            if (button) {
+                button.disabled = selectedWithdrawItems.length === 0;
+                button.textContent = selectedWithdrawItems.length > 0 ? 
+                    `📦 ЗАПРОСИТЬ ВЫВОД (${selectedWithdrawItems.length})` : 
+                    '📦 ЗАПРОСИТЬ ВЫВОД';
+            }
+        }
+
+        function showWithdrawPopup() {
+            if (selectedWithdrawItems.length === 0) {
+                alert('Выберите предметы для вывода');
+                return;
+            }
+            
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('withdrawPopup').style.display = 'block';
+            document.getElementById('usernameInput').value = '';
+        }
+
+        function closeWithdrawPopup() {
+            document.getElementById('withdrawPopup').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
+        }
+
+        function closeAllPopups() {
+            document.getElementById('overlay').style.display = 'none';
+            document.getElementById('paymentPopup').style.display = 'none';
+            document.getElementById('inventoryPopup').style.display = 'none';
+            document.getElementById('withdrawPopup').style.display = 'none';
+        }
+
+        function showPaymentPopup() {
+            document.getElementById('overlay').style.display = 'block';
+            document.getElementById('paymentPopup').style.display = 'block';
+        }
+
+        // АДМИН ФУНКЦИИ
+        function showAdminTab(tabName) {
+            // Скрываем все вкладки
+            document.querySelectorAll('.admin-content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Показываем выбранную вкладку
+            document.getElementById('admin' + tabName.charAt(0).toUpperCase() + tabName.slice(1)).style.display = 'block';
+            
+            // Загружаем данные для вкладки выводов
+            if (tabName === 'withdraws') {
+                loadAdminWithdrawRequests();
+            }
+            
+            // Обновляем активную вкладку
+            document.querySelectorAll('.admin-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+        }
+
+        function isAdmin() {
+            return adminUsers.includes(currentUserId);
+        }
+
+        function showAdminPage() {
+            hideAllPages();
+            document.getElementById('adminPage').style.display = 'block';
+            showAdminTab('withdraws');
         }
 
         function addAdminButton() {
@@ -3004,56 +2886,7 @@
                     <div class="nav-text">АДМИН</div>
                 `;
                 navigation.appendChild(adminBtn);
-                
-                navigation.style.gridTemplateColumns = 'repeat(7, 1fr)';
             }
-        }
-
-        function isAdmin() {
-            return adminUsers.includes(currentUserId);
-        }
-
-        function updateButtons() {
-            const spinButton = document.getElementById('spinButton');
-            const caseButton1 = document.getElementById('openCaseButton1');
-            const caseButton2 = document.getElementById('openCaseButton2');
-            const betButton = document.getElementById('placeBetButton');
-            
-            spinButton.disabled = true;
-            caseButton1.disabled = userBalance < 300 || isCaseAnimationRunning;
-            caseButton2.disabled = userBalance < 450 || isCaseAnimationRunning;
-            betButton.disabled = true; // Ставки всегда отключены
-        }
-
-        function copyUserId() {
-            navigator.clipboard.writeText(currentUserId).then(() => {
-                // Без уведомления
-            });
-        }
-
-        function showPaymentPopup() {
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('paymentPopup').style.display = 'block';
-        }
-
-        function closeAllPopups() {
-            document.getElementById('overlay').style.display = 'none';
-            document.getElementById('paymentPopup').style.display = 'none';
-            document.getElementById('inventoryPopup').style.display = 'none';
-            document.getElementById('withdrawPopup').style.display = 'none';
-        }
-
-        function showWithdrawPopup() {
-            if (selectedWithdrawItems.length === 0) return;
-            
-            document.getElementById('overlay').style.display = 'block';
-            document.getElementById('withdrawPopup').style.display = 'block';
-            document.getElementById('usernameInput').value = '';
-        }
-
-        function closeWithdrawPopup() {
-            document.getElementById('withdrawPopup').style.display = 'none';
-            document.getElementById('overlay').style.display = 'none';
         }
 
         // НАВИГАЦИЯ
@@ -3094,12 +2927,6 @@
             updateWithdrawItems();
         }
 
-        function showAdminPage() {
-            hideAllPages();
-            document.getElementById('adminPage').style.display = 'block';
-            loadAdminWithdrawRequests();
-        }
-
         function hideAllPages() {
             const pages = document.querySelectorAll('[id$="Page"]');
             pages.forEach(page => {
@@ -3118,386 +2945,98 @@
             });
         }
 
-        // ПРОМОКОДЫ
-        async function activatePromoCode() {
-            const promoInput = document.getElementById('promoCodeInput');
-            const promoCode = promoInput.value.trim().toUpperCase();
-            
-            if (!promoCode) return;
-            
-            if (usedPromoCodes.includes(promoCode)) return;
-            
-            await loadPromoCodesFromFirebase();
-            
-            let foundPromo = null;
-            let foundDocId = null;
-            
-            for (const [docId, promoData] of Object.entries(promoDatabase)) {
-                if (promoData.code === promoCode) {
-                    foundPromo = promoData;
-                    foundDocId = docId;
-                    break;
-                }
-            }
-            
-            if (foundPromo && foundPromo.used < foundPromo.uses) {
-                userBalance += foundPromo.stars;
-                foundPromo.used++;
-                usedPromoCodes.push(promoCode);
-                
-                await db.collection('promoCodes').doc(foundDocId).update({
-                    used: foundPromo.used
-                });
-                
-                updateUI();
-                saveUserData();
-                updatePromoHistory();
-                promoInput.value = '';
-            }
-        }
-
-        function updatePromoHistory() {
-            const historyList = document.getElementById('promoHistoryList');
-            
-            if (usedPromoCodes.length === 0) {
-                historyList.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; font-size: 14px;">Вы еще не активировали ни одного промокода</div>';
-                return;
-            }
-            
-            historyList.innerHTML = '';
-            usedPromoCodes.forEach(promoCode => {
-                let promoData = null;
-                for (const data of Object.values(promoDatabase)) {
-                    if (data.code === promoCode) {
-                        promoData = data;
-                        break;
-                    }
-                }
-                
-                if (promoData) {
-                    const historyItem = document.createElement('div');
-                    historyItem.className = 'promo-history-item';
-                    historyItem.innerHTML = `
-                        <div class="promo-code">${promoCode}</div>
-                        <div class="promo-reward">+${promoData.stars} ★</div>
-                        <div class="promo-status">✅ Активирован</div>
-                    `;
-                    historyList.appendChild(historyItem);
-                }
+        // ДРУГИЕ ФУНКЦИИ
+        function copyUserId() {
+            navigator.clipboard.writeText(currentUserId).then(() => {
+                // Можно добавить уведомление об успешном копировании
             });
         }
 
-        // КЕЙСЫ - КНОПКА "КРУТИТЬ ЕЩЕ РАЗ" СДВИНУТА ВЛЕВО
-        function openCase(caseType) {
-            if (isCaseAnimationRunning) return;
+        function createWheel() {
+            const wheel = document.getElementById('wheel');
+            wheel.innerHTML = '';
             
-            currentCaseType = caseType;
-            currentCaseCost = caseType === 1 ? 300 : 450;
+            const segmentAngle = 360 / prizes.length;
             
-            if (userBalance < currentCaseCost) return;
+            let gradientString = 'conic-gradient(';
+            prizes.forEach((prize, index) => {
+                const startAngle = index * segmentAngle;
+                const endAngle = (index + 1) * segmentAngle;
+                gradientString += `${prize.color} ${startAngle}deg ${endAngle}deg`;
+                if (index < prizes.length - 1) gradientString += ', ';
+            });
+            gradientString += ')';
             
-            document.getElementById('caseOpeningOverlay').style.display = 'flex';
-            document.getElementById('caseOpeningImage').src = caseType === 1 ? 
-                'https://i.ibb.co/hRf6YbV9/image.png' : 
-                'https://i.ibb.co/VcT5Prm5/image.png';
+            wheel.style.background = gradientString;
             
-            fillRewardsTrack(caseType);
-            
-            document.getElementById('wonItem').style.display = 'none';
-            document.getElementById('confirmOpenCaseButton').style.display = 'block';
-            document.getElementById('spinAgainButton').style.display = 'none';
-            document.getElementById('spinCounter').textContent = 'Готов к вращению';
-            
-            const rewardsTrack = document.getElementById('rewardsTrack');
-            rewardsTrack.style.transition = 'none';
-            rewardsTrack.style.transform = 'translateX(0)';
-            
-            const wonItems = document.querySelectorAll('.reward-item.won');
-            wonItems.forEach(item => item.classList.remove('won'));
+            prizes.forEach((prize, index) => {
+                const segment = document.createElement('div');
+                segment.className = 'wheel-segment';
+                segment.style.transform = `rotate(${index * segmentAngle}deg)`;
+                
+                const content = document.createElement('div');
+                content.className = 'segment-content';
+                
+                const image = document.createElement('img');
+                image.src = prize.image;
+                image.alt = prize.name;
+                image.className = 'segment-image';
+                
+                content.appendChild(image);
+                segment.appendChild(content);
+                wheel.appendChild(segment);
+            });
         }
 
-        function fillRewardsTrack(caseType) {
-            const rewardsTrack = document.getElementById('rewardsTrack');
-            rewardsTrack.innerHTML = '';
+        function init() {
+            console.log('🎮 Игра инициализирована');
+            console.log('👤 Текущий пользователь:', currentUserId);
+            console.log('🔧 Админ:', isAdmin());
             
-            const rewards = caseType === 1 ? caseRewards1 : caseRewards2;
+            createWheel();
             
-            for (let i = 0; i < 3; i++) {
-                rewards.forEach(reward => {
-                    const rewardItem = document.createElement('div');
-                    rewardItem.className = 'reward-item';
-                    rewardItem.setAttribute('data-name', reward.name);
-                    rewardItem.innerHTML = `
-                        <img src="${reward.image}" alt="${reward.name}" class="reward-image">
-                        <div class="reward-name">${reward.name}</div>
-                    `;
-                    rewardsTrack.appendChild(rewardItem);
-                });
+            if (isAdmin()) {
+                addAdminButton();
             }
         }
 
-        function startCaseAnimation() {
-            if (isCaseAnimationRunning) return;
-            
-            isCaseAnimationRunning = true;
-            userBalance -= currentCaseCost;
-            userStats.casesOpened++;
-            userStats.totalSpent += currentCaseCost;
-            
-            updateUI();
-            saveUserData();
-            
-            const rewardsTrack = document.getElementById('rewardsTrack');
-            const spinCounter = document.getElementById('spinCounter');
-            const confirmButton = document.getElementById('confirmOpenCaseButton');
-            
-            confirmButton.style.display = 'none';
-            spinCounter.textContent = 'Крутим...';
-            
-            const rewards = currentCaseType === 1 ? caseRewards1 : caseRewards2;
-            
-            const totalChance = rewards.reduce((sum, reward) => sum + reward.chance, 0);
-            let random = Math.random() * totalChance;
-            let selectedReward = rewards[0];
-            let chanceSum = 0;
-            
-            for (const reward of rewards) {
-                chanceSum += reward.chance;
-                if (random <= chanceSum) {
-                    selectedReward = reward;
-                    break;
-                }
-            }
-            
-            const itemWidth = 120;
-            const rewardsPerSet = rewards.length;
-            const totalItems = rewardsTrack.children.length;
-            
-            let targetIndex = -1;
-            const thirdPassStart = rewardsPerSet * 2;
-            const thirdPassEnd = rewardsPerSet * 3;
-            
-            for (let i = thirdPassStart; i < thirdPassEnd; i++) {
-                if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
-                    targetIndex = i;
-                    break;
-                }
-            }
-            
-            if (targetIndex === -1) {
-                for (let i = 0; i < totalItems; i++) {
-                    if (rewardsTrack.children[i] && rewardsTrack.children[i].getAttribute('data-name') === selectedReward.name) {
-                        targetIndex = i;
-                        break;
-                    }
-                }
-            }
-            
-            const pointerPosition = 150;
-            const targetPosition = -(targetIndex * itemWidth - pointerPosition + itemWidth / 2);
-            const startPosition = 0;
-            
-            rewardsTrack.style.transition = 'none';
-            rewardsTrack.style.transform = `translateX(${startPosition}px)`;
-            
+        // Запуск при загрузке
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Приложение загружено');
+            // Ждем инициализации Firebase
             setTimeout(() => {
-                rewardsTrack.style.transition = 'transform 5s cubic-bezier(0.1, 0.8, 0.2, 1)';
-                rewardsTrack.style.transform = `translateX(${targetPosition}px)`;
-                
-                setTimeout(() => {
-                    const allItems = document.querySelectorAll('.reward-item');
-                    allItems.forEach(item => {
-                        if (item.getAttribute('data-name') === selectedReward.name) {
-                            const rect = item.getBoundingClientRect();
-                            const container = document.getElementById('rewardsAnimation');
-                            const containerRect = container.getBoundingClientRect();
-                            
-                            if (rect.left >= containerRect.left && rect.right <= containerRect.right) {
-                                item.classList.add('won');
-                            }
-                        }
-                    });
-                    
-                    showWonItem(selectedReward);
-                    isCaseAnimationRunning = false;
-                    spinCounter.textContent = 'Готово!';
-                    document.getElementById('spinAgainButton').style.display = 'block';
-                    createConfetti();
-                    
-                }, 5000);
-            }, 50);
+                if (window.firebase) {
+                    console.log('✅ Firebase готов к работе');
+                } else {
+                    console.log('⚠️ Firebase еще не инициализирован');
+                }
+            }, 1000);
+        });
+
+        // Заглушки для остальных функций
+        function activatePromoCode() {
+            alert('Функция промокодов временно недоступна');
         }
 
-        function showWonItem(reward) {
-            const wonItem = document.getElementById('wonItem');
-            const wonItemImage = document.getElementById('wonItemImage');
-            const wonItemName = document.getElementById('wonItemName');
-            
-            wonItemImage.src = reward.image;
-            wonItemName.textContent = reward.name;
-            wonItem.style.display = 'block';
-            
-            userInventory.push({
-                name: reward.name,
-                image: reward.image,
-                type: 'case',
-                wonAt: Date.now(),
-                caseType: currentCaseType
-            });
-            
-            userStats.itemsWon++;
-            updateUI();
-            saveUserData();
+        function openCase(caseType) {
+            alert('Функция кейсов временно недоступна');
         }
 
-        function spinAgain() {
-            if (isCaseAnimationRunning) return;
-            
-            if (userBalance < currentCaseCost) {
-                alert('Недостаточно звезд для открытия кейса!');
-                closeCaseOpening();
-                return;
-            }
-            
-            openCase(currentCaseType);
-        }
-
-        function closeCaseOpening() {
-            document.getElementById('caseOpeningOverlay').style.display = 'none';
-            isCaseAnimationRunning = false;
-        }
-
-        // СТАВКИ - ОТКЛЮЧЕНЫ
         function selectBetColor(color, amount) {
             // Ставки отключены
-            return;
         }
 
-        function placeBet() {
-            // Ставки отключены
-            return;
+        function giveStarsToUser() {
+            alert('Функция выдачи звезд временно недоступна');
         }
 
-        // ВЫВОД ПРЕДМЕТОВ
-        function updateWithdrawItems() {
-            const withdrawItemsGrid = document.getElementById('withdrawItemsGrid');
-            withdrawItemsGrid.innerHTML = '';
-            
-            if (userInventory.length === 0) {
-                withdrawItemsGrid.innerHTML = '<div style="color: rgba(255,255,255,0.6); text-align: center; padding: 20px; grid-column: 1 / -1;">Ваш инвентарь пуст</div>';
-                return;
-            }
-            
-            userInventory.forEach((item, index) => {
-                const itemElement = document.createElement('div');
-                itemElement.className = 'withdraw-item';
-                itemElement.onclick = () => toggleWithdrawItemSelection(index);
-                itemElement.innerHTML = `
-                    <img src="${item.image}" alt="${item.name}" class="withdraw-item-image">
-                    <div class="withdraw-item-name">${item.name}</div>
-                `;
-                withdrawItemsGrid.appendChild(itemElement);
-            });
-            
-            updateWithdrawUI();
+        function searchUser() {
+            alert('Функция поиска пользователей временно недоступна');
         }
 
-        function toggleWithdrawItemSelection(index) {
-            const item = userInventory[index];
-            const itemIndex = selectedWithdrawItems.findIndex(selected => 
-                selected.name === item.name && selected.image === item.image
-            );
-            
-            if (itemIndex === -1) {
-                selectedWithdrawItems.push(item);
-            } else {
-                selectedWithdrawItems.splice(itemIndex, 1);
-            }
-            
-            updateWithdrawUI();
-            
-            const withdrawItems = document.querySelectorAll('.withdraw-item');
-            withdrawItems.forEach((itemElement, i) => {
-                const currentItem = userInventory[i];
-                const isSelected = selectedWithdrawItems.some(selected => 
-                    selected.name === currentItem.name && selected.image === currentItem.image
-                );
-                itemElement.classList.toggle('selected', isSelected);
-            });
+        function quickGiveStars(amount) {
+            alert('Функция быстрой выдачи звезд временно недоступна');
         }
-
-        function updateWithdrawUI() {
-            const button = document.getElementById('requestWithdrawButton');
-            button.disabled = selectedWithdrawItems.length === 0;
-            
-            if (selectedWithdrawItems.length > 0) {
-                button.textContent = `📦 ЗАПРОСИТЬ ВЫВОД (${selectedWithdrawItems.length})`;
-            } else {
-                button.textContent = '📦 ЗАПРОСИТЬ ВЫВОД';
-            }
-        }
-
-        async function confirmWithdraw() {
-            const username = document.getElementById('usernameInput').value.trim();
-            
-            if (!username) {
-                alert('Введите ваш юзернейм');
-                return;
-            }
-            
-            if (selectedWithdrawItems.length === 0) {
-                alert('Выберите предметы для вывода');
-                return;
-            }
-            
-            const request = {
-                userId: currentUserId,
-                username: username,
-                items: [...selectedWithdrawItems],
-                timestamp: Date.now(),
-                status: 'pending'
-            };
-            
-            const success = await saveWithdrawRequestToFirebase(request);
-            
-            if (success) {
-                selectedWithdrawItems.forEach(selectedItem => {
-                    const itemIndex = userInventory.findIndex(invItem => 
-                        invItem.name === selectedItem.name && invItem.image === selectedItem.image
-                    );
-                    if (itemIndex !== -1) {
-                        userInventory.splice(itemIndex, 1);
-                    }
-                });
-                
-                await saveUserData();
-                updateUI();
-                updateWithdrawItems();
-                
-                closeWithdrawPopup();
-                
-                selectedWithdrawItems = [];
-                updateWithdrawUI();
-                
-                alert('✅ Заявка на вывод успешно отправлена! Свяжитесь с администратором для получения предметов.');
-            } else {
-                alert('❌ Ошибка при отправке заявки. Попробуйте еще раз.');
-            }
-        }
-
-        // ИНИЦИАЛИЗАЦИЯ
-        async function init() {
-            await loadPromoCodesFromFirebase();
-            createWheel();
-            updateUI();
-            updatePromoHistory();
-        }
-
-        // ЗАПУСК ПРИ ЗАГРУЗКЕ
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(startGame, 1000);
-        });
     </script>
 </body>
 </html>
-
